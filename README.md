@@ -1,2 +1,3 @@
 # E-learning-App
-Final web project
+
+Learning Management System (LMS)
