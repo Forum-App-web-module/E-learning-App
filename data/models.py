@@ -1,0 +1,102 @@
+from pydantic import BaseModel, Field
+from datetime import datetime, timedelta
+from typing import Annotated, Literal
+from enum import Enum
+
+
+class UserRole(str, Enum):
+    STUDENT = "student"
+    TEACHER = "teacher"
+    ADMIN = "admin"
+
+Password = Annotated[str, Field(min_length=8, max_length=30)]
+Rating = Annotated[int, Field(ge=1, le=10)]
+
+class User(BaseModel):
+    id: int | None
+    role: UserRole
+    first_name: str
+    last_name: str
+    email: str
+    password: Password
+    avatar_url: str | None = None
+    is_active: bool = False
+    notifications: bool = True
+    created_on: datetime = datetime.now()
+
+class Student(User):
+    pass
+
+class Teacher(User):
+    mobile: str
+    linked_in_url: str
+    email_verified: bool = False
+
+
+class Admin(User):
+    account_verified: bool = False
+
+class Course(BaseModel):
+    id: int | None
+    title: str
+    description: str
+    tags: str
+    picture_url: str
+    is_premium: bool
+    owner_id: int
+    is_hidden: bool = False
+    avarage_rating: float
+    created_on: datetime = datetime.now()
+
+class Section(BaseModel):
+    id: int | None
+    title: str
+    course_id: int
+    content: str
+    description: str
+
+class Event(BaseModel):
+    id: int | None
+    user_id: int
+    event_type: str
+    description: str
+    timestamp: datetime = datetime.now()
+
+class Subscription(BaseModel):
+    id: int | None
+    student_id: int
+    subscribed_at: datetime = datetime.now()
+    expire_date: datetime = subscribed_at + timedelta(days=365)
+    
+    @property
+    def is_active(self) -> bool:
+        return self.expire_date < datetime.now()
+
+class Course_rating(BaseModel):
+    id: int | None
+    user_id: int
+    rating_given: Rating
+
+
+class External_resourse(BaseModel):
+    id: int
+    section_id: int
+    url: str
+
+class Enrollment(BaseModel):
+    id: int | None
+    student_id: int
+    course_id: int
+    is_approved: bool = False
+    requested_at: datetime = datetime.now()
+    approved_at: datetime | None
+    completed_at: datetime | None
+
+class Section_progress(BaseModel):
+    id: int | None
+    student_id: int
+    course_id: int
+    section_id: int
+    is_completed: bool = True
+
+
