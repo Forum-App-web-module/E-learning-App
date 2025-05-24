@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime, timedelta
 from typing import Annotated, Literal
 from enum import Enum
@@ -12,17 +12,34 @@ class UserRole(str, Enum):
 Password = Annotated[str, Field(min_length=8, max_length=30)]
 Rating = Annotated[int, Field(ge=1, le=10)]
 
+class LoginData(BaseModel):
+    email: EmailStr
+    password: Password
+
+class RegisterData(BaseModel):
+    first_name: str
+    last_name: str
+    email: EmailStr
+    password: Password
+
+class StudentRegisterData(RegisterData):
+    pass
+
+class TeacherRegisterData(RegisterData):
+    mobile: str
+    linked_in_url: str
+
 class User(BaseModel):
     id: int | None
     role: UserRole
     first_name: str
     last_name: str
-    email: str
+    email: EmailStr
     password: Password
     avatar_url: str | None = None
     is_active: bool = False
     notifications: bool = True
-    created_on: datetime = datetime.now()
+    created_on: datetime
 
 class Student(User):
     pass
