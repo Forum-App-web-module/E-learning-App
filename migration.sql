@@ -3,6 +3,40 @@
 BEGIN;
 
 
+ALTER TABLE IF EXISTS v1.admins DROP CONSTRAINT IF EXISTS user_id;
+
+ALTER TABLE IF EXISTS v1.course_rating DROP CONSTRAINT IF EXISTS course_id;
+
+ALTER TABLE IF EXISTS v1.course_rating DROP CONSTRAINT IF EXISTS user_id;
+
+ALTER TABLE IF EXISTS v1.course_sections DROP CONSTRAINT IF EXISTS course_id;
+
+ALTER TABLE IF EXISTS v1.courses DROP CONSTRAINT IF EXISTS owner_id;
+
+ALTER TABLE IF EXISTS v1.enrollments DROP CONSTRAINT IF EXISTS course_id;
+
+ALTER TABLE IF EXISTS v1.enrollments DROP CONSTRAINT IF EXISTS student_id;
+
+ALTER TABLE IF EXISTS v1.event_log DROP CONSTRAINT IF EXISTS user_id;
+
+ALTER TABLE IF EXISTS v1.external_resources DROP CONSTRAINT IF EXISTS course_section_id;
+
+ALTER TABLE IF EXISTS v1.section_progress DROP CONSTRAINT IF EXISTS course_id;
+
+ALTER TABLE IF EXISTS v1.section_progress DROP CONSTRAINT IF EXISTS section_id;
+
+ALTER TABLE IF EXISTS v1.section_progress DROP CONSTRAINT IF EXISTS student_id;
+
+ALTER TABLE IF EXISTS v1.students DROP CONSTRAINT IF EXISTS user_id;
+
+ALTER TABLE IF EXISTS v1.subscriptions DROP CONSTRAINT IF EXISTS student_id;
+
+ALTER TABLE IF EXISTS v1.teachers DROP CONSTRAINT IF EXISTS user_id;
+
+
+
+DROP TABLE IF EXISTS v1.admins;
+
 CREATE TABLE IF NOT EXISTS v1.admins
 (
     id serial NOT NULL,
@@ -12,6 +46,8 @@ CREATE TABLE IF NOT EXISTS v1.admins
     CONSTRAINT admins_pkey PRIMARY KEY (id)
 );
 
+DROP TABLE IF EXISTS v1.course_rating;
+
 CREATE TABLE IF NOT EXISTS v1.course_rating
 (
     id serial NOT NULL,
@@ -20,6 +56,8 @@ CREATE TABLE IF NOT EXISTS v1.course_rating
     course_id integer NOT NULL,
     CONSTRAINT course_reting_pkey PRIMARY KEY (id)
 );
+
+DROP TABLE IF EXISTS v1.course_sections;
 
 CREATE TABLE IF NOT EXISTS v1.course_sections
 (
@@ -31,6 +69,8 @@ CREATE TABLE IF NOT EXISTS v1.course_sections
     CONSTRAINT course_sections_pkey PRIMARY KEY (id),
     CONSTRAINT section_title UNIQUE (title)
 );
+
+DROP TABLE IF EXISTS v1.courses;
 
 CREATE TABLE IF NOT EXISTS v1.courses
 (
@@ -49,6 +89,8 @@ CREATE TABLE IF NOT EXISTS v1.courses
     CONSTRAINT course_title_key UNIQUE (title)
 );
 
+DROP TABLE IF EXISTS v1.enrollments;
+
 CREATE TABLE IF NOT EXISTS v1.enrollments
 (
     id serial NOT NULL,
@@ -61,6 +103,8 @@ CREATE TABLE IF NOT EXISTS v1.enrollments
     CONSTRAINT enrollments_pkey PRIMARY KEY (id)
 );
 
+DROP TABLE IF EXISTS v1.event_log;
+
 CREATE TABLE IF NOT EXISTS v1.event_log
 (
     id serial NOT NULL,
@@ -71,6 +115,8 @@ CREATE TABLE IF NOT EXISTS v1.event_log
     CONSTRAINT id PRIMARY KEY (id)
 );
 
+DROP TABLE IF EXISTS v1.external_resources;
+
 CREATE TABLE IF NOT EXISTS v1.external_resources
 (
     id serial NOT NULL,
@@ -78,6 +124,8 @@ CREATE TABLE IF NOT EXISTS v1.external_resources
     url character varying COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT external_resources_pkey PRIMARY KEY (id)
 );
+
+DROP TABLE IF EXISTS v1.section_progress;
 
 CREATE TABLE IF NOT EXISTS v1.section_progress
 (
@@ -89,12 +137,16 @@ CREATE TABLE IF NOT EXISTS v1.section_progress
     CONSTRAINT section_progress_pkey PRIMARY KEY (id)
 );
 
+DROP TABLE IF EXISTS v1.students;
+
 CREATE TABLE IF NOT EXISTS v1.students
 (
     id serial NOT NULL,
     user_id integer NOT NULL,
     CONSTRAINT students_pkey PRIMARY KEY (id)
 );
+
+DROP TABLE IF EXISTS v1.subscriptions;
 
 CREATE TABLE IF NOT EXISTS v1.subscriptions
 (
@@ -106,6 +158,8 @@ CREATE TABLE IF NOT EXISTS v1.subscriptions
     CONSTRAINT subscriptions_pkey PRIMARY KEY (id)
 );
 
+DROP TABLE IF EXISTS v1.teachers;
+
 CREATE TABLE IF NOT EXISTS v1.teachers
 (
     id serial NOT NULL,
@@ -115,6 +169,8 @@ CREATE TABLE IF NOT EXISTS v1.teachers
     email_verified boolean NOT NULL DEFAULT false,
     CONSTRAINT teachers_pkey PRIMARY KEY (id)
 );
+
+DROP TABLE IF EXISTS v1.users;
 
 CREATE TABLE IF NOT EXISTS v1.users
 (
