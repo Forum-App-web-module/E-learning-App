@@ -1,6 +1,6 @@
 from data.database import read_query, insert_query, update_query
 from security.secrets import hash_password
-from data.models import RegisterData, UserRole
+from data.models import RegisterData, UserRole, StudentRegisterData, TeacherRegisterData
 
 
 def create_user(data:RegisterData, role: UserRole, avatar_url: str = None, insert_func=None):
@@ -21,6 +21,29 @@ def create_user(data:RegisterData, role: UserRole, avatar_url: str = None, inser
         avatar_url
     ))
     return new_user
+
+
+def create_account(data, hashed_password, insert_data_func = insert_query):
+    if isinstance(data, StudentRegisterData):
+        role = UserRole.STUDENT
+    elif isinstance(data, TeacherRegisterData):
+        role = UserRole.TEACHER
+
+    users_query = "INSERT INTO v1.users (role, email, first_name, last_name, password) VALUES (%s, %s, %s, %s, %s) RETURNING id"
+    user_id = insert_data_func(users_query, (role, data.email, data.first_name, data.last_name, hashed_password))
+
+    if role == UserRole.STUDENT:
+        role_query = "INSERT INTO v1.students (user_id) VALUES (%s) RETURNING id"
+        id = insert_data_func(role_query, (user_id,))
+    elif role == UserRole.TEACHER:
+        role_query = "INSERT INTO v1.teachers (user_id, mobile, linked_in_url) VALUES (%s, %s, %s) RETURNING id"
+        id = insert_data_func(role_query, (user_id, data.mobile, data.linked_in_url))
+
+    return role, id
+
+
+
+
 
 #lists all users, maybe admin rights needed
 def get_users():
@@ -49,7 +72,7 @@ def email_exists(email: str, get_data_func = None):
     if get_data_func is None:
         get_data_func = read_query
 
-    query = """SELECT 1 FROM users WHERE email = ?"""
+    query = """SELECT 1 FROM v1.users WHERE email = %s"""
     result = get_data_func(query, (email,))
     return bool(result)
 
@@ -64,3 +87,16 @@ def deactivate_ser(user_id: int, update_data_func = None):
     """
     result = update_data_func(query, (user_id, ))
     return result
+
+def get_hash_by_email(email: str, get_data_func = read_query):
+    query = "SELECT password FROM users WHERE email = %s"
+    return get_data_func(query, (email,))[0][0]
+
+def is_student():
+    pass
+
+def is_teacher():
+    pass
+
+def is_admin():
+    pass
