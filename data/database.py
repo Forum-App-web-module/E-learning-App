@@ -11,7 +11,7 @@ def _get_connection() -> Connection:
     )
 
 def read_query(sql: str, sql_params=()):
-    with _get_connection as conn:
+    with _get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute(sql, sql_params)
             return cursor.fetchall()
