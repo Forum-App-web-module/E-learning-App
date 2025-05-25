@@ -2,3 +2,5 @@ jose==1.0.0
 passlib==1.7.4
 psycopg2_binary==2.9.10
 python_jose==3.4.0
+pydantic[email]
+passlib[bcrypt]
