@@ -12,7 +12,7 @@ def login(login: LoginData):
     pass
 
 @auth_router.post('/register')
-def register(register_data: Union[StudentRegisterData, TeacherRegisterData]):
+def register(register_data: Union[TeacherRegisterData, StudentRegisterData]):
     if email_exists(register_data.email):
         return responses.BadRequest(content="Email already registered.")
     
