@@ -163,3 +163,4 @@ __pycache__/
 .env
 # Ignore database connection file
 database.py
+data/database.py
