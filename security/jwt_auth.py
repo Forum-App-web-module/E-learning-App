@@ -1,21 +1,13 @@
 from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
 from fastapi.responses import JSONResponse
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 from dotenv import load_dotenv
 from os import getenv
 
-load_dotenv(dotenv_path="key_example.env")
 
 SECRET_KEY = getenv("SECRET_KEY")
 ALGORITHM = getenv("ALGORITHM")
-# ACCESS_TOKEN_EXPIRE_MINUTES = getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
-
-
-# SECRET_KEY = "A69"
-# ALGORITHM = "HS256"
-# ACCESS_TOKEN_EXPIRE_MINUTES = 180
-
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
@@ -28,6 +20,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
 def verify_access_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
     except JWTError:
         raise HTTPException(status_code=401, detail="Authentication failed!")
     # if not payload:
@@ -35,7 +28,10 @@ def verify_access_token(token: str):
     return payload
 
 
-
-
+def get_token(request: Request):
+    data = request.headers.get("Authorization")
+    if not data or not data.startswith("Bearer"):
+        raise HTTPException(status_code=401, detail="Authentication failed!")
+    return data.split(" ")[1]
 
 
