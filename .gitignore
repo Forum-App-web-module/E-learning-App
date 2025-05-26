@@ -164,3 +164,4 @@ __pycache__/
 # Ignore database connection file
 database.py
 data/database.py
+key_gen.py

@@ -3,24 +3,24 @@ from security.secrets import hash_password
 from data.models import RegisterData, UserRole, StudentRegisterData, TeacherRegisterData
 
 
-def create_user(data:RegisterData, role: UserRole, avatar_url: str = None, insert_func=None):
-    if insert_func is None:
-        insert_func = insert_query
+# def create_user(data:RegisterData, role: UserRole, avatar_url: str = None, insert_func=None):
+#     if insert_func is None:
+#         insert_func = insert_query
 
-    hashed_pw = hash_password(data.password)
-    query = """
-        INSERT into users (email, first_name, last_name, password, role, avatar_url, is_active, notifications, created_on)
-        VALUES (%s, %s, %s, %s, %s, %s, TRUE, TRUE, NOW())"""
+#     hashed_pw = hash_password(data.password)
+#     query = """
+#         INSERT into users (email, first_name, last_name, password, role, avatar_url, is_active, notifications, created_on)
+#         VALUES (%s, %s, %s, %s, %s, %s, TRUE, TRUE, NOW())"""
     
-    new_user = insert_func(query, (
-        data.email,
-        data.first_name,
-        data.last_name,
-        hashed_pw,
-        role.value,
-        avatar_url
-    ))
-    return new_user
+#     new_user = insert_func(query, (
+#         data.email,
+#         data.first_name,
+#         data.last_name,
+#         hashed_pw,
+#         role.value,
+#         avatar_url
+#     ))
+#     return new_user
 
 
 def create_account(data, hashed_password, insert_data_func = insert_query):
@@ -49,7 +49,7 @@ def create_account(data, hashed_password, insert_data_func = insert_query):
 def get_users():
     query = '''
         SELECT id, email, first_name, last_name, role, is_active, created_on
-        FROM users
+        FROM v1.users
         ORDER BY created_on DESC
     '''
     return read_query(query)
@@ -61,8 +61,8 @@ def find_user_by_email(email: str, get_data_func = None):
 
     query = """
         SELECT id, email, first_name, last_name, role, avatar_url, is_active, notifications, created_on
-        FROM users
-        WHERE email = ?
+        FROM v1.users
+        WHERE email = %s
     """
     result = get_data_func(query, (email,))
     return result[0] if result else None
@@ -81,7 +81,7 @@ def deactivate_ser(user_id: int, update_data_func = None):
     if update_data_func is None:
         update_data_func = update_query
     query = """
-    UPDATE users
+    UPDATE v1.users
     SET is_active = FALSE
     WHERE id = ?
     """
@@ -89,7 +89,7 @@ def deactivate_ser(user_id: int, update_data_func = None):
     return result
 
 def get_hash_by_email(email: str, get_data_func = read_query):
-    query = "SELECT password FROM users WHERE email = %s"
+    query = "SELECT password FROM v1.users WHERE email = %s"
     return get_data_func(query, (email,))[0][0]
 
 def is_student():
