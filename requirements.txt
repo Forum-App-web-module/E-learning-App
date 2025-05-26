@@ -4,3 +4,7 @@ psycopg2_binary==2.9.10
 python_jose==3.4.0
 pydantic[email]
 passlib[bcrypt]
+python-dotenv==1.1.0
+itsdangerous==2.2.0
+httpx==0.28.1
+Authlib==1.6.0
