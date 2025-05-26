@@ -95,7 +95,6 @@ async def auth_google_callback(request: Request):
     jwt_token = create_access_token({"sub": email, "auth_source": "google"})
     return HTMLResponse(f"""
         <h2>Добре дошъл, {name}!</h2>
-        <code>{jwt_token['JWT']}</code>
     """)
 
 
