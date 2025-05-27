@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse, HTMLResponse
 from data.models import LoginData, StudentRegisterData, TeacherRegisterData, UserRole
-from services.user_service import email_exists, create_account, find_user_by_email, get_hash_by_email
+from services.user_service import email_exists, create_account, get_hash_by_email
 from common import responses
 from typing import Union
 from security import secrets
@@ -29,13 +29,13 @@ oauth.register(
 @auth_router.post('/login')
 def login(login: LoginData):
     if not email_exists(login.email):
-        return responses.Unauthorized("Wornd Credentiasl!")
+        return responses.Unauthorized("Wrong Credentials!")
     
     hased_pw = get_hash_by_email(login.email)
     if not secrets.verify_password(login.password, hased_pw):
-        return responses.Unauthorized("Wornd Credentiasl!")
+        return responses.Unauthorized("Wrong Credentials!")
     
-    username = find_user_by_email(login.email)
+    username = email_exists(login.email)
     token = create_access_token({"sub": username['email'], "role": username['role']})
     
     return {"access_token": token["JWT"], "token_type": "bearer"}
@@ -79,14 +79,11 @@ async def auth_google_callback(request: Request):
 
     email = user_data["email"]
     name = user_data.get("name", "")
-    first_name, _, last_name = (name + "  ").split(" ", 2)[:3]
 
-    user = find_user_by_email(email)
+    user = email_exists(email)
     if not user:
         student = StudentRegisterData(
             email=email,
-            first_name=first_name.strip(),
-            last_name=last_name.strip(),
             password="GOOGLE_AUTH"
         )
         create_account(student, hashed_password="GOOGLE_AUTH")

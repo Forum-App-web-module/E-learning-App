@@ -17,8 +17,6 @@ class LoginData(BaseModel):
     password: Password
 
 class RegisterData(BaseModel):
-    first_name: str
-    last_name: str
     email: EmailStr
     password: Password
 
@@ -29,28 +27,16 @@ class TeacherRegisterData(RegisterData):
     mobile: str
     linked_in_url: str
 
-class User(BaseModel):
-    id: int | None
-    role: UserRole
-    first_name: str
-    last_name: str
-    email: EmailStr
-    password: Password
-    avatar_url: str | None = None
-    is_active: bool = False
-    notifications: bool = True
-    created_on: datetime
 
-class Student(User):
+class Student(BaseModel):
     pass
 
-class Teacher(User):
+class Teacher(BaseModel):
     mobile: str
     linked_in_url: str
     email_verified: bool = False
 
-
-class Admin(User):
+class Admin(BaseModel):
     account_verified: bool = False
 
 class Course(BaseModel):
