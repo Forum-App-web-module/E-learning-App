@@ -11,6 +11,7 @@ class UserRole(str, Enum):
 
 Password = Annotated[str, Field(min_length=8, max_length=30)]
 Rating = Annotated[int, Field(ge=1, le=10)]
+Name = Annotated[str, Field(min_length=2, max_length=30)]
 
 class LoginData(BaseModel):
     email: EmailStr
@@ -29,7 +30,10 @@ class TeacherRegisterData(RegisterData):
 
 
 class Student(BaseModel):
-    pass
+    email: EmailStr
+    first_name: Name
+    last_name: Name
+    avatar_url: str
 
 class Teacher(BaseModel):
     mobile: str
