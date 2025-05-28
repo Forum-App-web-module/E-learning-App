@@ -31,9 +31,10 @@ class TeacherRegisterData(RegisterData):
 
 class Student(BaseModel):
     email: EmailStr
-    first_name: Name
-    last_name: Name
-    avatar_url: str
+    first_name: Name | None
+    last_name: Name | None
+    avatar_url: str | None
+
 
 class Teacher(BaseModel):
     mobile: str

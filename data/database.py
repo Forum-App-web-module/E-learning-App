@@ -1,7 +1,5 @@
 import asyncpg
 from typing import Any, Sequence, Union
-import psycopg2
-from psycopg2.extensions import connection as Connection
 from data.database_deploy_config import Connection_supabase
 from os import getenv
 from dotenv import load_dotenv
@@ -10,20 +8,20 @@ from dotenv import load_dotenv
 load_dotenv(dotenv_path="external_keys.env")
 USE_DEPLOYED_DB = getenv("USE_DEPLOYED_DB", "true").lower() == "true"
 
-import asyncpg
-from typing import Any, Sequence, Union
 
-async def _get_connection() -> Connection:
+DB_CONFIG = {
+    "user": "postgres",
+    "password": "1997",
+    "host": "localhost",
+    "port": 5432,
+    "database": "E-learning"
+}
+
+async def _get_connection():
     if USE_DEPLOYED_DB:
-        return await Connection_supabase()
+        return Connection_supabase()
     else:
-        return await psycopg2.connect(
-            user='postgres',
-            password='1997',
-            host='localhost',
-            port=5432,
-            dbname='E-learning'
-        )
+        return await asyncpg.connect(**DB_CONFIG)
 
 async def read_query(sql: str, sql_params: Union[Sequence[Any], dict] = ()):
     conn = await _get_connection()
