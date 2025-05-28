@@ -24,7 +24,7 @@ def create_account(data, hashed_password, insert_data_func = insert_query):
 # checks if an email exists, to be used when registring
 def email_exists(email: str, get_data_func = read_query):
 
-    query = """SELECT 1 FROM v1.users WHERE email = %s"""
+    query = """SELECT email FROM v1.students UNION SELECT email from v1.teachers WHERE email = %s"""
     result = get_data_func(query, (email,))
     return bool(result)
 
