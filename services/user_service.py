@@ -3,7 +3,6 @@ from pydantic import EmailStr
 from data.database import read_query, insert_query, update_query
 from security.secrets import hash_password
 from data.models import RegisterData, UserRole, StudentRegisterData, TeacherRegisterData
-from security.jwt_auth import verify_access_token
 from fastapi import Depends, status
 from fastapi.security import OAuth2PasswordBearer
 from common.responses import Unauthorized, Forbidden
