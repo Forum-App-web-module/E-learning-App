@@ -1,6 +1,10 @@
-from typing import Callable, Any
+from typing import Callable, Any, Union
 
-from data.database import read_query
+from starlette.responses import JSONResponse
+
+from common.responses import BadRequest
+from data.database import read_query, insert_query
+from data.models import StudentRegisterData, TeacherRegisterData, UserRole
 
 ALLOWED_ROLES = {
     "student": {
@@ -12,6 +16,33 @@ ALLOWED_ROLES = {
         "fields": "email, mobile, linked_in_url"
     },
 }
+
+async def insert_user(user_data: Union[StudentRegisterData, TeacherRegisterData], hashed_password: str):
+
+    if isinstance(user_data, StudentRegisterData):
+        query = """
+            INSERT INTO v1.students (email, password)
+            VALUES ($1, $2)
+            RETURNING id
+        """
+        values = (user_data.email, hashed_password)
+        role = UserRole.STUDENT
+
+    elif isinstance(user_data, TeacherRegisterData):
+        query = """
+            INSERT INTO v1.teachers (email, password, mobile, linked_in_url)
+            VALUES ($1, $2, $3, $4)
+            RETURNING id
+        """
+        values = (user_data.email, hashed_password, user_data.mobile, user_data.linked_in_url)
+        role = UserRole.TEACHER
+
+    else:
+        return BadRequest("Unknown user data type")
+
+    user_id = await insert_query(query, values)
+    return role, user_id
+
 
 async def get_account_by_email(
     email: str,

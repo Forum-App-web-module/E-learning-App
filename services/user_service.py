@@ -1,3 +1,5 @@
+from pydantic import EmailStr
+
 from data.database import read_query, insert_query, update_query
 from security.secrets import hash_password
 from data.models import RegisterData, UserRole, StudentRegisterData, TeacherRegisterData
@@ -5,27 +7,36 @@ from security.jwt_auth import verify_access_token
 from fastapi import Depends, status
 from fastapi.security import OAuth2PasswordBearer
 from common.responses import Unauthorized, Forbidden
+from repositories.user_repo import insert_user
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
-def create_account(data, hashed_password, insert_data_func = insert_query):
-    if isinstance(data, StudentRegisterData):
-        role = UserRole.STUDENT
-        role_query = "INSERT INTO v1.students (email, password) VALUES (%s, %s) RETURNING id"
-        id = insert_data_func(role_query, (data.email, hashed_password))
-    elif isinstance(data, TeacherRegisterData):
-        role = UserRole.TEACHER
-        role_query = "INSERT INTO v1.teachers (email, password, mobile, linked_in_url) VALUES (%s, %s, %s, %s) RETURNING id"
-        id = insert_data_func(role_query, (data.email, hashed_password ,data.mobile, data.linked_in_url))
+async def create_account(data: RegisterData, hashed_password: str):
+    # Check if data has teacher fields
+    if hasattr(data, "mobile") and hasattr(data, "linked_in_url"):
+        # Converting if data is not yet a TeacherRegisterData
+        if not isinstance(data, TeacherRegisterData):
+            data = TeacherRegisterData(**data.dict())
+    else:
+        # Same for StudentRegisterData instance
+        if not isinstance(data, StudentRegisterData):
+            data = StudentRegisterData(**data.dict())
 
-    return role, id
+    role, user_id = await insert_user(data, hashed_password)
+    return role, user_id
 
-# checks if an email exists, to be used when registring
-def email_exists(email: str, get_data_func = read_query):
+# checks if an email exists, to be used when registering
+async def email_exists(email: EmailStr, get_data_func = read_query):
 
-    query = """SELECT email FROM v1.students UNION SELECT email from v1.teachers WHERE email = %s"""
-    result = get_data_func(query, (email,))
+    query = """
+            SELECT email FROM v1.students
+                WHERE email = $1
+            UNION
+            SELECT email FROM v1.teachers
+                WHERE email = $2
+            """
+    result = await get_data_func(query, (email, email))
     return bool(result)
 
 
@@ -40,7 +51,7 @@ def deactivate_user(email: str, role: UserRole, update_data_func = update_query)
     result = update_data_func(query, (email, ))
     return result
 
-def get_hash_by_email(email: str, get_data_func = read_query):
+def get_hash_by_email(email: EmailStr, get_data_func = read_query):
     query = "SELECT password FROM v1.students WHERE email = %s" \
     "UNION " \
     "SELECT password FROM v1.teachers WHERE email = %s" \

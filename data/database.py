@@ -17,7 +17,9 @@ DB_CONFIG = {
     "database": "E-learning"
 }
 
-async def _get_connection():
+# TODO: hosted connection should be async
+
+async def _get_connection()-> asyncpg.Connection:
     if USE_DEPLOYED_DB:
         return Connection_supabase()
     else:
