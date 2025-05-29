@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from fastapi.params import Depends
+from fastapi.params import Depends, Header
 from controllers import teacher_controller
 from security.auth_dependencies import get_current_user
 
