@@ -3,8 +3,8 @@ from pydantic import EmailStr
 from data.database import read_query, insert_query, update_query
 from security.secrets import hash_password
 from data.models import RegisterData, UserRole, StudentRegisterData, TeacherRegisterData
-from security.jwt_auth import verify_access_token
 from fastapi import Depends, status
+from security. jwt_auth import verify_access_token
 from fastapi.security import OAuth2PasswordBearer
 from common.responses import Unauthorized, Forbidden
 from repositories.user_repo import insert_user, repo_email_exists
@@ -34,14 +34,16 @@ def deactivate_user(email: str, role: UserRole, update_data_func = update_query)
     result = update_data_func(query, (email, ))
     return result
 
-def get_hash_by_email(email: EmailStr, get_data_func = read_query):
-    query = "SELECT password FROM v1.students WHERE email = %s" \
+async def get_hash_by_email(email: EmailStr, get_data_func = read_query):
+    query = "SELECT password FROM v1.students WHERE email = $1 " \
     "UNION " \
-    "SELECT password FROM v1.teachers WHERE email = %s" \
-    "UNION" \
-    "SELECT password FROM v1.admins WHERE email = %s"
+    "SELECT password FROM v1.teachers WHERE email = $2 " \
+    "UNION " \
+    "SELECT password FROM v1.admins WHERE email = $3"
 
-    return get_data_func(query, (email, email, email))[0][0]
+    result = await get_data_func(query, (email, email, email))
+
+    return result[0][0]
 
 # to avoid code repetition
 # check if the user role is the same as the required one
@@ -50,3 +52,7 @@ def check_user_role(token: str, role: UserRole):
     if user.get("role") != role:
         raise Forbidden
     return True
+
+def get_user_role(token: str):
+    user = verify_access_token(token)
+    return user.get("role")

@@ -27,16 +27,15 @@ oauth.register(
 )
 
 @auth_router.post('/login')
-def login(login: LoginData):
-    if not email_exists(login.email):
+async def login(login: LoginData, role: UserRole):
+    if not await email_exists(login.email):
         return responses.Unauthorized("Wrong Credentials!")
     
-    hashed_pw = get_hash_by_email(login.email)
+    hashed_pw =  await get_hash_by_email(login.email)
     if not secrets.verify_password(login.password, hashed_pw):
         return responses.Unauthorized("Wrong Credentials!")
-    
-    username = email_exists(login.email)
-    token = create_access_token({"sub": username['email'], "role": username['role']})
+
+    token = create_access_token({"sub": login.email, "role" : role})
     
     return {"access_token": token["JWT"], "token_type": "bearer"}
 

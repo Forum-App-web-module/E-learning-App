@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 import uvicorn
 from routers.api.auth import auth_router
+from routers.api.students import students_router
 from routers.api.teachers import teachers_router
 from starlette.middleware.sessions import SessionMiddleware
 from dotenv import load_dotenv
@@ -12,6 +13,10 @@ app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))
 
 app.include_router(auth_router)
+app.include_router(students_router)
+
+
+
 app.include_router(teachers_router)
 
 

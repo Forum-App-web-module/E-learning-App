@@ -69,7 +69,7 @@ async def get_account_by_email(
     query = f"""
         SELECT {role_info['fields']}
         FROM {role_info['table']}
-        WHERE email = %s
+        WHERE email = $1
     """
 
     result = await get_data_func(query, (email,))
