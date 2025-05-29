@@ -1,5 +1,5 @@
 from typing import Callable, Any, Union
-
+from pydantic import EmailStr
 from starlette.responses import JSONResponse
 
 from common.responses import BadRequest
@@ -42,6 +42,18 @@ async def insert_user(user_data: Union[StudentRegisterData, TeacherRegisterData]
 
     user_id = await insert_query(query, values)
     return role, user_id
+
+async def repo_email_exists(email: EmailStr, get_data_func = read_query) -> bool:
+
+    query = """
+            SELECT email FROM v1.students
+                WHERE email = $1
+            UNION
+            SELECT email FROM v1.teachers
+                WHERE email = $2
+            """
+    result = await get_data_func(query, (email, email))
+    return bool(result)
 
 
 async def get_account_by_email(
