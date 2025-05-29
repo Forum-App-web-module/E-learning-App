@@ -15,17 +15,17 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     token = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return {"JWT": token}
 
-# def verify_access_token(token: str):
-#     try:
-#         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-#         return payload
-#     except JWTError:
-#         raise HTTPException(status_code=401, detail="Authentication failed!")
+def verify_access_token(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Authentication failed!")
 
-# def get_token(request: Request):
-#     data = request.headers.get("Authorization")
-#     if not data or not data.startswith("Bearer"):
-#         raise HTTPException(status_code=401, detail="Authentication failed!")
-#     return data.split(" ")[1]
+def get_token(request: Request):
+    data = request.headers.get("Authorization")
+    if not data or not data.startswith("Bearer"):
+        raise HTTPException(status_code=401, detail="Authentication failed!")
+    return data.split(" ")[1]
 
 
