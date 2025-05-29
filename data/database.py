@@ -1,27 +1,16 @@
 import asyncpg
 from typing import Any, Sequence, Union
-from data.database_deploy_config import Connection_supabase
+from data.database_deploy_config import connection_supabase
 from os import getenv
 from dotenv import load_dotenv
 
 
-load_dotenv(dotenv_path="external_keys.env")
-USE_DEPLOYED_DB = getenv("USE_DEPLOYED_DB", "true").lower() == "true"
+# load_dotenv(dotenv_path="external_keys.env")
+# USE_DEPLOYED_DB = getenv("USE_DEPLOYED_DB", "true").lower() == "true"
 
 
-DB_CONFIG = {
-    "user": "postgres",
-    "password": "1997",
-    "host": "localhost",
-    "port": 5432,
-    "database": "E-learning"
-}
-
-async def _get_connection():
-    if USE_DEPLOYED_DB:
-        return Connection_supabase()
-    else:
-        return await asyncpg.connect(**DB_CONFIG)
+async def _get_connection()-> asyncpg.Connection:
+    return await asyncpg.connect(**connection_supabase())
 
 async def read_query(sql: str, sql_params: Union[Sequence[Any], dict] = ()):
     conn = await _get_connection()

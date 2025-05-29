@@ -31,8 +31,8 @@ def login(login: LoginData):
     if not email_exists(login.email):
         return responses.Unauthorized("Wrong Credentials!")
     
-    hased_pw = get_hash_by_email(login.email)
-    if not secrets.verify_password(login.password, hased_pw):
+    hashed_pw = get_hash_by_email(login.email)
+    if not secrets.verify_password(login.password, hashed_pw):
         return responses.Unauthorized("Wrong Credentials!")
     
     username = email_exists(login.email)
@@ -41,11 +41,11 @@ def login(login: LoginData):
     return {"access_token": token["JWT"], "token_type": "bearer"}
 
 @auth_router.post('/register')
-def register(register_data: Union[TeacherRegisterData, StudentRegisterData]):
-    if email_exists(register_data.email):
+async def register(register_data: Union[TeacherRegisterData, StudentRegisterData]):
+    if await email_exists(register_data.email):
         return responses.BadRequest(content="Email already registered.")
     
-    role, role_id = create_account(register_data, secrets.hash_password(register_data.password))
+    role, role_id = await create_account(register_data, secrets.hash_password(register_data.password))
 
     return responses.Created(content={
         "message": f"New User is registered.",

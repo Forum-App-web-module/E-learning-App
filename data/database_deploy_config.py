@@ -1,29 +1,34 @@
-import psycopg2
-import os
+from typing import Any
+from os import getenv
 from dotenv import load_dotenv
 from supabase import create_client, Client
-from psycopg2.extensions import connection as Connection
+
 
 load_dotenv(dotenv_path="external_keys.env")
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-KEY = os.getenv("KEY")
+DATABASE_URL = getenv("DATABASE_URL")
+KEY = getenv("KEY")
 
 # supabase: Client = create_client(DATABASE_URL, KEY)
 
-# Fetch variables
-USER = os.getenv("user")
-PASSWORD = os.getenv("password")
-HOST = os.getenv("host")
-PORT = os.getenv("port")
-DATABASE = os.getenv("dbname")
 
-# Connect to the database
-def Connection_supabase() -> Connection:
-    return psycopg2.connect(
-        user=USER,
-        password=PASSWORD,
-        host=HOST,
-        port=PORT,
-        dbname=DATABASE
-    )
+DB_CONFIG_LOCAL = {
+    "user": "postgres",
+    "password": "1997",
+    "host": "localhost",
+    "port": 5432,
+    "database": "E-learning"
+}
+
+DB_CONFIG_HOSTED = {
+    "user": getenv("USER"),
+    "password": getenv("PASSWORD"),
+    "host": getenv("HOST"),
+    "port": getenv("PORT"),
+    "database": getenv("DBNAME")
+}
+
+# Connect details
+def connection_supabase() -> dict:
+    return DB_CONFIG_HOSTED if getenv("USE_DEPLOYED_DB", "true").lower() == "true" else DB_CONFIG_LOCAL
+
