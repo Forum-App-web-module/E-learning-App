@@ -29,17 +29,20 @@ class TeacherRegisterData(RegisterData):
     linked_in_url: str
 
 
-class Student(BaseModel):
+class StudentResponse(BaseModel):
     email: EmailStr
     first_name: Name | None
     last_name: Name | None
     avatar_url: str | None
+    is_active: bool
+    notifications: bool
 
 
-class Teacher(BaseModel):
+class TeacherResponse(BaseModel):
+    id: int
+    email: EmailStr
     mobile: str
     linked_in_url: str
-    email_verified: bool = False
 
 class Admin(BaseModel):
     account_verified: bool = False

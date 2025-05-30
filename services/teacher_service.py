@@ -1,5 +1,5 @@
 from data.database import read_query, insert_query, update_query
-from data.models import Teacher, TeacherRegisterData, UserRole
+from data.models import TeacherRegisterData, UserRole
 from repositories.user_repo import get_account_by_email
 
 
