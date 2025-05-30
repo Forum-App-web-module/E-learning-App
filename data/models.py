@@ -44,17 +44,14 @@ class Teacher(BaseModel):
 class Admin(BaseModel):
     account_verified: bool = False
 
-class Course(BaseModel):
-    id: int | None
+class CourseBase(BaseModel):
     title: str
     description: str
     tags: str
     picture_url: str
     is_premium: bool
-    owner_id: int
     is_hidden: bool = False
-    avarage_rating: float
-    created_on: datetime = datetime.now()
+
 
 class Section(BaseModel):
     id: int | None
@@ -106,5 +103,13 @@ class Section_progress(BaseModel):
     course_id: int
     section_id: int
     is_completed: bool = True
+
+class CourseCreate(CourseBase):
+    owner_id: int
+
+class Course(CourseBase):
+    id: int
+    owner_id: int
+    created_on: datetime = datetime.now()
 
 
