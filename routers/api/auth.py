@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse, HTMLResponse
 from data.models import LoginData, StudentRegisterData, TeacherRegisterData, UserRole
-from services.user_service import email_exists, create_account, get_hash_by_email
+from services.user_service import email_exists, create_account, get_hash_by_email, get_role_by_email
 from common import responses
 from typing import Union
 from security import secrets
@@ -27,7 +27,7 @@ oauth.register(
 )
 
 @auth_router.post('/login')
-async def login(login: LoginData, role: UserRole):
+async def login(login: LoginData):
     if not await email_exists(login.email):
         return responses.Unauthorized("Wrong Credentials!")
     
@@ -35,9 +35,11 @@ async def login(login: LoginData, role: UserRole):
     if not secrets.verify_password(login.password, hashed_pw):
         return responses.Unauthorized("Wrong Credentials!")
 
+    role = await get_role_by_email(login.email)
+
     token = create_access_token({"sub": login.email, "role" : role})
     
-    return {"access_token": token["JWT"], "token_type": "bearer"}
+    return responses.Successful(content={"access_token": token["JWT"], "token_type": "bearer"})
 
 @auth_router.post('/register')
 async def register(register_data: Union[TeacherRegisterData, StudentRegisterData]):
