@@ -4,10 +4,9 @@ from data.database import read_query, insert_query, update_query
 from security.secrets import hash_password
 from data.models import RegisterData, UserRole, StudentRegisterData, TeacherRegisterData
 from fastapi import Depends, status
-from security. jwt_auth import verify_access_token
 from fastapi.security import OAuth2PasswordBearer
 from common.responses import Unauthorized, Forbidden
-from repositories.user_repo import insert_user, repo_email_exists
+from repositories.user_repo import insert_user, repo_email_exists, repo_get_role_by_email
 from typing import Union
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
@@ -47,12 +46,12 @@ async def get_hash_by_email(email: EmailStr, get_data_func = read_query):
 
 # to avoid code repetition
 # check if the user role is the same as the required one
-def check_user_role(token: str, role: UserRole):
-    user = verify_access_token(token)
-    if user.get("role") != role:
-        raise Forbidden
-    return True
+# def check_user_role(token: str, role: UserRole):
+#     user = verify_access_token(token)
+#     if user.get("role") != role:
+#         raise Forbidden
+#     return True
 
-def get_user_role(token: str):
-    user = verify_access_token(token)
-    return user.get("role")
+
+async def get_role_by_email(email):
+    return await repo_get_role_by_email(email)

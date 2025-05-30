@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Security
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from typing import Optional
@@ -6,12 +6,12 @@ from os import getenv
 import os
 
 # Point FastAPI where the token is expected (Authorization header with Bearer scheme)
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")  # change here if token URL is different
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")  # change here if token URL is different
 
 SECRET_KEY = getenv("SECRET_KEY")
 ALGORITHM = getenv("ALGORITHM")
 
-def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
+def get_current_user(token: str = Security(oauth2_scheme)) -> dict:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: Optional[str] = payload.get("sub")

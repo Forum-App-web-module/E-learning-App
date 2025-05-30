@@ -9,11 +9,11 @@ from data.models import StudentRegisterData, TeacherRegisterData, UserRole
 ALLOWED_ROLES = {
     "student": {
         "table": "v1.students",
-        "fields": "email, first_name, last_name, avatar_url"
+        "fields": "id, email, first_name, last_name, avatar_url"
     },
     "teacher": {
         "table": "v1.teachers",
-        "fields": "email, mobile, linked_in_url"
+        "fields": "id, email, mobile, linked_in_url"
     },
 }
 
@@ -75,11 +75,16 @@ async def get_account_by_email(
     result = await get_data_func(query, (email,))
     return result[0] if result else None
 
+async def repo_get_role_by_email(email, get_data_func: Callable[[str, tuple], Any] = read_query):
 
+    tables = {"v1.students": "student", "v1.teachers": "teacher", "v1.admins": "admins"}
+    query = "SELECT 1 FROM v1.students WHERE email = $1"
 
-
-
-
+    for table, role in tables.items():
+        query = f"SELECT 1 FROM {table} WHERE email = $1"
+        role_found = get_data_func(query,(email,))
+        if role_found:
+            return role
 
 
 
