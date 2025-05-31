@@ -6,22 +6,22 @@ from fastapi.security import OAuth2PasswordBearer
 from common.responses import Unauthorized, NotFound, Created, Successful
 from security.auth_dependencies import get_current_user
 from services.teacher_service import get_teacher_by_email
-from controllers.teacher_controller import verify_teacher_id
+from controllers.teacher_controller import get_all_courses_contorller
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 courses_router = APIRouter(prefix="/courses", tags=["courses"])
 
 
-@courses_router.get("/{teacher_id}")
-async def get_all_courses_per_teacher(teacher_id: int, payload: dict = Depends(get_current_user)):
+@courses_router.get("/")
+async def get_all_courses_per_teacher(payload: dict = Depends(get_current_user)):
     """
     Returns a list with all courses owned by the teacher\n
-    Params: teacher_id: int\n
+    Params: payload
     
     """
-    email = payload.get("sub")
-    return await get_all_courses_per_teacher_service(teacher_id)
+   # email = payload.get("sub")
+    return await get_all_courses_contorller(payload["sub"])
 
 @courses_router.post("/")
 async def create_course(course_data: CourseBase, payload: dict = Security(get_current_user)): 
@@ -68,14 +68,14 @@ async def update_course(course_id: int, updates: CourseUpdate, payload: dict = S
     teacher = await get_teacher_by_email(email)
 
     if not teacher:
-        raise Unauthorized()
+        return Unauthorized()
     
     await verify_course_owner(course_id, teacher["id"])
 
     updated = await update_course_service(course_id, updates)
 
     if not updated:
-        raise NotFound(content="Course not found")
+        return NotFound(content="Course not found")
     
     return Successful(content={"message": f"Course with id {course_id} updated"})
 
@@ -95,7 +95,7 @@ async def create_section(course_id: int, section: SectionCreate, payload: dict =
     teacher = await get_teacher_by_email(email)
 
     if not teacher:
-        raise Unauthorized(content="Only teachers allowed for this action")
+        return Unauthorized(content="Only teachers allowed for this action")
     
     await verify_course_owner(course_id, teacher["id"])
 
@@ -131,14 +131,14 @@ async def update_section(section_id: int, updates: CourseUpdate, payload: dict =
     teacher = await get_teacher_by_email(email)
 
     if not teacher:
-        raise Unauthorized()
+        return Unauthorized()
     
     await verify_course_owner(section_id, teacher["id"])
 
     updated = await update_course_service(section_id, updates)
 
     if not updated:
-        raise NotFound(content="Course not found")
+        return NotFound(content="Course not found")
     
     return Successful(content={"message": f"Course with id {section_id} updated"})
 
