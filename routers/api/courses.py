@@ -1,14 +1,12 @@
 from fastapi import APIRouter, Depends, Security
-#from controllers.course_controller
 from services.course_service import get_all_courses_per_teacher_service, get_course_by_id_service, create_course_service, verify_course_owner, update_course_service
 from services.section_service import create_section_service
-from data.models import CourseCreate, Course, CourseBase, CourseUpdate, SectionCreate, SectionOut
+from data.models import CourseCreate, CourseBase, CourseUpdate, SectionCreate, SectionOut, SectionUpdate
 from fastapi.security import OAuth2PasswordBearer
-from data.database import read_query
 from common.responses import Unauthorized, NotFound, Created, Successful
 from security.auth_dependencies import get_current_user
 from services.teacher_service import get_teacher_by_email
-
+from controllers.teacher_controller import verify_teacher_id
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -16,12 +14,13 @@ courses_router = APIRouter(prefix="/courses", tags=["courses"])
 
 
 @courses_router.get("/{teacher_id}")
-async def get_all_courses_per_teacher(teacher_id: int):
+async def get_all_courses_per_teacher(teacher_id: int, payload: dict = Depends(get_current_user)):
     """
     Returns a list with all courses owned by the teacher\n
     Params: teacher_id: int\n
     
     """
+    email = payload.get("sub")
     return await get_all_courses_per_teacher_service(teacher_id)
 
 @courses_router.post("/")
@@ -103,3 +102,44 @@ async def create_section(course_id: int, section: SectionCreate, payload: dict =
     new_section = await create_section_service(course_id, section)
 
     return Created(content={"section": new_section})
+
+@courses_router.post("/{course_id}/{section_id}}")
+async def update_section(section_id: int, updates: CourseUpdate, payload: dict = Security(get_current_user)):
+    """
+    Update a course section by ID\n
+    Requirements:\n
+        - valid access token\n
+        - role: teacher\n
+        - only course owner can update the section\n
+    Accepts partial updates of section fields.\n
+    Only include the fields you want to change in the request body. \n
+    Fields left out will retain their current values.\n
+
+    ❗ Important:\n
+    Do NOT submit fields with default or placeholder values like `"description": "string"`,
+    as these will overwrite real data.\n
+    For example, to update only the course title, 
+    send:\n
+    
+        {
+            "title": "New Title"
+        }
+        
+    """
+
+    email = payload.get("sub")
+    teacher = await get_teacher_by_email(email)
+
+    if not teacher:
+        raise Unauthorized()
+    
+    await verify_course_owner(section_id, teacher["id"])
+
+    updated = await update_course_service(section_id, updates)
+
+    if not updated:
+        raise NotFound(content="Course not found")
+    
+    return Successful(content={"message": f"Course with id {section_id} updated"})
+
+

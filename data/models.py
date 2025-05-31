@@ -95,6 +95,13 @@ class SectionOut(Section):
     id: int
     course_id: int
 
+class SectionUpdate(BaseModel):
+    title: Optional[str] = Field(default=None, example="New section title")
+    content:  Optional[str] = Field(default=None, example="New content")
+    description:  Optional[str] = Field(default=None, example="New section description")
+
+
+
 
 # --- Event Models ---
 
