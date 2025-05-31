@@ -1,4 +1,4 @@
-from data.models import Course
+from data.models import Course,CourseUpdate
 from data.database import insert_query, read_query, update_query
 
 
@@ -11,9 +11,8 @@ async def read_course_by_id(id: int, get_data_func = read_query):
     WHERE id = $1
 """
 
-    course = await read_query(query)
-    return course
-
+    result = await read_query(query, (id, ))
+    return result[0] if result else None
 # get all courses
 
 async def read_all_courses(get_data_func = read_query):
@@ -50,16 +49,32 @@ async def insert_course(course_data: Course, insert_data_func = insert_query):
     
 # update course by title
 
-async def update_course_by_id(title: str, get_data_func = read_query):
+async def update_course_data(id: int, updates: CourseUpdate, update_data_func = update_query): #update_query -> int
 
     query = """
-    SELECT *
-    FROM v1.courses
+    UPDATE v1.courses
+    SET 
+        title = COALESCE($2, title),
+        description = COALESCE($3, description),
+        tags = COALESCE($4, tags),
+        picture_url = COALESCE($5, picture_url),
+        is_premium = COALESCE($6, is_premium),
+        is_hidden = COALESCE($7, is_hidden)
     WHERE id = $1
+    RETURNING id
 """
+    data = (
+        id,
+        updates.title,
+        updates.description,
+        updates.tags,
+        updates.picture_url,
+        updates.is_premium,
+        updates.is_hidden
+    )
 
-    course = await read_query(query)
-    return course
+    updated = await update_data_func(query, data)
+    return updated if updated else None
 
 # get rating
 

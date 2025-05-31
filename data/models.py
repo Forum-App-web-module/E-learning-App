@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime, timedelta
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Optional
 from enum import Enum
 
 
@@ -114,5 +114,13 @@ class Course(CourseBase):
     id: int
     owner_id: int
     created_on: datetime = datetime.now()
+
+class CourseUpdate(BaseModel):
+    title: Optional[str] = None
+    description:  Optional[str] = None
+    tags:  Optional[str] = None
+    picture_url:  Optional[str] = None
+    is_premium:  Optional[bool] = None
+    is_hidden:  Optional[bool] = None
 
 
