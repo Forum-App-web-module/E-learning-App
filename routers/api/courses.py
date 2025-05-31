@@ -6,7 +6,8 @@ from fastapi.security import OAuth2PasswordBearer
 from common.responses import Unauthorized, NotFound, Created, Successful
 from security.auth_dependencies import get_current_user
 from services.teacher_service import get_teacher_by_email
-from controllers.teacher_controller import get_all_courses_contorller
+from controllers.teacher_controller import get_all_courses_controller
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -21,7 +22,7 @@ async def get_all_courses_per_teacher(payload: dict = Depends(get_current_user))
     
     """
    # email = payload.get("sub")
-    return await get_all_courses_contorller(payload["sub"])
+    return await get_all_courses_controller(payload["sub"])
 
 @courses_router.post("/")
 async def create_course(course_data: CourseBase, payload: dict = Security(get_current_user)): 
