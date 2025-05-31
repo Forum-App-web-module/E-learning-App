@@ -14,7 +14,9 @@ async def validate_teacher_role(email: str) -> Union[Unauthorized, Forbidden] | 
     return None
 
 async def get_teacher_by_email_controller(email: str):
-    return await get_teacher_by_email(email)
+    # Using boolean operator with objects - this returns either the first truthy or the last object
+    # When valid teacher role -> None so we call the object on the right
+    return await validate_teacher_role(email) or get_teacher_by_email(email)
 
 async def update_teacher_controller(mobile, linked_in_url, email):
         # if isinstance(await validate_teacher_role(email), Forbidden):
@@ -26,12 +28,12 @@ async def update_teacher_controller(mobile, linked_in_url, email):
         return await validate_teacher_role(email) or await update_teacher_service(mobile, linked_in_url, email)
 
 async def verify_teacher_id(email):
-    id = await get_teacher_by_email(email)
-    if not id:
+    teacher = await get_teacher_by_email(email)
+    if not teacher["id"]:
         return Unauthorized(content="Only accessible for teachers!")
-    return id
+    return teacher["id"]
 
-async def get_all_courses_contorller(email):
+async def get_all_courses_controller(email):
     if isinstance(await validate_teacher_role(email), Forbidden):
         return Forbidden(content="Only a Teacher user can perform this action")
     
