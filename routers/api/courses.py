@@ -44,7 +44,19 @@ async def update_course(course_id: int, updates: CourseUpdate, payload: dict = S
         role: teacher\n
         only course owner can update it\n
     Accepts partial updates of course fields.\n
+    Only include the fields you want to change in the request body. \n
+    Fields left out will retain their current values.\n
 
+    ❗ Important:\n
+    Do NOT submit fields with default or placeholder values like `"description": "string"`,
+    as these will overwrite real data.\n
+    For example, to update only the course title, 
+    send:\n
+    
+        {
+            "title": "New Title"
+        }
+        
     """
 
     email = payload.get("sub")

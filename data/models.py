@@ -116,11 +116,11 @@ class Course(CourseBase):
     created_on: datetime = datetime.now()
 
 class CourseUpdate(BaseModel):
-    title: Optional[str] = None
-    description:  Optional[str] = None
-    tags:  Optional[str] = None
-    picture_url:  Optional[str] = None
-    is_premium:  Optional[bool] = None
-    is_hidden:  Optional[bool] = None
+    title: Optional[str] = Field(default=None, example="New course title")
+    description:  Optional[str] = Field(default=None, example="New course description")
+    tags:  Optional[str] = Field(default=None, example="New Tag")
+    picture_url:  Optional[str] = Field(default=None, example="New-URL")
+    is_premium:  Optional[bool] = Field(default=None, example="False")
+    is_hidden:  Optional[bool] = Field(default=None, example="False")
 
 
