@@ -57,11 +57,16 @@ class CourseBase(BaseModel):
 
 
 class Section(BaseModel):
-    id: int | None
     title: str
-    course_id: int
     content: str
     description: str
+
+class SectionCreate(Section):
+    pass
+
+class SectionOut(Section):
+    id: int
+    course_id: int
 
 class Event(BaseModel):
     id: int | None

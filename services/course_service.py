@@ -1,4 +1,5 @@
-from repositories.course_repo import read_all_courses, read_course_by_id, insert_course, update_course_data
+from repositories.course_repo import read_all_courses_per_teacher, read_course_by_id, insert_course, update_course_data
+from repositories.user_repo import get_account_by_email
 from common.responses import Unauthorized, NotFound
 from data.models import CourseCreate, CourseUpdate
 from asyncpg.exceptions import UniqueViolationError
@@ -7,8 +8,8 @@ from fastapi.exceptions import HTTPException
 async def get_course_by_id_service(id: int):
     return await read_course_by_id(id)
 
-async def get_all_courses_service():
-    return await read_all_courses()
+async def get_all_courses_per_teacher_service(teacher_id):
+    return await read_all_courses_per_teacher(teacher_id)
 
 async def create_course_service(course_data: CourseCreate):
     try:

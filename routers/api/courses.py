@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, Security
 #from controllers.course_controller
-from services.course_service import get_all_courses_service, get_course_by_id_service, create_course_service, verify_course_owner, update_course_service
-from data.models import CourseCreate, Course, CourseBase, CourseUpdate
+from services.course_service import get_all_courses_per_teacher_service, get_course_by_id_service, create_course_service, verify_course_owner, update_course_service
+from services.section_service import create_section_service
+from data.models import CourseCreate, Course, CourseBase, CourseUpdate, SectionCreate, SectionOut
 from fastapi.security import OAuth2PasswordBearer
 from data.database import read_query
 from common.responses import Unauthorized, NotFound, Created, Successful
@@ -14,9 +15,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 courses_router = APIRouter(prefix="/courses", tags=["courses"])
 
 
-@courses_router.get("/")
-async def get_all_courses():
-    return await get_all_courses_service()
+@courses_router.get("/{teacher_id}")
+async def get_all_courses(teacher_id):
+    return await get_all_courses_per_teacher_service(teacher_id)
 
 @courses_router.post("/")
 async def create_course(course_data: CourseBase, payload: dict = Security(get_current_user)): 
@@ -75,3 +76,17 @@ async def update_course(course_id: int, updates: CourseUpdate, payload: dict = S
     return Successful(content={"message": f"Course with id {course_id} updated"})
 
 
+@courses_router.post("/{course_id}/sections")
+async def create_section(course_id: int, section: SectionCreate, payload: dict = Security(get_current_user)):
+
+    email = payload.get("sub")
+    teacher = await get_teacher_by_email(email)
+
+    if not teacher:
+        raise Unauthorized(content="Only teachers allowed for this action")
+    
+    await verify_course_owner(course_id, teacher["id"])
+
+    new_section = await create_section_service(course_id, section)
+
+    return Created(content={"section": new_section})
