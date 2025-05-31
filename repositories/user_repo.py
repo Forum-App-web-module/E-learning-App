@@ -9,7 +9,7 @@ from data.models import StudentRegisterData, TeacherRegisterData, UserRole
 ALLOWED_ROLES = {
     "student": {
         "table": "v1.students",
-        "fields": "id, email, first_name, last_name, avatar_url"
+        "fields": "id, email, first_name, last_name, avatar_url, is_active, notifications"
     },
     "teacher": {
         "table": "v1.teachers",

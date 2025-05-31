@@ -1,4 +1,4 @@
-from data.models import Course
+from data.models import Course,CourseUpdate, Course_rating, SectionCreate
 from data.database import insert_query, read_query, update_query
 
 
@@ -11,23 +11,22 @@ async def read_course_by_id(id: int, get_data_func = read_query):
     WHERE id = $1
 """
 
-    course = await read_query(query)
-    return course
+    result = await read_query(query, (id, ))
+    return result[0] if result else None
 
-# get all courses
-
-async def read_all_courses(get_data_func = read_query):
+# get all courses per teacher
+async def read_all_courses_per_teacher(teacher_id, get_data_func = read_query):
 
     query = """
     SELECT *
     FROM v1.courses
+    WHERE owner_id = $1
 """
 
-    courses = await read_query(query)
-    return courses
+    courses = await get_data_func(query, (teacher_id, ))
+    return courses if courses else None
 
 # create course
-
 async def insert_course(course_data: Course, insert_data_func = insert_query):
 
     query = """
@@ -49,19 +48,47 @@ async def insert_course(course_data: Course, insert_data_func = insert_query):
     return course
     
 # update course by title
-
-async def update_course_by_id(title: str, get_data_func = read_query):
+async def update_course_data(id: int, updates: CourseUpdate, update_data_func = update_query): #update_query -> int
 
     query = """
-    SELECT *
-    FROM v1.courses
+    UPDATE v1.courses
+    SET 
+        title = COALESCE($2, title),
+        description = COALESCE($3, description),
+        tags = COALESCE($4, tags),
+        picture_url = COALESCE($5, picture_url),
+        is_premium = COALESCE($6, is_premium),
+        is_hidden = COALESCE($7, is_hidden)
     WHERE id = $1
+    RETURNING id
+"""
+    data = (
+        id,
+        updates.title,
+        updates.description,
+        updates.tags,
+        updates.picture_url,
+        updates.is_premium,
+        updates.is_hidden
+    )
+
+    updated = await update_data_func(query, data)
+    return updated if updated else None
+
+
+async def insert_section(course_id: int, section: SectionCreate, insert_data_func = insert_query):
+    query = """
+        INSERT INTO v1.course_sections (title, course_id, content, description)
+        VALUES ($1, $2, $3, $4)
+        RETURNING id
 """
 
-    course = await read_query(query)
-    return course
+    data = (
+        section.title,
+        course_id,
+        section.content,
+        section.description
+    )
 
-# get rating
-
-async def get_course_rating(id: int, get_data_func = read_query):
-    pass
+    result  = await insert_data_func(query, data)
+    return result if result else None

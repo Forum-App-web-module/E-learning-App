@@ -1,6 +1,6 @@
 import asyncpg
 from typing import Any, Sequence, Union
-from data.database_deploy_config import connection_supabase
+from config.database_deploy_config import connection_supabase
 from os import getenv
 from dotenv import load_dotenv
 

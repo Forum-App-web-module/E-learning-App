@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime, timedelta
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Optional
 from enum import Enum
 
 
@@ -29,17 +29,20 @@ class TeacherRegisterData(RegisterData):
     linked_in_url: str
 
 
-class Student(BaseModel):
+class StudentResponse(BaseModel):
     email: EmailStr
     first_name: Name | None
     last_name: Name | None
     avatar_url: str | None
+    is_active: bool
+    notifications: bool
 
 
-class Teacher(BaseModel):
+class TeacherResponse(BaseModel):
+    id: int
+    email: EmailStr
     mobile: str
     linked_in_url: str
-    email_verified: bool = False
 
 class Admin(BaseModel):
     account_verified: bool = False
@@ -54,11 +57,16 @@ class CourseBase(BaseModel):
 
 
 class Section(BaseModel):
-    id: int | None
     title: str
-    course_id: int
     content: str
     description: str
+
+class SectionCreate(Section):
+    pass
+
+class SectionOut(Section):
+    id: int
+    course_id: int
 
 class Event(BaseModel):
     id: int | None
@@ -111,5 +119,13 @@ class Course(CourseBase):
     id: int
     owner_id: int
     created_on: datetime = datetime.now()
+
+class CourseUpdate(BaseModel):
+    title: Optional[str] = Field(default=None, example="New course title")
+    description:  Optional[str] = Field(default=None, example="New course description")
+    tags:  Optional[str] = Field(default=None, example="New Tag")
+    picture_url:  Optional[str] = Field(default=None, example="New-URL")
+    is_premium:  Optional[bool] = Field(default=None, example="False")
+    is_hidden:  Optional[bool] = Field(default=None, example="False")
 
 
