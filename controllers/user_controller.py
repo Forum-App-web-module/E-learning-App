@@ -1,18 +1,18 @@
 from data.models import StudentRegisterData, TeacherRegisterData
 from typing import Union
+from common.responses import Created, Unauthorized, Forbidden
+from data.models import UserRole
+from repositories.user_repo import repo_get_role_by_email
 
-#
-# async def create_account(data: Union[StudentRegisterData, TeacherRegisterData], hashed_password: str):
-#     #   # Check if data has teacher fields
-#     if hasattr(data, "mobile") and hasattr(data, "linked_in_url"):
-#         # Converting if data is not yet a TeacherRegisterData
-#         if not isinstance(data, TeacherRegisterData):
-#             data = TeacherRegisterData(**data.model_dump())
-#     else:
-#         # Same for StudentRegisterData instance
-#         if not isinstance(data, StudentRegisterData):
-#             data = StudentRegisterData(**data.model_dump())
-#
-#     role, user_id = await create_account(data, hashed_password)
-#     return role, user_id
+async def validate_teacher_role(email: str) -> Union[Unauthorized, Forbidden] | None:
+    role = await repo_get_role_by_email(email)
+    if role != UserRole.TEACHER:
+        return Forbidden(content="Only a Teacher user can perform this action")
+    return None
+
+
+
+
+
+
 

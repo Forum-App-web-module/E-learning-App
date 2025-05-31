@@ -78,13 +78,15 @@ async def get_account_by_email(
 async def repo_get_role_by_email(email, get_data_func: Callable[[str, tuple], Any] = read_query):
 
     tables = {"v1.students": "student", "v1.teachers": "teacher", "v1.admins": "admins"}
-    query = "SELECT 1 FROM v1.students WHERE email = $1"
+    #query = "SELECT 1 FROM v1.students WHERE email = $1"
 
     for table, role in tables.items():
         query = f"SELECT 1 FROM {table} WHERE email = $1"
-        role_found = get_data_func(query,(email,))
+        role_found = await get_data_func(query,(email,))
         if role_found:
             return role
+    else:
+        return None
 
 
 

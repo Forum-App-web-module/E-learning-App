@@ -21,9 +21,9 @@ async def get_all_courses():
 @courses_router.post("/")
 async def create_course(course_data: CourseBase, payload: str = Security(get_current_user)): 
     email = payload.get("sub")
-    id = get_teacher_by_email(email)[0]
+    id = await get_teacher_by_email(email)
 
-    new_course = CourseCreate(**course_data.model_dump(), owner_id=id)
+    new_course = CourseCreate(**course_data.model_dump(), owner_id=id[0])
     new_id = await create_course_service(new_course)
 
     return Created(content={"new_id" : new_id})

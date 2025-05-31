@@ -1,14 +1,15 @@
-from data.database import read_query, insert_query, update_query
-from data.models import Teacher, TeacherRegisterData, UserRole
+from common.responses import Unauthorized, Forbidden, NotFound, NoContent
 from repositories.user_repo import get_account_by_email
+from repositories.teacher_repo import update_teacher_repo
 
 
-# account = await get_account_by_email("teacher@example.com", role="teacher")
 async def get_teacher_by_email(email):
     return await get_account_by_email(email, role="teacher")
 
-# def get_teacher_by_id():
-#     pass
-
-# def verify_teacher_email():
-#     pass
+async def update_teacher_service(data, email):
+        if not await get_teacher_by_email(email):
+            raise NotFound(content="User with this email does not exist")
+        elif await update_teacher_repo(data, email):
+            return await get_teacher_by_email(email)
+        else:
+            raise NotFound(content="Oops, unfortunately, we didn't handle this outcome. No changes made")
