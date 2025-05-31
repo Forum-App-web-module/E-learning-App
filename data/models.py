@@ -4,6 +4,8 @@ from typing import Annotated, Literal, Optional
 from enum import Enum
 
 
+# --- Enums and Type Aliases ---
+
 class UserRole(str, Enum):
     STUDENT = "student"
     TEACHER = "teacher"
@@ -12,6 +14,9 @@ class UserRole(str, Enum):
 Password = Annotated[str, Field(min_length=8, max_length=30)]
 Rating = Annotated[int, Field(ge=1, le=10)]
 Name = Annotated[str, Field(min_length=2, max_length=30)]
+
+
+# --- Login and Registration ---
 
 class LoginData(BaseModel):
     email: EmailStr
@@ -29,6 +34,8 @@ class TeacherRegisterData(RegisterData):
     linked_in_url: str
 
 
+# --- Response Models ---
+
 class StudentResponse(BaseModel):
     email: EmailStr
     first_name: Name | None
@@ -36,7 +43,6 @@ class StudentResponse(BaseModel):
     avatar_url: str | None
     is_active: bool
     notifications: bool
-
 
 class TeacherResponse(BaseModel):
     id: int
@@ -47,6 +53,9 @@ class TeacherResponse(BaseModel):
 class Admin(BaseModel):
     account_verified: bool = False
 
+
+# --- Course Models ---
+
 class CourseBase(BaseModel):
     title: str
     description: str
@@ -54,63 +63,6 @@ class CourseBase(BaseModel):
     picture_url: str
     is_premium: bool
     is_hidden: bool = False
-
-
-class Section(BaseModel):
-    title: str
-    content: str
-    description: str
-
-class SectionCreate(Section):
-    pass
-
-class SectionOut(Section):
-    id: int
-    course_id: int
-
-class Event(BaseModel):
-    id: int | None
-    user_id: int
-    event_type: str
-    description: str
-    timestamp: datetime = datetime.now()
-
-class Subscription(BaseModel):
-    id: int | None
-    student_id: int
-    subscribed_at: datetime = datetime.now()
-    expire_date: datetime = subscribed_at + timedelta(days=365)
-    
-    @property
-    def is_active(self) -> bool:
-        return self.expire_date < datetime.now()
-
-class Course_rating(BaseModel):
-    id: int | None
-    user_id: int
-    rating_given: Rating
-
-
-class External_resourse(BaseModel):
-    id: int
-    section_id: int
-    url: str
-
-class Enrollment(BaseModel):
-    id: int | None
-    student_id: int
-    course_id: int
-    is_approved: bool = False
-    requested_at: datetime = datetime.now()
-    approved_at: datetime | None
-    completed_at: datetime | None
-
-class Section_progress(BaseModel):
-    id: int | None
-    student_id: int
-    course_id: int
-    section_id: int
-    is_completed: bool = True
 
 class CourseCreate(CourseBase):
     owner_id: int
@@ -129,3 +81,72 @@ class CourseUpdate(BaseModel):
     is_hidden:  Optional[bool] = Field(default=None, example="False")
 
 
+# --- Section Models ---
+
+class Section(BaseModel):
+    title: str
+    content: str
+    description: str
+
+class SectionCreate(Section):
+    pass
+
+class SectionOut(Section):
+    id: int
+    course_id: int
+
+
+# --- Event Models ---
+
+class Event(BaseModel):
+    id: int | None
+    user_id: int
+    event_type: str
+    description: str
+    timestamp: datetime = datetime.now()
+
+
+# --- Subscription and Progress Models ---
+
+class Subscription(BaseModel):
+    id: int | None
+    student_id: int
+    subscribed_at: datetime = datetime.now()
+    expire_date: datetime = subscribed_at + timedelta(days=365)
+
+    @property
+    def is_active(self) -> bool:
+        return self.expire_date < datetime.now()
+
+class Section_progress(BaseModel):
+    id: int | None
+    student_id: int
+    course_id: int
+    section_id: int
+    is_completed: bool = True
+
+
+# --- Rating and Resource Models ---
+
+class Course_rating(BaseModel):
+    id: int | None
+    user_id: int
+    rating_given: Rating
+
+
+class External_resourse(BaseModel):
+    id: int
+    section_id: int
+    url: str
+
+
+# --- Enrollment Models ---
+
+class Enrollment(BaseModel):
+    id: int | None
+    student_id: int
+    course_id: int
+    is_approved: bool = False
+    requested_at: datetime = datetime.now()
+    approved_at: datetime | None
+    completed_at: datetime | None
