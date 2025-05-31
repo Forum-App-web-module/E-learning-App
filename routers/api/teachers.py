@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from fastapi.params import Depends, Header, Body
 from controllers.teacher_controller import get_teacher_by_email_controller, update_teacher_controller
-from data.models import TeacherRegisterData, Teacher
+from data.models import TeacherRegisterData
 from security.auth_dependencies import get_current_user
 
 
@@ -23,6 +23,5 @@ async def update_teacher(
         mobile: str = Body(min_length=6, max_length=17),
         linked_in_url: str = Body(regex="^https?:\/\/www\.linkedin\.com\/.+"),
 ):
-    data = Teacher(mobile=mobile, linked_in_url=linked_in_url)
-    return await update_teacher_controller(data, payload["sub"])
+    return await update_teacher_controller(mobile, linked_in_url, payload["sub"])
 

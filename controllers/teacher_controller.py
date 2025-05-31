@@ -16,9 +16,9 @@ async def validate_teacher_role(email: str) -> Union[Unauthorized, Forbidden] | 
 async def get_teacher_by_email_controller(email: str):
     return await get_teacher_by_email(email)
 
-async def update_teacher_controller(data, email):
+async def update_teacher_controller(mobile, linked_in_url, email):
         await validate_teacher_role(email)
-        return await update_teacher_service(data, email)
+        return await update_teacher_service(mobile, linked_in_url, email)
 
 
 
