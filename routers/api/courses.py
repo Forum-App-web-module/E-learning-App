@@ -16,7 +16,12 @@ courses_router = APIRouter(prefix="/courses", tags=["courses"])
 
 
 @courses_router.get("/{teacher_id}")
-async def get_all_courses(teacher_id):
+async def get_all_courses_per_teacher(teacher_id: int):
+    """
+    Returns a list with all courses owned by the teacher\n
+    Params: teacher_id: int\n
+    
+    """
     return await get_all_courses_per_teacher_service(teacher_id)
 
 @courses_router.post("/")
@@ -40,10 +45,10 @@ async def create_course(course_data: CourseBase, payload: dict = Security(get_cu
 async def update_course(course_id: int, updates: CourseUpdate, payload: dict = Security(get_current_user)):
     """
     Update a course by ID\n
-    Requrements:\n
-        valid access token\n
-        role: teacher\n
-        only course owner can update it\n
+    Requirements:\n
+        - valid access token\n
+        - role: teacher\n
+        - only course owner can update it\n
     Accepts partial updates of course fields.\n
     Only include the fields you want to change in the request body. \n
     Fields left out will retain their current values.\n
@@ -78,7 +83,15 @@ async def update_course(course_id: int, updates: CourseUpdate, payload: dict = S
 
 @courses_router.post("/{course_id}/sections")
 async def create_section(course_id: int, section: SectionCreate, payload: dict = Security(get_current_user)):
+    """
+    Create a new section under a specific course.\n\n
+    Valid access token is required\n
+    - `course_id` comes from the route.\n
+    - Body should include: title, content, description.\n
+    - Authorization is required, and only the course owner can perform this action\n
 
+    Return new section ID
+    """
     email = payload.get("sub")
     teacher = await get_teacher_by_email(email)
 
