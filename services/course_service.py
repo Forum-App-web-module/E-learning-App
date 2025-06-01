@@ -4,6 +4,7 @@ from common.responses import Unauthorized, NotFound
 from data.models import CourseCreate, CourseUpdate
 from asyncpg.exceptions import UniqueViolationError
 from fastapi.exceptions import HTTPException
+from repositories.enrollments import repo_create_enrollment
 
 async def get_course_by_id_service(id: int):
     return await read_course_by_id(id)
@@ -30,3 +31,10 @@ async def verify_course_owner(course_id: int, teacher_id: int):
         raise Unauthorized(content="You are not the owner of the course")
     
     return True
+
+async def enroll_course(course_id: int, student_id):
+    enrollment_id = repo_create_enrollment(course_id, student_id)
+
+
+async def count_premium_enrollments(student_id):
+    pass

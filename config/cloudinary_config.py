@@ -31,12 +31,12 @@ def upload_avatar(image_file, email):
     return upload_result['secure_url']
 
 
-# Optimize delivery by resizing and applying auto-format and auto-quality
-optimize_url, _ = cloudinary_url("avatars", fetch_format="auto", quality="auto")
-print(optimize_url)
+# # Optimize delivery by resizing and applying auto-format and auto-quality
+# optimize_url, _ = cloudinary_url("avatars", fetch_format="auto", quality="auto")
+# print(optimize_url)
 
-# Transform the image: auto-crop to square aspect_ratio
-auto_crop_url, _ = cloudinary_url("avatars", width=500, height=500, crop="auto", gravity="auto")
-print(auto_crop_url)
+# # Transform the image: auto-crop to square aspect_ratio
+# auto_crop_url, _ = cloudinary_url("avatars", width=500, height=500, crop="auto", gravity="auto")
+# print(auto_crop_url)
 
 

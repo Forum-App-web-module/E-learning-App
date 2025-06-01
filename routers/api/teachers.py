@@ -12,10 +12,18 @@ teachers_router = APIRouter(prefix="/teachers", tags=["teachers"])
 async def get_teachers(payload: str = Depends(get_current_user)):
     return await get_teacher_by_email_controller(payload["sub"])
 
-# Verify email byh email. Teacher get from email link.
+# Verify email by email. Teacher get email from system to verify his email by clicking on the Url.
 @teachers_router.get("/email/{}")
 async def verify_email():
     pass
+
+
+# Teacher gets email from system for course enrollments. This endpoint is sent to the teacher in the message. By clicking to the Url teacher gets this endpoint and approves.
+@teachers_router.put("/enrollments/{id}")
+async def approve_enrollment(payload: str = Depends(get_current_user)):
+    pass
+
+
 
 @teachers_router.put("/")
 async def update_teacher(

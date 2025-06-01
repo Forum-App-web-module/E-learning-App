@@ -11,6 +11,6 @@ async def update_avatar_url(url: str, user_email):
 async def get_student_by_email(email):
     student_atributes = await get_account_by_email(email, role="student")
     if student_atributes:
-        student_profile = StudentResponse(*student_atributes)
-        return student_profile
+        student_id = student_atributes[0]
+        return student_id
     return None
