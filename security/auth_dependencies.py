@@ -6,7 +6,7 @@ from os import getenv
 import os
 
 # Point FastAPI where the token is expected (Authorization header with Bearer scheme)
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")  # change here if token URL is different
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")  # change here if token URL is different
 
 SECRET_KEY = getenv("SECRET_KEY")
 ALGORITHM = getenv("ALGORITHM")

@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Depends
 from fastapi.responses import RedirectResponse, HTMLResponse
+from fastapi.security import OAuth2PasswordRequestForm
 from data.models import LoginData, StudentRegisterData, TeacherRegisterData, UserRole
 from services.user_service import email_exists, create_account, get_hash_by_email, get_role_by_email
 from common import responses
@@ -9,7 +10,10 @@ from security.jwt_auth import create_access_token
 from authlib.integrations.starlette_client import OAuth
 from starlette.config import Config
 from dotenv import load_dotenv
+from controllers.user_controller import authenticate_user
 import os
+
+
 
 auth_router = APIRouter(prefix="", tags=["Auth"])
 
@@ -26,20 +30,17 @@ oauth.register(
     client_kwargs={'scope': 'email profile'}
 )
 
+@auth_router.post("/token")
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    email = form_data.username
+    password = form_data.password
+
+    return await authenticate_user(email, password)
+
 @auth_router.post('/login')
 async def login(login: LoginData):
-    if not await email_exists(login.email):
-        return responses.Unauthorized("Wrong Credentials!")
-    
-    hashed_pw =  await get_hash_by_email(login.email)
-    if not secrets.verify_password(login.password, hashed_pw):
-        return responses.Unauthorized("Wrong Credentials!")
+    return await authenticate_user(login.email, login.password)
 
-    role = await get_role_by_email(login.email)
-
-    token = create_access_token({"sub": login.email, "role" : role})
-    
-    return responses.Successful(content={"access_token": token["JWT"], "token_type": "bearer"})
 
 @auth_router.post('/register')
 async def register(register_data: Union[TeacherRegisterData, StudentRegisterData]):
@@ -96,4 +97,3 @@ async def auth_google_callback(request: Request):
     """)
 
 
-    
