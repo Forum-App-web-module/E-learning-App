@@ -5,7 +5,7 @@
 from mailjet_rest import Client
 from os import getenv
 from dotenv import load_dotenv
-from data.models import TeacherResponse
+from data.models import TeacherResponse, StudentResponse, Course
 
 load_dotenv(dotenv_path="external_keys.env")
 
@@ -17,7 +17,7 @@ api_secret = getenv("MAILJET_SECRET")
 mailjet = Client(auth=(api_key, api_secret), version='v3.1')
 
 
-async def teacher_aproval(teacher_data: TeacherResponse, admin_email: str):
+async def admin_teacher_aproval(teacher_data: TeacherResponse, admin_email: str):
     URL = "http://127.0.0.1:8000/admins/approve_teacher/" + f"{teacher_data.id}"
     data = {
     'Messages': [
@@ -66,3 +66,29 @@ async def teacher_verify_email(teacher_data: TeacherResponse):
             ]
     }
     result = mailjet.send.create(data=data)
+
+
+
+async def teacher_approve_enrollment(teacher_data: TeacherResponse, student_data: StudentResponse, course: Course, enrollment_id: int):
+    URL = "http://127.0.0.1:8000/teachers/enrollments/" + f"{enrollment_id}"
+    data = {
+    'Messages': [
+                    {
+                            "From": {
+                                    "Email": "noreply@exaple.com",
+                                    "Name": "System"
+                            },
+                            "To": [
+                                    {
+                                            "Email": f"{teacher_data.email}",
+                                            "Name": "You"
+                                    }
+                            ],
+                            "Subject": f"New enrollment for your course: {course.title}",
+                            "TextPart": "Hope you have a great day!",
+                            "HTMLPart": f"<h3>Hello, you have new student enrolling for course {course.title}. Student informaion: First name: {student_data.first_name}, Last name: {student_data.last_name} <a href=\"{URL}>Click here to approve the enrollment</a>!</h3><br />Enjoy your teaching!"
+                    }
+            ]
+    }
+    result = mailjet.send.create(data=data)
+    
