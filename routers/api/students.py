@@ -7,6 +7,7 @@ from services.student_service import update_avatar_url, get_student_by_email
 from fastapi.security import OAuth2PasswordBearer
 from services.subscription_service import subscribe, is_subscribed
 from services.course_service import enroll_course, count_premium_enrollments, get_course_by_id_service
+from data.models import SubscriptionResponse
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
@@ -41,9 +42,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 @students_router.post("/subscribe")
 async def subscribe_student(payload: str = Depends(get_current_user)):
     student = await get_student_by_email(payload["sub"])
-    print(student)
-    subscription_id = await subscribe(student)
-    return responses.Created(content={"id": subscription_id})
+    subscription = await subscribe(student)
+    return responses.Created(content=SubscriptionResponse(**subscription).model_dump(mode="json"))
 
 @students_router.post("/enroll")
 async def enroll(course_id: int, payload: str = Depends(get_current_user)):

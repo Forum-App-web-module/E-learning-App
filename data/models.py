@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, field_serializer
 from datetime import datetime, timedelta
 from typing import Annotated, Literal, Optional
 from enum import Enum
@@ -116,14 +116,24 @@ class Event(BaseModel):
 # --- Subscription and Progress Models ---
 
 class Subscription(BaseModel):
-    id: int | None
+    id: int | None = None
     student_id: int
-    subscribed_at: datetime = datetime.now()
-    expire_date: datetime = subscribed_at + timedelta(days=365)
+    subscribed_at: datetime = Field(default_factory=datetime.now)
+    expire_date: datetime = Field(default_factory=lambda: datetime.now() + timedelta(days=365))
 
     @property
     def is_active(self) -> bool:
         return self.expire_date < datetime.now()
+    
+class SubscriptionResponse(BaseModel):
+    id: int
+    student_id: int
+    subscribed_at: datetime
+    expire_date: datetime
+
+    @field_serializer('subscribed_at', 'expire_date')
+    def format_datetime(self, dt: datetime, _info):
+        return dt.strftime('%Y-%m-%d %H:%M:%S')
 
 class Section_progress(BaseModel):
     id: int | None
