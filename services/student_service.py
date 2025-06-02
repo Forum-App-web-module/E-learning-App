@@ -7,10 +7,7 @@ from data.models import StudentResponse
 async def update_avatar_url(url: str, user_email):
     return await repo_update_avatar_url(url, user_email)
 
-# account = await get_account_by_email("student@example.com", role="student")
+
 async def get_student_by_email(email):
-    student_atributes = await get_account_by_email(email, role="student")
-    if student_atributes:
-        student_id = student_atributes[0]
-        return student_id
-    return None
+    return await get_account_by_email(email, role="student")
+
