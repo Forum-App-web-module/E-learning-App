@@ -1,15 +1,23 @@
 from common.responses import Unauthorized, Forbidden, NotFound, NoContent
 from repositories.user_repo import get_account_by_email
 from repositories.teacher_repo import update_teacher_repo
-
+from typing import Union
+from data.models import UserRole
+from repositories.user_repo import repo_get_role_by_email
 
 async def get_teacher_by_email(email):
     return await get_account_by_email(email, role="teacher")
 
 async def update_teacher_service(mobile, linked_in_url, email):
-        if not await get_teacher_by_email(email):
-            return NotFound(content="User with this email does not exist")
-        elif await update_teacher_repo(mobile, linked_in_url, email):
-            return await get_teacher_by_email(email)
-        else:
-            return NotFound(content="Oops, unfortunately, we didn't handle this outcome. No changes made")
+        await update_teacher_repo(mobile, linked_in_url, email)
+        return await get_teacher_by_email(email)
+
+async def validate_teacher_role(email: str) -> Union[Unauthorized, Forbidden] | None:
+    role = await repo_get_role_by_email(email)
+    if role != UserRole.TEACHER:
+        return Forbidden(content="Only a Teacher user can perform this action")
+    return None
+
+
+
+

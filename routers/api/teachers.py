@@ -1,16 +1,19 @@
 from fastapi import APIRouter
 from fastapi.params import Depends, Header, Body
-from controllers.teacher_controller import get_teacher_by_email_controller, update_teacher_controller
-from data.models import TeacherRegisterData
+from data.models import TeacherRegisterData, UserRole, TeacherResponse
 from security.auth_dependencies import get_current_user
-
+from services.teacher_service import get_teacher_by_email, update_teacher_service
+from common import responses
 
 teachers_router = APIRouter(prefix="/teachers", tags=["teachers"])
 
 
 @teachers_router.get("/")
 async def get_teachers(payload: str = Depends(get_current_user)):
-    return await get_teacher_by_email_controller(payload["sub"])
+    teacher = await get_teacher_by_email(payload["sub"])
+    return responses.Successful(content=TeacherResponse(**teacher).model_dump(mode="json")) if teacher else responses.Forbidden(content="Only a Teacher user can perform this action")
+
+
 
 # Verify email by email. Teacher get email from system to verify his email by clicking on the Url.
 @teachers_router.get("/email/{}")
@@ -31,5 +34,11 @@ async def update_teacher(
         mobile: str = Body(min_length=6, max_length=17),
         linked_in_url: str = Body(regex="^https?:\/\/www\.linkedin\.com\/.+"),
 ):
-    return await update_teacher_controller(mobile, linked_in_url, payload["sub"])
+    email = payload["sub"]
+    if not await get_teacher_by_email(email):
+            return responses.NotFound(content="You need to be Teacher for this action.")
+    
+    teacher = await update_teacher_service(mobile, linked_in_url, email)
+
+    return responses.Successful(content=TeacherResponse(**teacher).model_dump(mode="json"))
 

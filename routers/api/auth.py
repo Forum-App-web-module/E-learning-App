@@ -10,9 +10,8 @@ from security.jwt_auth import create_access_token
 from authlib.integrations.starlette_client import OAuth
 from starlette.config import Config
 from dotenv import load_dotenv
-from controllers.user_controller import authenticate_user
 import os
-
+from security.secrets import verify_password
 
 
 auth_router = APIRouter(prefix="", tags=["Auth"])
@@ -30,16 +29,33 @@ oauth.register(
     client_kwargs={'scope': 'email profile'}
 )
 
+
+async def _authenticate_user(email: str, password: str):
+
+    if not await email_exists(email):
+        raise responses.Unauthorized("Wrong Credentials!")
+    
+    hashed_pw = await get_hash_by_email(email)
+    if not verify_password(password, hashed_pw):
+        raise responses.Unauthorized("Wrong Credentials!")
+
+    role = await get_role_by_email(email)
+
+    token = create_access_token({"sub": email, "role" : role})
+    
+    return responses.Successful(content={"access_token": token["JWT"], "token_type": "bearer"})
+
+
 @auth_router.post("/token")
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     email = form_data.username
     password = form_data.password
 
-    return await authenticate_user(email, password)
+    return await _authenticate_user(email, password)
 
 @auth_router.post('/login')
 async def login(login: LoginData):
-    return await authenticate_user(login.email, login.password)
+    return await _authenticate_user(login.email, login.password)
 
 
 @auth_router.post('/register')
