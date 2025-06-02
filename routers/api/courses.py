@@ -6,7 +6,6 @@ from fastapi.security import OAuth2PasswordBearer
 from common.responses import Unauthorized, NotFound, Created, Successful
 from security.auth_dependencies import get_current_user
 from services.teacher_service import get_teacher_by_email
-from controllers.teacher_controller import get_all_courses_controller
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
@@ -14,15 +13,21 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 courses_router = APIRouter(prefix="/courses", tags=["courses"])
 
 
+async def _get_teacher_id(email):
+    teacher = await get_teacher_by_email(email)
+    if not teacher["id"]:
+        return Unauthorized(content="Only accessible for teachers!")
+    return teacher["id"]
+
 @courses_router.get("/")
 async def get_all_courses_per_teacher(payload: dict = Depends(get_current_user)):
     """
     Returns a list with all courses owned by the teacher\n
     Params: payload
-    
+
     """
-   # email = payload.get("sub")
-    return await get_all_courses_controller(payload["sub"])
+    teacher_id = await _get_teacher_id(payload.get("sub"))
+    return await get_all_courses_per_teacher_service(teacher_id)
 
 @courses_router.post("/")
 async def create_course(course_data: CourseBase, payload: dict = Security(get_current_user)): 
@@ -33,8 +38,7 @@ async def create_course(course_data: CourseBase, payload: dict = Security(get_cu
         role: teacher \n
     Owner ID is extracted from the token and linked to the course.\n
     """
-    email = payload.get("sub")
-    id = await get_teacher_by_email(email)
+    id = await _get_teacher_id(payload.get("sub"))
 
     new_course = CourseCreate(**course_data.model_dump(), owner_id=id[0])
     new_id = await create_course_service(new_course)
