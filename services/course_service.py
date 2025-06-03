@@ -25,10 +25,10 @@ async def verify_course_owner(course_id: int, teacher_id: int):
     course = await read_course_by_id(course_id)
 
     if not course:
-        raise NotFound(content="Course not found")
+        return NotFound(content="Course not found")
     
     if course["owner_id"] != teacher_id:
-        raise Unauthorized(content="You are not the owner of the course")
+        return Unauthorized(content="You are not the owner of the course")
     
     return True
 

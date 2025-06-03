@@ -1,6 +1,6 @@
-from repositories.course_repo import insert_section
+from repositories.section_repo import insert_section, update_section
 from repositories.user_repo import get_account_by_email
-from data.models import SectionCreate
+from data.models import SectionCreate, SectionUpdate
 from fastapi.exceptions import HTTPException
 from asyncpg import UniqueViolationError
 
@@ -10,4 +10,9 @@ async def create_section_service(course_id: int, section: SectionCreate):
     except UniqueViolationError:
         raise HTTPException(status_code=400, detail="Section with this title already axists")
     
-   
+async def get_all_sections_per_course_service():
+    pass
+
+async def update_section_service(course_id: int, updates: SectionUpdate):
+    return update_section(course_id, updates)
+    

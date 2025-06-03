@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Security
 from services.course_service import get_all_courses_per_teacher_service, get_course_by_id_service, create_course_service, verify_course_owner, update_course_service
-from services.section_service import create_section_service
-from data.models import CourseCreate, CourseBase, CourseUpdate, SectionCreate, SectionOut, SectionUpdate
+from services.section_service import create_section_service, update_section_service
+from data.models import CourseCreate, CourseBase, CourseUpdate, SectionCreate, SectionOut, SectionUpdate, Course
 from fastapi.security import OAuth2PasswordBearer
 from common.responses import Unauthorized, NotFound, Created, Successful
 from security.auth_dependencies import get_current_user
@@ -40,7 +40,7 @@ async def create_course(course_data: CourseBase, payload: dict = Security(get_cu
     """
     id = await _get_teacher_id(payload.get("sub"))
 
-    new_course = CourseCreate(**course_data.model_dump(), owner_id=id[0])
+    new_course = CourseCreate(**course_data.model_dump(), owner_id=id)
     new_id = await create_course_service(new_course)
 
     return Created(content={"new_id" : new_id, "message": f"Course with id {new_id} created"})
@@ -69,13 +69,9 @@ async def update_course(course_id: int, updates: CourseUpdate, payload: dict = S
         
     """
 
-    email = payload.get("sub")
-    teacher = await get_teacher_by_email(email)
-
-    if not teacher:
-        return Unauthorized()
+    id = await _get_teacher_id(payload.get("sub"))
     
-    await verify_course_owner(course_id, teacher["id"])
+    await verify_course_owner(course_id, id)
 
     updated = await update_course_service(course_id, updates)
 
@@ -108,8 +104,8 @@ async def create_section(course_id: int, section: SectionCreate, payload: dict =
 
     return Created(content={"section": new_section})
 
-@courses_router.post("/{course_id}/{section_id}}")
-async def update_section(section_id: int, updates: CourseUpdate, payload: dict = Security(get_current_user)):
+@courses_router.patch("/{course_id}/{section_id}")
+async def update_section(course_id: int, section_id: int, updates: SectionUpdate, payload: dict = Security(get_current_user)):
     """
     Update a course section by ID\n
     Requirements:\n
@@ -138,13 +134,13 @@ async def update_section(section_id: int, updates: CourseUpdate, payload: dict =
     if not teacher:
         return Unauthorized()
     
-    await verify_course_owner(section_id, teacher["id"])
+    await verify_course_owner(course_id, teacher["id"])
 
-    updated = await update_course_service(section_id, updates)
+    updated = await update_section_service(section_id, updates)
 
     if not updated:
-        return NotFound(content="Course not found")
+        return NotFound(content="Section not found")
     
-    return Successful(content={"message": f"Course with id {section_id} updated"})
+    return Successful(content={"message": f"Section with id {section_id} updated"})
 
 

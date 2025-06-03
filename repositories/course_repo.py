@@ -44,7 +44,7 @@ async def insert_course(course_data: Course, insert_data_func = insert_query):
         course_data.owner_id,
         course_data.is_hidden,
     )
-    course = await insert_query(query, values)
+    course = await insert_data_func(query, values)
     return course
     
 # update course by title
@@ -74,21 +74,3 @@ async def update_course_data(id: int, updates: CourseUpdate, update_data_func = 
 
     updated = await update_data_func(query, data)
     return updated if updated else None
-
-
-async def insert_section(course_id: int, section: SectionCreate, insert_data_func = insert_query):
-    query = """
-        INSERT INTO v1.course_sections (title, course_id, content, description)
-        VALUES ($1, $2, $3, $4)
-        RETURNING id
-"""
-
-    data = (
-        section.title,
-        course_id,
-        section.content,
-        section.description
-    )
-
-    result  = await insert_data_func(query, data)
-    return result if result else None
