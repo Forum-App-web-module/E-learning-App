@@ -1,9 +1,8 @@
 from data.database import read_query, insert_query, update_query
 
 
-# account = await get_account_by_email("teacher@example.com", role="teacher")
 
-async def update_teacher_repo(mobile, linked_in_url, email):
+async def update_teacher_repo(mobile, linked_in_url, email, update_data_func = update_query):
     query = """
     UPDATE v1.teachers
     SET mobile = $1,
@@ -11,8 +10,21 @@ async def update_teacher_repo(mobile, linked_in_url, email):
     WHERE email = $3
     """
 
-    return await update_query(query, (mobile, linked_in_url, email))
+    result = await update_data_func(query, (mobile, linked_in_url, email))
+    return result if result else None
 
+async def report_enrolled_students(owner_id: int,  get_data_func = read_query):
+    query = """
+    SELECT e.student_id, s.email, s.first_name, s.last_name,
+       e.course_id, c.title, e.requested_at, e.approved_at, e.completed_at, e.drop_out, c.created_on
+    FROM v1.enrollments AS e
+        JOIN v1.courses AS c
+    ON e.course_id = c.id
+        JOIN v1.students AS s
+    ON e.student_id = s.id
+    WHERE c.owner_id = $1
+    """
 
-
+    report = await get_data_func(query, (owner_id, ))
+    return report if report else None
 

@@ -167,3 +167,21 @@ class Enrollment(BaseModel):
     requested_at: datetime = datetime.now()
     approved_at: datetime | None
     completed_at: datetime | None
+
+
+# e.student_id, s.email, s.first_name, s.last_name,
+# e.course_id, c.title, e.requested_at, e.approved_at, e.completed_at, e.drop_out, c.created_on
+class EnrollmentReport(BaseModel):
+    student_id: int
+    email: EmailStr
+    first_name: Name | None
+    last_name: Name | None
+    course_id: int
+    title: str
+    requested_at: datetime
+    approved_at: datetime | None
+    completed_at: datetime | None
+    drop_out: bool
+    created_on: datetime
+
+

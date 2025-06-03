@@ -6,6 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 from common.responses import Unauthorized, NotFound, Created, Successful
 from security.auth_dependencies import get_current_user
 from services.teacher_service import get_teacher_by_email
+from router_helper import router_helper
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
@@ -13,11 +14,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 courses_router = APIRouter(prefix="/courses", tags=["courses"])
 
 
-async def _get_teacher_id(email):
-    teacher = await get_teacher_by_email(email)
-    if not teacher["id"]:
-        return Unauthorized(content="Only accessible for teachers!")
-    return teacher["id"]
 
 @courses_router.get("/")
 async def get_all_courses_per_teacher(payload: dict = Depends(get_current_user)):
@@ -26,7 +22,7 @@ async def get_all_courses_per_teacher(payload: dict = Depends(get_current_user))
     Params: payload
 
     """
-    teacher_id = await _get_teacher_id(payload.get("sub"))
+    teacher_id = await router_helper.get_teacher_id(payload.get("sub"))
     return await get_all_courses_per_teacher_service(teacher_id)
 
 @courses_router.post("/")
@@ -38,7 +34,7 @@ async def create_course(course_data: CourseBase, payload: dict = Security(get_cu
         role: teacher \n
     Owner ID is extracted from the token and linked to the course.\n
     """
-    id = await _get_teacher_id(payload.get("sub"))
+    id = await router_helper.get_teacher_id(payload.get("sub"))
 
     new_course = CourseCreate(**course_data.model_dump(), owner_id=id)
     new_id = await create_course_service(new_course)
@@ -69,7 +65,7 @@ async def update_course(course_id: int, updates: CourseUpdate, payload: dict = S
         
     """
 
-    id = await _get_teacher_id(payload.get("sub"))
+    id = await router_helper.get_teacher_id(payload.get("sub"))
     
     await verify_course_owner(course_id, id)
 

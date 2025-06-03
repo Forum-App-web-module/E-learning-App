@@ -13,18 +13,13 @@ async def validate_teacher_role(email: str) -> Union[Unauthorized, Forbidden] | 
         return Forbidden(content="Only a Teacher user can perform this action")
     return None
 
-# async def verify_teacher_id(email):
-#     teacher = await get_teacher_by_email(email)
-#     if not teacher["id"]:
-#         return Unauthorized(content="Only accessible for teachers!")
-#     return teacher["id"]
-#
-# async def get_all_courses_controller(email):
-#     if isinstance(await validate_teacher_role(email), Forbidden):
-#         return Forbidden(content="Only a Teacher user can perform this action")
-#
-#     teacher_id = await verify_teacher_id(email)
-#     return await get_all_courses_per_teacher_service(teacher_id)
+async def get_teacher_id(email):
+    teacher = await get_teacher_by_email(email)
+    if not teacher["id"]:
+        return Unauthorized(content="Only accessible for teachers!")
+    return teacher["id"]
+
+
     
 
      
