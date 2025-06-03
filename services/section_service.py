@@ -14,5 +14,5 @@ async def get_all_sections_per_course_service():
     pass
 
 async def update_section_service(course_id: int, updates: SectionUpdate):
-    return update_section(course_id, updates)
+    return await update_section(course_id, updates)
     

@@ -20,7 +20,7 @@ async def insert_section(course_id: int, section: SectionCreate, insert_data_fun
 
 async def update_section(id: int, updates: SectionUpdate, update_data_func = update_query):
     query = """
-    UPDATE v1.sections
+    UPDATE v1.course_sections
     SET
         title = COALESCE($2, title),
         content = COALESCE($3, content),
