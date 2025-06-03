@@ -1,5 +1,5 @@
 from data.models import Section, SectionCreate, CourseUpdate, SectionUpdate
-from data.database import insert_query, update_query
+from data.database import insert_query, update_query, read_query
 
 async def insert_section(course_id: int, section: SectionCreate, insert_data_func = insert_query):
     query = """
@@ -40,5 +40,12 @@ async def update_section(id: int, updates: SectionUpdate, update_data_func = upd
     updated = await update_data_func(query, data)
     return updated if updated else None
 
-async def get_all_course_sections():
-    pass
+async def get_all_course_sections_repo(id: int, get_data_func = read_query):
+    query = """
+    SELECT * FROM v1.course_sections
+    WHERE course_id = $1
+
+"""
+
+    all_sections = await get_data_func(query, (id, ))
+    return all_sections if all_sections else None
