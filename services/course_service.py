@@ -1,10 +1,14 @@
-from repositories.course_repo import read_all_courses_per_teacher, read_course_by_id, insert_course, update_course_data
+from repositories.course_repo import read_all_courses_per_teacher, read_course_by_id, insert_course, update_course_data, get_all_public_courses_repo
 from repositories.user_repo import get_account_by_email
 from common.responses import Unauthorized, NotFound
 from data.models import CourseCreate, CourseUpdate
 from asyncpg.exceptions import UniqueViolationError
 from fastapi.exceptions import HTTPException
 from repositories.enrollments import repo_create_enrollment
+from typing import Optional
+
+async def get_all_public_courses_service(tag: Optional[str]):
+    return await get_all_public_courses_repo(tag)
 
 async def get_course_by_id_service(id: int):
     return await read_course_by_id(id)
