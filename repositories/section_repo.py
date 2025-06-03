@@ -40,11 +40,21 @@ async def update_section(id: int, updates: SectionUpdate, update_data_func = upd
     updated = await update_data_func(query, data)
     return updated if updated else None
 
-async def get_all_course_sections_repo(id: int, get_data_func = read_query):
-    query = """
+async def get_all_course_sections_repo(id: int, sort_by: str = "id", order: str = "asc", get_data_func = read_query):
+    
+    sorting_options = {"id", "title"}
+    order_options = {"asc","desc"}
+
+    if sort_by not in sorting_options:
+        sort_by = "id"
+
+    if order not in order_options:
+        order = "asc"
+
+    query = f"""
     SELECT * FROM v1.course_sections
     WHERE course_id = $1
-
+    ORDER BY {sort_by} {order}
 """
 
     all_sections = await get_data_func(query, (id, ))

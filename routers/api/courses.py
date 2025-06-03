@@ -143,8 +143,12 @@ async def update_section(course_id: int, section_id: int, updates: SectionUpdate
     
     return Successful(content={"message": f"Section with id {section_id} updated"})
 
-@courses_router.get("/{course_id}")
-async def get_all_course_sections(course_id: int, payload: dict = Security(get_current_user)):
+@courses_router.get("/{course_id}/sections")
+async def get_all_course_sections(
+    course_id: int,
+    sort_by: str = "id",
+    order: str = "asc",
+    payload: dict = Security(get_current_user)):
 
     email = payload.get("sub")
     teacher = await get_teacher_by_email(email)
@@ -154,7 +158,7 @@ async def get_all_course_sections(course_id: int, payload: dict = Security(get_c
     
     await verify_course_owner(course_id, teacher["id"])
 
-    return  await get_all_sections_per_course_service(course_id)
+    return  await get_all_sections_per_course_service(course_id, sort_by, order)
 
 
 

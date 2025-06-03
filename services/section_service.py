@@ -10,8 +10,8 @@ async def create_section_service(course_id: int, section: SectionCreate):
     except UniqueViolationError:
         raise HTTPException(status_code=400, detail="Section with this title already axists")
     
-async def get_all_sections_per_course_service(course_id):
-    return await get_all_course_sections_repo(course_id)
+async def get_all_sections_per_course_service(course_id, sort_by: str = "id", order: str = "asc"):
+    return await get_all_course_sections_repo(course_id, sort_by, order)
 
 async def update_section_service(course_id: int, updates: SectionUpdate):
     return await update_section(course_id, updates)
