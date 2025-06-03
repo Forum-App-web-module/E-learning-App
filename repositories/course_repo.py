@@ -1,6 +1,32 @@
 from data.models import Course,CourseUpdate, Course_rating, SectionCreate
 from data.database import insert_query, read_query, update_query
+from typing import Optional
 
+# get all public courses, display title and description onyl
+
+async def get_all_public_courses_repo(tag: Optional[str], get_data_func = read_query):
+    if not tag:
+        query= """
+        SELECT title, description, tags
+        FROM v1.courses
+        WHERE is_premium = FALSE
+        AND is_hidden = FALSE
+
+    """
+        public_courses = await get_data_func(query)
+    else:    
+        query = """
+        SELECT title, description, tags
+        FROM v1.courses
+        WHERE is_premium = FALSE
+        AND is_hidden = FALSE
+        AND tags ILIKE '%' || $1 || '%';
+    """
+    # AND tags ILIKE '%' || $1 || '%' 
+    # AND tags ILIKE '%pyt%';
+        public_courses = await get_data_func(query, (tag, ))
+
+    return public_courses
 
 # get course by id
 async def read_course_by_id(id: int, get_data_func = read_query):
@@ -11,7 +37,7 @@ async def read_course_by_id(id: int, get_data_func = read_query):
     WHERE id = $1
 """
 
-    result = await read_query(query, (id, ))
+    result = await get_data_func(query, (id, ))
     return result[0] if result else None
 
 # get all courses per teacher

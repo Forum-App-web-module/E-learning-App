@@ -47,8 +47,8 @@ Your task is to design an e-learning platform that would be used by students to 
 ## Public Part
 
 The public part must be accessible without authentication i.e., for anonymous users
-- ❌ Anonymous users must be able to view the title and description, tags of available public courses but not be able to open them.
-- ❌ Anonymous users could search courses by tag and/or rating.
+- ✅ Anonymous users must be able to view the title and description, tags of available public courses but not be able to open them.
+- ✅ Anonymous users could search courses by tag ❌ and/or rating.
 - ✅ Anonymous users must be able to register and login
 
 ---
