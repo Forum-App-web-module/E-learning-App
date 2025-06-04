@@ -17,7 +17,7 @@ students_router = APIRouter(prefix="/students", tags=["students"])
 
 @students_router.get("/")
 async def get_students(payload: dict = Depends(get_current_user)):
-   student = await get_student_by_email(payload.get("sub"))
+   student = await get_student_by_email(payload.get("email"))
    return responses.Successful(content=StudentResponse(**student).model_dump(mode="json"))
 
 
@@ -25,7 +25,7 @@ async def get_students(payload: dict = Depends(get_current_user)):
 @students_router.post('/avatar')
 async def upload_avatar_photo(file: UploadFile = File(...), payload: dict = Depends(get_current_user) ):
 
-    email = payload.get("sub")
+    email = payload.get("email")
 
     # Uploading and generating URL 
     url = upload_avatar(file, email)
@@ -42,25 +42,37 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 @students_router.post("/subscribe")
 async def subscribe_student(payload: dict = Depends(get_current_user)):
-    student = await get_student_by_email(payload.get("sub"))
+    student = await get_student_by_email(payload.get("email"))
     subscription = await subscribe(student[0])
     return responses.Created(content=SubscriptionResponse(**subscription).model_dump(mode="json"))
 
-@students_router.post("/enroll")
+@students_router.post("/enroll/{course_id}")
 async def enroll(course_id: int, payload: dict = Depends(get_current_user)):
-
     # Checking if course is premium
-    course = get_course_by_id_service(course_id)
-    if course[5] == True:
-        if is_subscribed(student_id):
 
-            # Checking premium courses enrollment count.
-            premium_enrollments_count = count_premium_enrollments((payload.get("sub")))
-            if premium_enrollments_count >= 5:
-                return responses.Unauthorized(content="Student is already enrolled to 5 premium courses. First complete or cancel enrollment.")
+    course = await get_course_by_id_service(course_id)
+    print(course)
+    student_id = payload.get("id")
+    if course:
+        if course[5] == True:
+        # Check if student is subscibed
+            if await is_subscribed(student_id):
+                # Checking premium courses enrollment count.
+                premium_enrollments_count = await count_premium_enrollments((payload.get("id")))
+                if premium_enrollments_count >= 5:
+                    return responses.Unauthorized(content="Student is already enrolled to 5 premium courses. First complete or cancel enrollment.")
+                else: 
+                    # Creating enrollment
+                    enrollment_id = await enroll_course(course_id, student_id )
+                    return responses.Created(content=f"Enrollment created. Course teacher will be notified about your interest.")
 
-    # Creating enrollment.
-    endrollment_id = enroll_course()
-    pass
+            else: responses.Forbidden(content="Course enrollment requires premium subscription!")
+        else: 
+            # Creating enrollment.
+            enrollment_id = await enroll_course(course_id, student_id)
+            return responses.Created(content=f"Enrollment created. Course teacher will be notified about your interest.")
+        
+    else: return responses.BadRequest(content=f"There is no course with id {course_id}")
+    
     
 

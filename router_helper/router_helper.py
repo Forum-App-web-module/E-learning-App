@@ -16,13 +16,13 @@ async def validate_teacher_role(email: str) -> Union[Unauthorized, Forbidden] | 
 
 async def get_teacher_id(email):
     teacher = await get_teacher_by_email(email)
-    if not teacher["id"]:
+    if not teacher:
         return Unauthorized(content="Only accessible for teachers!")
     return teacher["id"]
 
 async def get_student_id(email):
     student = await get_student_by_email(email)
-    if not student["id"]:
+    if not student:
         return Unauthorized(content="Only accessible for student!")
     return student["id"]
 

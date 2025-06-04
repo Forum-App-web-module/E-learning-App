@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Security
 from services.course_service import (
     get_all_courses_per_teacher_service,
+    get_all_courses_per_student_service,
     get_course_by_id_service,
     create_course_service,
     verify_course_owner,
@@ -33,8 +34,7 @@ async def get_all_courses_per_student(payload: dict = Depends(get_current_user))
     Params: payload
 
     """
-    student_id = await router_helper.get_student_id(payload.get("sub"))
-    return await get_all_courses_per_student(student_id)
+    return await get_all_courses_per_student_service(payload.get("id"))
 
 @courses_router.get("/teacher")
 async def get_all_courses_per_teacher(payload: dict = Depends(get_current_user)):
@@ -43,8 +43,7 @@ async def get_all_courses_per_teacher(payload: dict = Depends(get_current_user))
     Params: payload
 
     """
-    teacher_id = await router_helper.get_teacher_id(payload.get("sub"))
-    return await get_all_courses_per_teacher_service(teacher_id)
+    return await get_all_courses_per_teacher_service(payload.get("id"))
 
 @courses_router.post("/")
 async def create_course(course_data: CourseBase, payload: dict = Security(get_current_user)): 
@@ -55,7 +54,7 @@ async def create_course(course_data: CourseBase, payload: dict = Security(get_cu
         role: teacher \n
     Owner ID is extracted from the token and linked to the course.\n
     """
-    id = await router_helper.get_teacher_id(payload.get("sub"))
+    id = await router_helper.get_teacher_id(payload.get("email"))
 
     new_course = CourseCreate(**course_data.model_dump(), owner_id=id)
     new_id = await create_course_service(new_course)
@@ -86,7 +85,7 @@ async def update_course(course_id: int, updates: CourseUpdate, payload: dict = S
         
     """
 
-    id = await router_helper.get_teacher_id(payload.get("sub"))
+    id = await router_helper.get_teacher_id(payload.get("email"))
     
     await verify_course_owner(course_id, id)
 
@@ -109,7 +108,7 @@ async def create_section(course_id: int, section: SectionCreate, payload: dict =
 
     Return new section ID
     """
-    id = await router_helper.get_teacher_id(payload.get("sub"))
+    id = await router_helper.get_teacher_id(payload.get("email"))
     
     await verify_course_owner(course_id, id)
 
@@ -140,7 +139,7 @@ async def update_section(course_id: int, section_id: int, updates: SectionUpdate
         }
         
     """
-    id = await router_helper.get_teacher_id(payload.get("sub"))
+    id = await router_helper.get_teacher_id(payload.get("email"))
     
     await verify_course_owner(course_id, id)
 
@@ -158,7 +157,7 @@ async def get_all_course_sections(
     order: str = "asc",
     payload: dict = Security(get_current_user)):
 
-    email = payload.get("sub")
+    email = payload.get("email")
     teacher = await get_teacher_by_email(email)
 
     if not teacher:
