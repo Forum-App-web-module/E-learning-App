@@ -14,7 +14,7 @@ ALGORITHM = getenv("ALGORITHM")
 def get_current_user(token: str = Security(oauth2_scheme)) -> dict:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: Optional[str] = payload.get("sub")
+        email: Optional[str] = payload.get("email")
         if email is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

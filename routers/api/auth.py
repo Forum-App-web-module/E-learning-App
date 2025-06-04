@@ -10,6 +10,7 @@ from security.jwt_auth import create_access_token
 from authlib.integrations.starlette_client import OAuth
 from starlette.config import Config
 from dotenv import load_dotenv
+from repositories.user_repo import get_account_by_email
 import os
 from security.secrets import verify_password
 
@@ -29,7 +30,6 @@ oauth.register(
     client_kwargs={'scope': 'email profile'}
 )
 
-
 async def _authenticate_user(email: str, password: str):
 
     if not await email_exists(email):
@@ -41,7 +41,18 @@ async def _authenticate_user(email: str, password: str):
 
     role = await get_role_by_email(email)
 
-    token = create_access_token({"sub": email, "role" : role})
+    
+    profile = await get_account_by_email(email, role)
+    profile["role"] = role
+
+    # token = create_access_token({"sub": email, "role" : role})
+
+    # check if google login and add "sub" and source
+    # if password == "GOOGLE_AUTH":
+    #     profile["sub"] = profile.get("email")
+    #     profile["auth_source"] = "google"
+    
+    token = create_access_token(dict(profile))
     
     return responses.Successful(content={"access_token": token["JWT"], "token_type": "bearer"})
 
@@ -95,7 +106,7 @@ async def auth_google_callback(request: Request):
     google_responce = await oauth.google.get("https://openidconnect.googleapis.com/v1/userinfo", token=token)
     user_data = google_responce.json()
 
-    email = user_data["email"]
+    email = user_data["sub"]
     name = user_data.get("name", "")
 
     user = email_exists(email)
@@ -106,8 +117,10 @@ async def auth_google_callback(request: Request):
         )
         create_account(student, hashed_password="GOOGLE_AUTH")
 
+    _authenticate_user(email=email, password="GOOGLE_AUTH")
+
 #returning html for testing purposes
-    jwt_token = create_access_token({"sub": email, "auth_source": "google"})
+    # jwt_token = create_access_token({"sub": email, "auth_source": "google"})
     return HTMLResponse(f"""
         <h2>Добре дошъл, {name}!</h2>
     """)
