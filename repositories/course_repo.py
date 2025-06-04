@@ -5,23 +5,25 @@ from typing import Optional
 # get all public courses, display title and description onyl
 
 async def get_all_public_courses_repo(tag: Optional[str], get_data_func = read_query):
-    if not tag:
-        query= """
-        SELECT title, description, tags
-        FROM v1.courses
-        WHERE is_premium = FALSE
-        AND is_hidden = FALSE
+
+    query= """
+    SELECT title, description, tags
+    FROM v1.courses
+    WHERE is_premium = FALSE
+    AND is_hidden = FALSE
 
     """
+    if not tag:
         public_courses = await get_data_func(query)
     else:    
-        query = """
-        SELECT title, description, tags
-        FROM v1.courses
-        WHERE is_premium = FALSE
-        AND is_hidden = FALSE
-        AND tags ILIKE '%' || $1 || '%';
-    """
+        query += "AND tags ILIKE '%' || $1 || '%';"
+        #query = """
+        #SELECT title, description, tags
+        #FROM v1.courses
+        #WHERE is_premium = FALSE
+        #AND is_hidden = FALSE
+        #AND tags ILIKE '%' || $1 || '%';
+    #"""
     # AND tags ILIKE '%' || $1 || '%' 
     # AND tags ILIKE '%pyt%';
         public_courses = await get_data_func(query, (tag, ))
@@ -50,6 +52,17 @@ async def read_all_courses_per_teacher(teacher_id, get_data_func = read_query):
 """
 
     courses = await get_data_func(query, (teacher_id, ))
+    return courses if courses else None
+
+# get all courses a student is enrolled to 
+async def get_all_student_courses_repo(student_id, get_data_func = read_query):
+    query = """
+    SELECT c.id AS course_id, c.title
+    FROM v1.enrollments e
+    INNER JOIN v1.courses c ON e.course_id = c.id
+    WHERE e.student_id = $1
+"""
+    courses = await get_data_func(query, (student_id, ))
     return courses if courses else None
 
 # create course

@@ -1,4 +1,4 @@
-from repositories.course_repo import read_all_courses_per_teacher, read_course_by_id, insert_course, update_course_data, get_all_public_courses_repo
+from repositories.course_repo import read_all_courses_per_teacher, read_course_by_id, insert_course, update_course_data, get_all_public_courses_repo, get_all_student_courses_repo
 from repositories.user_repo import get_account_by_email
 from common.responses import Unauthorized, NotFound
 from data.models import CourseCreate, CourseUpdate
@@ -15,6 +15,9 @@ async def get_course_by_id_service(id: int):
 
 async def get_all_courses_per_teacher_service(teacher_id):
     return await read_all_courses_per_teacher(teacher_id)
+
+async def get_all_courses_per_student_service(student_id):
+    return await get_all_student_courses_repo(student_id)
 
 async def create_course_service(course_data: CourseCreate):
     try:

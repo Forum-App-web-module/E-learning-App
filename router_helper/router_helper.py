@@ -5,6 +5,7 @@ from common.responses import Created, Unauthorized, Forbidden, NoContent, NotFou
 from data.models import UserRole
 from repositories.user_repo import repo_get_role_by_email
 from services.course_service import get_all_courses_per_teacher_service
+from services.student_service import get_student_by_email
 
 # Teacher Role validation - call repo
 async def validate_teacher_role(email: str) -> Union[Unauthorized, Forbidden] | None:
@@ -18,6 +19,13 @@ async def get_teacher_id(email):
     if not teacher["id"]:
         return Unauthorized(content="Only accessible for teachers!")
     return teacher["id"]
+
+async def get_student_id(email):
+    student = await get_student_by_email(email)
+    if not student["id"]:
+        return Unauthorized(content="Only accessible for student!")
+    return student["id"]
+
 
 
     

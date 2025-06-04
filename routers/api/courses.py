@@ -26,9 +26,17 @@ async def get_public_courses(tag: Optional[str] = None):
 
     return await get_all_public_courses_service(tag)
 
+@courses_router.get("/student")
+async def get_all_courses_per_student(payload: dict = Depends(get_current_user)):
+    """
+    Returns a list with all courses owned by the teacher\n
+    Params: payload
 
+    """
+    student_id = await router_helper.get_student_id(payload.get("sub"))
+    return await get_all_courses_per_student(student_id)
 
-@courses_router.get("/")
+@courses_router.get("/teacher")
 async def get_all_courses_per_teacher(payload: dict = Depends(get_current_user)):
     """
     Returns a list with all courses owned by the teacher\n
@@ -101,13 +109,9 @@ async def create_section(course_id: int, section: SectionCreate, payload: dict =
 
     Return new section ID
     """
-    email = payload.get("sub")
-    teacher = await get_teacher_by_email(email)
-
-    if not teacher:
-        return Unauthorized(content="Only teachers allowed for this action")
+    id = await router_helper.get_teacher_id(payload.get("sub"))
     
-    await verify_course_owner(course_id, teacher["id"])
+    await verify_course_owner(course_id, id)
 
     new_section = await create_section_service(course_id, section)
 
@@ -136,14 +140,9 @@ async def update_section(course_id: int, section_id: int, updates: SectionUpdate
         }
         
     """
-
-    email = payload.get("sub")
-    teacher = await get_teacher_by_email(email)
-
-    if not teacher:
-        return Unauthorized()
+    id = await router_helper.get_teacher_id(payload.get("sub"))
     
-    await verify_course_owner(course_id, teacher["id"])
+    await verify_course_owner(course_id, id)
 
     updated = await update_section_service(section_id, updates)
 
