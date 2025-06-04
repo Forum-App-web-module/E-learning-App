@@ -33,11 +33,11 @@ oauth.register(
 async def _authenticate_user(email: str, password: str):
 
     if not await email_exists(email):
-        raise responses.Unauthorized("Wrong Credentials!")
+        return responses.Unauthorized("Wrong Credentials!")
     
     hashed_pw = await get_hash_by_email(email)
     if not verify_password(password, hashed_pw):
-        raise responses.Unauthorized("Wrong Credentials!")
+        return responses.Unauthorized("Wrong Credentials!")
 
     role = await get_role_by_email(email)
 
