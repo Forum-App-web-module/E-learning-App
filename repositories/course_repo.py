@@ -1,5 +1,5 @@
 from data.models import Course,CourseUpdate, Course_rating, SectionCreate
-from data.database import insert_query, read_query, update_query
+from data.database import insert_query, read_query, update_query, query_count
 from typing import Optional
 
 # get all public courses, display title and description onyl
@@ -113,3 +113,8 @@ async def update_course_data(id: int, updates: CourseUpdate, update_data_func = 
 
     updated = await update_data_func(query, data)
     return updated if updated else None
+
+async def repo_count_premium_enrollments(student_id, count_data_func = query_count):
+    query = "SELECT count(*) FROM v1.enrollments as en JOIN v1.courses as co on en.course_id=co.id WHERE is_approved = true AND completed_at IS NULL AND drop_out = false AND is_premium = true AND student_id = $1"
+    enrollments = await count_data_func(query,(student_id,))
+    return enrollments
