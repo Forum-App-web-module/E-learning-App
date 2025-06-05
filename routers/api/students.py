@@ -7,12 +7,13 @@ from services.student_service import (
     update_avatar_url,
     get_student_by_email,
     update_student_service,
-    get_student_courses_service
+    get_student_courses_service,
+    get_student_courses_progress_service
 )
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from services.subscription_service import subscribe, is_subscribed
 from services.course_service import enroll_course, count_premium_enrollments, get_course_by_id_service
-from data.models import SubscriptionResponse, StudentResponse, CourseStudentResponse
+from data.models import SubscriptionResponse, StudentResponse, CourseStudentResponse, CoursesProgressResponse
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -50,9 +51,23 @@ async def update_student(
 async def get_student_courses(payload: dict = Depends(get_current_user)):
     if payload.get("role") != "student":
         return responses.Forbidden(content="Only a Student user can perform this action")
+
     student_courses = await get_student_courses_service(payload.get("id"))
     student_courses_response = [CourseStudentResponse(**sc).model_dump(mode="json") for sc in student_courses]
+
     return responses.Successful(content=student_courses_response)
+
+@students_router.get("/courses/progress")
+async def get_student_courses_progress(payload: dict = Depends(get_current_user)):
+    if payload.get("role") != "student":
+        return responses.Forbidden(content="Only a Student user can perform this action")
+
+    progress_data = await get_student_courses_progress_service(payload.get("id"))
+    # progress_data["progress"] = str(progress_data["progress"]) + "%"
+    progress_response = [CoursesProgressResponse(**prd).model_dump(mode="json") for prd in progress_data]
+
+    return responses.Successful(content=progress_response)
+
 
 @students_router.post('/avatar')
 async def upload_avatar_photo(file: UploadFile = File(...), payload: dict = Depends(get_current_user) ):

@@ -34,6 +34,30 @@ async def repo_get_courses_student_all(student_id, get_data_func = read_query):
     courses = await get_data_func(query, (student_id,))
     return courses if courses else None
 
+async def repo_get_courses_progress(student_id:int, get_data_func = read_query):
+    query = """
+    SELECT
+    c.id AS course_id,
+    c.title,
+    COALESCE(visited.count * 100.0 / total.count, 0) AS progress_percentage
+    FROM
+        v1.courses c
+    LEFT JOIN (
+        SELECT course_id, COUNT(*) AS count
+        FROM v1.course_sections
+        GROUP BY course_id
+    ) total ON total.course_id = c.id
+    LEFT JOIN (
+        SELECT cs.course_id, COUNT(*) AS count
+        FROM v1.students_course_sections scs
+        JOIN v1.course_sections cs ON cs.id = scs.course_sections_id
+        WHERE scs.students_id = $1 AND scs.is_completed = true
+        GROUP BY cs.course_id
+    ) visited ON visited.course_id = c.id
+    """
+    courses = await get_data_func(query, (student_id,))
+    return courses if courses else None
+
 async def repo_update_avatar_url(url: str, user_email, update_data_func = update_query): 
     query = "UPDATE v1.students SET avatar_url = $1 WHERE email = $2"
     student_id = await update_data_func(query, (url, user_email))

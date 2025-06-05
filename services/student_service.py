@@ -3,17 +3,21 @@ from data.database import insert_query, update_query
 from repositories.student_repo import (
     repo_update_avatar_url,
     update_student_data,
-    repo_get_courses_student_all
+    repo_get_courses_student_all,
+    repo_get_courses_progress
 )
 
 
 
-async def update_student_service(first_name, last_name, avatar_url, user_email, user_role):
+async def update_student_service(first_name: str, last_name: str, avatar_url: str, user_email: str, user_role: str):
     await update_student_data(first_name, last_name, avatar_url, user_email)
     return await get_account_by_email(user_email, user_role)
 
-async def get_student_courses_service(student_id):
+async def get_student_courses_service(student_id: int):
     return await repo_get_courses_student_all(student_id)
+
+async def get_student_courses_progress_service(student_id: int):
+    return await repo_get_courses_progress(student_id)
 
 async def update_avatar_url(url: str, user_email):
     return await repo_update_avatar_url(url, user_email)

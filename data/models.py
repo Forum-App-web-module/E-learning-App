@@ -89,6 +89,11 @@ class CourseUpdate(BaseModel):
     is_premium:  Optional[bool] = Field(default=None, example="False")
     is_hidden:  Optional[bool] = Field(default=None, example="False")
 
+class CoursesProgressResponse(BaseModel):
+    course_id: int
+    title: str
+    progress_percentage: float
+
 
 # --- Section Models ---
 
