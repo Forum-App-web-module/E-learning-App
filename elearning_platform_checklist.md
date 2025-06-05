@@ -79,7 +79,7 @@ Accessible only if the user is authenticated. If the user is authenticated as a 
 - ✅ Teachers must be able to create courses, view and update their own courses.
 - ❌ Teachers petar could be notified via email whenever an enrollment request is sent by a student for a specific course that they own.
 - ❌ Teachers petar should be able to approve enrollment requests sent by students.
-- ❌ Teachers could be able to deactivate / hide only courses to which they are owners when there are no students subscribed for that course.
+- ✅ Teachers could be able to deactivate / hide only courses to which they are owners when there are no students subscribed for that course.
 - ✅ Teachers should be able to generate reports for the past and current students that have subscribed for their courses.
 
 
