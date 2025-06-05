@@ -1,6 +1,10 @@
 from common.responses import Unauthorized, Forbidden, NotFound, NoContent
 from repositories.user_repo import get_account_by_email
-from repositories.teacher_repo import update_teacher_repo, report_enrolled_students
+from repositories.teacher_repo import (
+    update_teacher_repo,
+    report_enrolled_students,
+    hide_unpopular_courses
+)
 from typing import Union
 from data.models import UserRole
 from repositories.user_repo import repo_get_role_by_email
@@ -20,6 +24,9 @@ async def validate_teacher_role(email: str) -> Union[Unauthorized, Forbidden] | 
 
 async def get_enrolled_students(teacher_id: int):
     return await report_enrolled_students(teacher_id)
+
+async def hide_unpopular_courses_service(teacher_id: int):
+    return await hide_unpopular_courses(teacher_id)
 
 
 

@@ -2,7 +2,12 @@ from fastapi import APIRouter
 from fastapi.params import Depends, Header, Body
 from data.models import TeacherRegisterData, UserRole, TeacherResponse, EnrollmentReport
 from security.auth_dependencies import get_current_user
-from services.teacher_service import get_teacher_by_email, update_teacher_service, get_enrolled_students
+from services.teacher_service import (
+    get_teacher_by_email,
+    update_teacher_service,
+    get_enrolled_students,
+    hide_unpopular_courses_service
+)
 from common import responses
 from router_helper import router_helper
 
@@ -37,7 +42,7 @@ async def approve_enrollment(payload: dict = Depends(get_current_user)):
 async def update_teacher(
         payload: dict = Depends(get_current_user),
         mobile: str = Body(min_length=6, max_length=17),
-        linked_in_url: str = Body(regex="^https?:\/\/www\.linkedin\.com\/.+"),
+        linked_in_url: str = Body(regex=r"^https?:\/\/www\.linkedin\.com\/.+"),
 ):
     email = payload["email"]
     if not await get_teacher_by_email(email):
@@ -60,4 +65,17 @@ async def generate_report(payload: dict = Depends(get_current_user)):
 
     return responses.Successful(content=report_list)
 
+# Teachers to deactivate only courses to which they are owners when there are no student enrollments
+# The SQL query checks for enrollments and updates at the same time.
+@teachers_router.patch("/deactivate/courses")
+async def deactivate_courses(payload: dict = Depends(get_current_user)):
+    if not await get_teacher_by_email(payload["email"]):
+            return responses.NotFound(content="You need to be Teacher for this action.")
+
+    repo_response = await hide_unpopular_courses_service(payload["id"])
+
+    if repo_response:
+        return responses.Successful(content="Courses deactivated successfully.")
+    else:
+        return responses.NoContent()
 

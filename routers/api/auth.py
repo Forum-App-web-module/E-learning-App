@@ -43,7 +43,6 @@ async def _authenticate_user(email: str, password: str):
 
     
     profile = await get_account_by_email(email, role)
-    profile["role"] = role
 
     # token = create_access_token({"sub": email, "role" : role})
 
@@ -53,6 +52,7 @@ async def _authenticate_user(email: str, password: str):
     #     profile["auth_source"] = "google"
     
     token = create_access_token(dict(profile))
+    token["role"] = role
     
     return responses.Successful(content={"access_token": token["JWT"], "token_type": "bearer"})
 
