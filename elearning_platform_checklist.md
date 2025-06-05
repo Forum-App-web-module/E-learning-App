@@ -63,8 +63,8 @@ Accessible only if the user is authenticated. If the user is authenticated as a 
 
 - ✅ Users must be able to login/logout
 - ✅ Students must be able to view and edit their account information (except the email).
-- ❌ If logged in as a student, they would access all public courses and only the premium courses in which they are enrolled (info page).
-- ❌ Students should be able to track their progress for every course based on the sections that they have visited (i.e. if a course has 7 Sections and the Student visited 4 of them the progress would be 57%).
+- ✅ If logged in as a student, they would access all public courses and only the premium courses in which they are enrolled (info page).
+- ✅ Students should be able to track their progress for every course based on the sections that they have visited (i.e. if a course has 7 Sections and the Student visited 4 of them the progress would be 57%).
 - ❌ Students must be able to view the courses that they are enrolled in (both public and premium). 
 - ❌ Students must be able to view and search by name and tag through existing public and premium courses.
 - ❌ Students must be able to unsubscribe from premium courses.
