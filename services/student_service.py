@@ -2,7 +2,8 @@ from repositories.user_repo import get_account_by_email
 from data.database import insert_query, update_query
 from repositories.student_repo import (
     repo_update_avatar_url,
-    update_student_data
+    update_student_data,
+    repo_get_courses_student_all
 )
 
 
@@ -10,6 +11,9 @@ from repositories.student_repo import (
 async def update_student_service(first_name, last_name, avatar_url, user_email, user_role):
     await update_student_data(first_name, last_name, avatar_url, user_email)
     return await get_account_by_email(user_email, user_role)
+
+async def get_student_courses_service(student_id):
+    return await repo_get_courses_student_all(student_id)
 
 async def update_avatar_url(url: str, user_email):
     return await repo_update_avatar_url(url, user_email)

@@ -67,6 +67,15 @@ class CourseBase(BaseModel):
 class CourseCreate(CourseBase):
     owner_id: int
 
+class CourseStudentResponse(BaseModel):
+    id: int
+    title: str
+    description: str
+    tags: str
+    picture_url: str
+    is_premium: bool
+    created_on: datetime
+
 class Course(CourseBase):
     id: int
     owner_id: int

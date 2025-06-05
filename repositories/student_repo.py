@@ -19,6 +19,21 @@ async def update_student_data(
     student = await update_data_func(query, (first_name, last_name, avatar_url, user_email))
     return student
 
+async def repo_get_courses_student_all(student_id, get_data_func = read_query):
+    query = """
+    select * from v1.courses c
+    where is_premium = false
+    or (is_premium = true
+    and
+    id in (select e.course_id from v1.enrollments e
+            where e.student_id = $1
+            and e.is_approved = true
+            and e.completed_at is null)
+        )
+    """
+    courses = await get_data_func(query, (student_id,))
+    return courses if courses else None
+
 async def repo_update_avatar_url(url: str, user_email, update_data_func = update_query): 
     query = "UPDATE v1.students SET avatar_url = $1 WHERE email = $2"
     student_id = await update_data_func(query, (url, user_email))
