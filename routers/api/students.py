@@ -1,44 +1,58 @@
-from fastapi import APIRouter, UploadFile, File, Header, Depends
+from fastapi import APIRouter, UploadFile, File, Header, Body, Depends
 
 from config.cloudinary_config import upload_avatar
 from security.auth_dependencies import get_current_user
 from common import responses
-from services.student_service import update_avatar_url, get_student_by_email
-from fastapi.security import OAuth2PasswordBearer
+from services.student_service import update_avatar_url, get_student_by_email, update_student_service
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from services.subscription_service import subscribe, is_subscribed
 from services.course_service import enroll_course, count_premium_enrollments, get_course_by_id_service
 from data.models import SubscriptionResponse, StudentResponse
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
-
 students_router = APIRouter(prefix="/students", tags=["students"])
 
 
 @students_router.get("/")
 async def get_students(payload: dict = Depends(get_current_user)):
-   student = await get_student_by_email(payload.get("email"))
-   return responses.Successful(content=StudentResponse(**student).model_dump(mode="json"))
+    if payload.get("role") != "student":
+        return responses.Forbidden(content="Only a Student user can perform this action")
+    student = await get_student_by_email(payload.get("email"))
+    return responses.Successful(content=StudentResponse(**student).model_dump(mode="json"))
 
+@students_router.put("/account")
+async def update_student(
+        payload: dict = Depends(get_current_user),
+        first_name = Body(min_length=2, max_length=20),
+        last_name = Body(min_length=2, max_length=20),
+        avatar_url = Body(regex=r"^https?:\/\/.*\.(png|jpg|jpeg)$")
+):
+    if payload.get("role") != "student":
+        return responses.Forbidden(content="Only a Student user can perform this action")
+
+    student = await update_student_service(
+        first_name,
+        last_name,
+        avatar_url,
+        payload.get("email"),
+        payload.get("role")
+    )
+
+    return responses.Successful(content=StudentResponse(**student).model_dump(mode="json"))
 
 
 @students_router.post('/avatar')
 async def upload_avatar_photo(file: UploadFile = File(...), payload: dict = Depends(get_current_user) ):
-
     email = payload.get("email")
-
-    # Uploading and generating URL 
+    # Uploading and generating URL
     url = upload_avatar(file, email)
 
     # Updating URL in database
     await update_avatar_url(url, email)
-
     student_profile = await get_student_by_email(email)
 
     return responses.Created(content=StudentResponse(**student_profile).model_dump(mode="json"))
-
-
-from fastapi.security import OAuth2PasswordRequestForm
 
 @students_router.post("/subscribe")
 async def subscribe_student(payload: dict = Depends(get_current_user)):

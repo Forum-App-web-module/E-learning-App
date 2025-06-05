@@ -38,7 +38,7 @@ async def approve_enrollment(payload: dict = Depends(get_current_user)):
 
 
 # Teachers must be able to edit their account information
-@teachers_router.put("/")
+@teachers_router.put("/account")
 async def update_teacher(
         payload: dict = Depends(get_current_user),
         mobile: str = Body(min_length=6, max_length=17),
@@ -58,9 +58,8 @@ async def update_teacher(
 async def generate_report(payload: dict = Depends(get_current_user)):
     if not await get_teacher_by_email(payload["email"]):
             return responses.NotFound(content="You need to be Teacher for this action.")
-    teacher_id = await router_helper.get_teacher_id(payload["email"])
-    repo_records = await get_enrolled_students(teacher_id)
 
+    repo_records = await get_enrolled_students(payload["id"])
     report_list = [EnrollmentReport(**r).model_dump(mode="json") for r in repo_records]
 
     return responses.Successful(content=report_list)
