@@ -69,7 +69,7 @@ Accessible only if the user is authenticated. If the user is authenticated as a 
 - ❌ Students must be able to view and search by name and tag through existing public and premium courses.
 - ❌ Students must be able to unsubscribe from premium courses.
 - ❌ Students should be able to rate a course (only one score for a course) only if they are enrolled in it.
-- ❌ Students should be able to subscribe to a maximum of 5 premium courses at a time and unlimited number of public courses.
+- ✅ Students should be able to subscribe to a maximum of 5 premium courses at a time and unlimited number of public courses.
 
 
 ## For Teachers
@@ -77,15 +77,15 @@ Accessible only if the user is authenticated. If the user is authenticated as a 
 - ✅ Teachers must be able to view and edit their account information (except the username).
 - ✅ If the user is authenticated as a teacher, they would be able to access all courses and sections they own.
 - ✅ Teachers must be able to create courses, view and update their own courses.
-- ❌ Teachers could be notified via email whenever an enrollment request is sent by a student for a specific course that they own.
-- ❌ Teachers should be able to approve enrollment requests sent by students.
+- ❌ Teachers petar could be notified via email whenever an enrollment request is sent by a student for a specific course that they own.
+- ❌ Teachers petar should be able to approve enrollment requests sent by students.
 - ❌ Teachers could be able to deactivate / hide only courses to which they are owners when there are no students subscribed for that course.
-- ❌ Teachers should be able to generate reports for the past and current students that have subscribed for their courses.
+- ✅ Teachers should be able to generate reports for the past and current students that have subscribed for their courses.
 
 
 ## For Admins (could)
 
-- ❌ Admins could approve registrations for teachers (via email).
+- ❌ petar Admins could approve registrations for teachers (via email).
 - ❌ Admins could be able to view a list with all public and premium courses, the number of students in them and their rating. Courses list should support pagination. Admins should be able to search through courses filtered by teachers and/or by students. 
 - ❌ Admins could deactivate/reactivate students and teachers.
 - ❌ Admins could delete/hide courses and the enrolled students could receive a notification that the course is no longer active (via email).
