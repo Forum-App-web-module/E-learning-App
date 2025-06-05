@@ -50,9 +50,10 @@ async def _authenticate_user(email: str, password: str):
     # if password == "GOOGLE_AUTH":
     #     profile["sub"] = profile.get("email")
     #     profile["auth_source"] = "google"
-    
+
+    profile = dict(profile)
+    profile["role"] = role
     token = create_access_token(dict(profile))
-    token["role"] = role
     
     return responses.Successful(content={"access_token": token["JWT"], "token_type": "bearer"})
 

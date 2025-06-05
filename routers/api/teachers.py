@@ -42,7 +42,7 @@ async def approve_enrollment(payload: dict = Depends(get_current_user)):
 async def update_teacher(
         payload: dict = Depends(get_current_user),
         mobile: str = Body(min_length=6, max_length=17),
-        linked_in_url: str = Body(regex=r"^https?:\/\/www\.linkedin\.com\/.+"),
+        linked_in_url: str = Body(pattern=r"^https?:\/\/www\.linkedin\.com\/.+"),
 ):
     email = payload["email"]
     if not await get_teacher_by_email(email):
