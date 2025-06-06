@@ -30,7 +30,7 @@ Your task is to design an e-learning platform that would be used by students to 
 - ✅ Each course should optionally have a Home Page picture. 
 - ✅ Each course must be either public or premium and can later be augmented with sections. 
 - ❌ Each course should have an option for subscribing or unsubscribing.
-- ❌ Each course could have a rating which represents a proportionate value of the provided scores. As an example, if 2 people rate a course with 7 out of 10 and 6 out of 10, then the calculated rating would be 7 plus 6 divided by 20 (7 + 6 = 13 / 20 = 0.65). The rating would be 6.5 out of 10.
+- ✅ Each course could have a rating which represents a proportionate value of the provided scores. As an example, if 2 people rate a course with 7 out of 10 and 6 out of 10, then the calculated rating would be 7 plus 6 divided by 20 (7 + 6 = 13 / 20 = 0.65). The rating would be 6.5 out of 10.
 
 
 ---
@@ -65,10 +65,10 @@ Accessible only if the user is authenticated. If the user is authenticated as a 
 - ✅ Students must be able to view and edit their account information (except the email).
 - ✅ If logged in as a student, they would access all public courses and only the premium courses in which they are enrolled (info page).
 - ✅ Students should be able to track their progress for every course based on the sections that they have visited (i.e. if a course has 7 Sections and the Student visited 4 of them the progress would be 57%).
-- ❌ Students must be able to view the courses that they are enrolled in (both public and premium). 
+- ✅ Students must be able to view the courses that they are enrolled in (both public and premium). 
 - ❌ Students must be able to view and search by name and tag through existing public and premium courses.
 - ❌ Students must be able to unsubscribe from premium courses.
-- ❌ Students should be able to rate a course (only one score for a course) only if they are enrolled in it.
+- ✅ Students should be able to rate a course (only one score for a course) only if they are enrolled in it.
 - ✅ Students should be able to subscribe to a maximum of 5 premium courses at a time and unlimited number of public courses.
 
 
