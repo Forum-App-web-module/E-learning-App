@@ -7,16 +7,18 @@ from typing import Optional
 async def get_all_public_courses_repo(tag: Optional[str], get_data_func = read_query):
 
     query= """
-    SELECT title, description, tags
-    FROM v1.courses
-    WHERE is_premium = FALSE
-    AND is_hidden = FALSE
+    SELECT c.title, c.description, c.tags, ROUND(AVG(cr.rating), 1) AS average_rating
+    FROM v1.courses c
+    LEFT JOIN v1.course_rating cr ON c.id = cr.courses_id
+    WHERE c.is_premium = FALSE
+    AND c.is_hidden = FALSE
 
     """
     if not tag:
+        query += " GROUP BY c.id"
         public_courses = await get_data_func(query)
     else:    
-        query += "AND tags ILIKE '%' || $1 || '%';"
+        query += "AND tags ILIKE '%' || $1 || '%' GROUP BY c.id"
         #query = """
         #SELECT title, description, tags
         #FROM v1.courses
@@ -46,9 +48,12 @@ async def read_course_by_id(id: int, get_data_func = read_query):
 async def read_all_courses_per_teacher(teacher_id, get_data_func = read_query):
 
     query = """
-    SELECT *
-    FROM v1.courses
+    SELECT c.*,
+    AVG(cr.rating) as average_rating
+    FROM v1.courses c
+    LEFT JOIN v1.course_rating cr ON c.id = cr.courses_id
     WHERE owner_id = $1
+    GROUP BY c.id, c.title, c.description, c.tags, c.picture_url, c.is_premium, c.is_hidden
 """
 
     courses = await get_data_func(query, (teacher_id, ))

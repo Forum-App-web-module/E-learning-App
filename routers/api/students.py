@@ -8,7 +8,8 @@ from services.student_service import (
     get_student_by_email,
     update_student_service,
     get_student_courses_service,
-    get_student_courses_progress_service
+    get_student_courses_progress_service,
+    rate_course_service
 )
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from services.subscription_service import subscribe, is_subscribed
@@ -115,5 +116,17 @@ async def enroll(course_id: int, payload: dict = Depends(get_current_user)):
         
     else: return responses.BadRequest(content=f"There is no course with id {course_id}")
     
+@students_router.post("/{course_id}/rate")
+async def rate_course(course_id: int, rating: int, payload: dict = Depends(get_current_user)):
+    role = payload.get("role")
+    if role != "student":
+        return responses.Forbidden(content="Only a Student user can rate a course")
     
+    student_id = payload.get("id")
+    course_rating = await rate_course_service(student_id, course_id, rating)
 
+    if not course_rating:
+        return responses.Forbidden("You can only rate courses you are currently enrolled to or have completed.")
+    
+    return responses.Successful(content="Course rating submitted.")
+    

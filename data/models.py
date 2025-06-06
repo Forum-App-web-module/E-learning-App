@@ -75,6 +75,7 @@ class CourseStudentResponse(BaseModel):
     picture_url: str
     is_premium: bool
     created_on: datetime
+    rating: Optional[float] = Field(alias="average_rating")
 
 class Course(CourseBase):
     id: int

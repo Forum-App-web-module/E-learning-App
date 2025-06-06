@@ -21,7 +21,8 @@ async def update_student_data(
 
 async def repo_get_courses_student_all(student_id, get_data_func = read_query):
     query = """
-    select * from v1.courses c
+    select c.*, avg(cr.rating) as average_rating from v1.courses c
+    left join v1.course_rating cr on c.id = cr.courses_id
     where is_premium = false
     or (is_premium = true
     and
@@ -30,6 +31,7 @@ async def repo_get_courses_student_all(student_id, get_data_func = read_query):
             and e.is_approved = true
             and e.completed_at is null)
         )
+    group by c.id, c.title, c.description, c.tags, c.picture_url, c.is_premium, c.created_on
     """
     courses = await get_data_func(query, (student_id,))
     return courses if courses else None
@@ -74,3 +76,28 @@ async def repo_is_subscribed(student_id, get_data_func = read_query):
     query = "SELECT id, student_id, subscribed_at, expire_date FROM v1.subscriptions WHERE student_id = $1"
     subscription = await get_data_func(query, (student_id,))
     return subscription[0] if subscription else None
+
+async def repo_rate_course(student_id, course_id, rating: int, insert_data_func = insert_query):
+    query = """
+    INSERT INTO v1.course_rating(students_id, courses_id, rating)
+    VALUES ($1, $2, $3)
+    ON CONFLICT (students_id, courses_id)
+    DO UPDATE SET rating = EXCLUDED.rating
+    RETURNING students_id, courses_id, rating
+    """
+    # ON CONFLICT (student_id, course_id) DO UPDATE SET rating = EXCLUDED.rating - a student can change their rating, EXCLUDED.rating is the new raiting inserted
+    rating = await insert_data_func(query, (student_id, course_id, rating))
+    return rating
+
+#get all courses a student is enrolled to or has completed
+async def repo_allow_rating(student_id, course_id, get_data_func = read_query):
+    query = """
+    SELECT 1
+    FROM v1.enrollments
+    WHERE student_id = $1
+    AND course_id = $2
+    AND (completed_at IS NOT NULL OR (completed_at is NULL and drop_out = FALSE))    
+"""
+    result = await get_data_func(query, (student_id, course_id))
+    #print(result) # allow_rating result: [<Record ?column?=1>]
+    return len(result) > 0
