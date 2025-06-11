@@ -8,6 +8,8 @@ from repositories.student_repo import (
     repo_rate_course,
     repo_allow_rating
 )
+from data.models import StudentResponse
+from repositories.user_repo import get_user_by_id_repo
 
 
 
@@ -36,3 +38,6 @@ async def rate_course_service(student_id: int, course_id: int, rating: int):
     
     return await repo_rate_course(student_id, course_id, rating)
 
+async def get_student_by_id(student_id: int):
+    student = await get_user_by_id_repo(student_id, role = "student")
+    return StudentResponse(**student.model_dump(mode="json"))

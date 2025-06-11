@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Header, Body, Depends
-
+from config.mailJet_config import teacher_approve_enrollment
 from config.cloudinary_config import upload_avatar
 from security.auth_dependencies import get_current_user
 from common import responses
@@ -11,10 +11,11 @@ from services.student_service import (
     get_student_courses_progress_service,
     rate_course_service
 )
+from services.teacher_service import get_teacher_by_id
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from services.subscription_service import subscribe, is_subscribed
 from services.course_service import enroll_course, count_premium_enrollments, get_course_by_id_service
-from data.models import SubscriptionResponse, StudentResponse, CourseStudentResponse, CoursesProgressResponse
+from data.models import SubscriptionResponse, StudentResponse, CourseStudentResponse, CoursesProgressResponse, TeacherResponse, CourseResponse
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -90,10 +91,11 @@ async def subscribe_student(payload: dict = Depends(get_current_user)):
 
 @students_router.post("/enroll/{course_id}")
 async def enroll(course_id: int, payload: dict = Depends(get_current_user)):
-    # Checking if course is premium
+    # allowed by default
+    allowed = True
 
+    # Checking if course is premium
     course = await get_course_by_id_service(course_id)
-    print(course)
     student_id = payload.get("id")
     if course:
         if course[5] == True:
@@ -102,20 +104,29 @@ async def enroll(course_id: int, payload: dict = Depends(get_current_user)):
                 # Checking premium courses enrollment count.
                 premium_enrollments_count = await count_premium_enrollments((payload.get("id")))
                 if premium_enrollments_count >= 5:
+                    allowed = False
                     return responses.Unauthorized(content="Student is already enrolled to 5 premium courses. First complete or cancel enrollment.")
-                else: 
-                    # Creating enrollment
-                    enrollment_id = await enroll_course(course_id, student_id )
-                    return responses.Created(content=f"Enrollment created. Course teacher will be notified about your interest.")
-
-            else: responses.Forbidden(content="Course enrollment requires premium subscription!")
-        else: 
-            # Creating enrollment.
-            enrollment_id = await enroll_course(course_id, student_id)
-            return responses.Created(content=f"Enrollment created. Course teacher will be notified about your interest.")
-        
-    else: return responses.BadRequest(content=f"There is no course with id {course_id}")
+            else: 
+                allowed = False
+                return responses.Forbidden(content="Course enrollment requires premium subscription!")
+    else:
+        allowed = False 
+        return responses.BadRequest(content=f"There is no course with id {course_id}")
     
+
+    if allowed:
+        teacher_data = await get_teacher_by_id(course[6])
+
+        # Gathering all obejects needed
+        enrollment_id = await enroll_course(course_id, student_id)
+        course_object = CourseResponse(**(await get_course_by_id_service(course_id)))
+        student_object = StudentResponse(**payload)
+
+        # Sending enrollment request to course owner
+        await teacher_approve_enrollment(teacher_data, student_object, course_object, enrollment_id)
+
+        return responses.Created(content=f"Enrollment created. Course teacher will be notified about your interest.")
+
 @students_router.post("/{course_id}/rate")
 async def rate_course(course_id: int, rating: int, payload: dict = Depends(get_current_user)):
     role = payload.get("role")

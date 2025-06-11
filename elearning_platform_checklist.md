@@ -77,8 +77,8 @@ Accessible only if the user is authenticated. If the user is authenticated as a 
 - ✅ Teachers must be able to view and edit their account information (except the username).
 - ✅ If the user is authenticated as a teacher, they would be able to access all courses and sections they own.
 - ✅ Teachers must be able to create courses, view and update their own courses.
-- ❌ Teachers petar could be notified via email whenever an enrollment request is sent by a student for a specific course that they own.
-- ❌ Teachers petar should be able to approve enrollment requests sent by students.
+- ✅ Teachers could be notified via email whenever an enrollment request is sent by a student for a specific course that they own.
+- ✅ Teachers petar should be able to approve enrollment requests sent by students.
 - ✅ Teachers could be able to deactivate / hide only courses to which they are owners when there are no students subscribed for that course.
 - ✅ Teachers should be able to generate reports for the past and current students that have subscribed for their courses.
 
@@ -94,8 +94,8 @@ Accessible only if the user is authenticated. If the user is authenticated as a 
 
 ## Optional features (should)
 - ❌ Search endpoints should support pagination and sorting.
-- ❌ Email Verification for the teachers could be implemented. For the registration to be completed, the teacher must verify their email by clicking on a link send to their email by the application. Before verifying their email, teachers cannot create courses.
-- ❌ Email notifications could be supported (i.e.  with the help with a third party service like: https://dev.mailjet.com/email/guides/send-api-v31/.)
+- ❌ petar Email Verification for the teachers could be implemented. For the registration to be completed, the teacher must verify their email by clicking on a link send to their email by the application. Before verifying their email, teachers cannot create courses.
+- ❌ petar Email notifications could be supported (i.e.  with the help with a third party service like: https://dev.mailjet.com/email/guides/send-api-v31/.)
 Add Easter eggs whenever you could. Creativity is always welcome and appreciated. Find a way to add something fun and/or interesting, maybe an Easter egg or two to your project to add some variety. 
 
 ## REST API - Summary

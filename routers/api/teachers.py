@@ -6,8 +6,11 @@ from services.teacher_service import (
     get_teacher_by_email,
     update_teacher_service,
     get_enrolled_students,
-    hide_unpopular_courses_service
+    hide_unpopular_courses_service, 
+    confirm_enrollment
 )
+from services.enrollment_service import get_enrollment_by_id
+from services.course_service import verify_course_owner
 from common import responses
 from router_helper import router_helper
 
@@ -33,8 +36,13 @@ async def verify_email():
 # Teacher gets email from system for course enrollments. This endpoint is sent to the teacher in the message.
 # By clicking to the Url teacher gets this endpoint and approves.
 @teachers_router.put("/enrollments/{id}")
-async def approve_enrollment(payload: dict = Depends(get_current_user)):
-    pass
+async def approve_enrollment(id=id, payload: dict = Depends(get_current_user)):
+
+    enrollment_object = await get_enrollment_by_id(id)
+    if await verify_course_owner(enrollment_object.course_id, payload["id"]) == True:
+        await confirm_enrollment(id)
+        return responses.Successful(content="Enrollment is approved successfully.")
+    return responses.Forbidden(content="Only owner can approve enrollment.")
 
 
 # Teachers must be able to edit their account information

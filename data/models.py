@@ -77,6 +77,17 @@ class CourseStudentResponse(BaseModel):
     created_on: datetime
     rating: Optional[float] = Field(alias="average_rating")
 
+class CourseResponse(BaseModel):
+    id: int
+    title: str
+    description: str
+    tags: str
+    picture_url: str
+    is_premium: bool
+    owner_id: int
+    is_hidden: bool
+    created_on: datetime
+
 class Course(CourseBase):
     id: int
     owner_id: int
@@ -182,6 +193,17 @@ class Enrollment(BaseModel):
     requested_at: datetime = datetime.now()
     approved_at: datetime | None
     completed_at: datetime | None
+
+
+class EnrollmentResponse(BaseModel):
+    id: int | None
+    student_id: int
+    course_id: int
+    is_approved: bool = False
+    requested_at: datetime
+    approved_at: datetime | None
+    completed_at: datetime | None
+    drop_out: bool
 
 
 # e.student_id, s.email, s.first_name, s.last_name,

@@ -75,7 +75,7 @@ async def teacher_approve_enrollment(teacher_data: TeacherResponse, student_data
     'Messages': [
                     {
                             "From": {
-                                    "Email": "noreply@exaple.com",
+                                    "Email": "petar.k.pavlov@gmail.com",
                                     "Name": "System"
                             },
                             "To": [
@@ -86,7 +86,20 @@ async def teacher_approve_enrollment(teacher_data: TeacherResponse, student_data
                             ],
                             "Subject": f"New enrollment for your course: {course.title}",
                             "TextPart": "Hope you have a great day!",
-                            "HTMLPart": f"<h3>Hello, you have new student enrolling for course {course.title}. Student informaion: First name: {student_data.first_name}, Last name: {student_data.last_name} <a href=\"{URL}>Click here to approve the enrollment</a>!</h3><br />Enjoy your teaching!"
+                            "HTMLPart": f"""
+                                        <h3>
+                                                Hello, you have a new student enrolling for the course <strong>{course.title}</strong>.
+                                                <br /><br />
+                                                Student information:
+                                                <br />
+                                                First name: {student_data.first_name}<br />
+                                                Last name: {student_data.last_name}
+                                                <br /><br />
+                                                <a href="{URL}">Click here to approve the enrollment</a>!
+                                        </h3>
+                                        <br />
+                                        Enjoy your teaching!
+                                        """
                     }
             ]
     }

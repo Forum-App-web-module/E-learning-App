@@ -88,5 +88,16 @@ async def repo_get_role_by_email(email, get_data_func: Callable[[str, tuple], An
     else:
         return None
 
+async def get_user_by_id_repo(user_id, role: str, get_data_func: Callable[[str, tuple], Any] = read_query
+):
+    role_info = ALLOWED_ROLES.get(role.lower())
 
+    query = f"""
+        SELECT {role_info['fields']}
+        FROM {role_info['table']}
+        WHERE id = $1
+    """
+
+    result = await get_data_func(query, (user_id,))
+    return result[0] if result else None
 
