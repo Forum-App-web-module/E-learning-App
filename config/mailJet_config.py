@@ -9,7 +9,7 @@ from data.models import TeacherResponse, StudentResponse, Course
 
 load_dotenv(dotenv_path="external_keys.env")
 
-
+system_email = getenv("SYSTEM_EMAIL")
 api_key = getenv("MAILJET_API_KEY")
 api_secret = getenv("MAILJET_SECRET")
 
@@ -75,7 +75,7 @@ async def teacher_approve_enrollment(teacher_data: TeacherResponse, student_data
     'Messages': [
                     {
                             "From": {
-                                    "Email": "petar.k.pavlov@gmail.com",
+                                    "Email": system_email,
                                     "Name": "System"
                             },
                             "To": [
