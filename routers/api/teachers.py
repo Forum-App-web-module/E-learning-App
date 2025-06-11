@@ -7,7 +7,8 @@ from services.teacher_service import (
     update_teacher_service,
     get_enrolled_students,
     hide_unpopular_courses_service, 
-    confirm_enrollment
+    confirm_enrollment,
+    verify_email,
 )
 from services.enrollment_service import get_enrollment_by_id
 from services.course_service import verify_course_owner
@@ -28,10 +29,12 @@ async def get_teachers(payload: dict = Depends(get_current_user)):
 
 
 # Verify email by email. Teacher get email from system to verify his email by clicking on the Url.
-@teachers_router.get("/email/{}")
-async def verify_email():
-    pass
-
+@teachers_router.put("/email/{id}")
+async def verify_teacher_email(id=id, payload: dict = Depends(get_current_user)):
+    if id == str(payload["id"]):
+        await verify_email(payload["id"])
+        return responses.Successful(content="Email is now verified!")
+    else: return responses.Forbidden(content="Not authorised for this action.")
 
 # Teacher gets email from system for course enrollments. This endpoint is sent to the teacher in the message.
 # By clicking to the Url teacher gets this endpoint and approves.
