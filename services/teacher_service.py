@@ -4,7 +4,8 @@ from repositories.teacher_repo import (
     update_teacher_repo,
     report_enrolled_students,
     hide_unpopular_courses,
-    verify_email_repo
+    verify_email_repo,
+    validate_teacher_verified_and_activated_repo
 )
 from typing import Union
 from data.models import UserRole, TeacherResponse
@@ -39,3 +40,7 @@ async def confirm_enrollment(enrollment_id):
 
 async def verify_email(teacher_id):
      return await verify_email_repo(teacher_id)
+
+async def validate_teacher_verified_and_activated(teacher_id):
+     validation = await validate_teacher_verified_and_activated_repo(teacher_id)
+     return True if validation else False

@@ -47,3 +47,8 @@ async def verify_email_repo(teacher_id, update_data_func = update_query):
     query = "UPDATE v1.teachers SET email_verified = $1 WHERE id = $2"
     result = await update_data_func(query, (True, teacher_id))
     return result
+
+async def validate_teacher_verified_and_activated_repo(teacher_id, get_data_func = read_query):
+    query = "SELECT * FROM v1.teachers WHERE id = $1 and email_verified = $2 and is_active = $3"
+    result = await get_data_func(query,(teacher_id, True, True))
+    return result

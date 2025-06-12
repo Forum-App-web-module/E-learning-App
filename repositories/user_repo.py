@@ -15,6 +15,10 @@ ALLOWED_ROLES = {
         "table": "v1.teachers",
         "fields": "id, email, mobile, linked_in_url"
     },
+    "admin": {
+        "table": "v1.admins",
+        "fields": "id, email"
+    },
 }
 
 async def insert_user(user_data: Union[StudentRegisterData, TeacherRegisterData], hashed_password: str):
@@ -51,8 +55,11 @@ async def repo_email_exists(email: EmailStr, get_data_func = read_query) -> bool
         UNION
         SELECT email FROM v1.teachers
             WHERE email = $2
+        UNION
+        SELECT email FROM v1.admins
+            WHERE email = $3
     """
-    result = await get_data_func(query, (email, email))
+    result = await get_data_func(query, (email, email, email))
     return bool(result)
 
 
@@ -77,7 +84,7 @@ async def get_account_by_email(
 
 async def repo_get_role_by_email(email, get_data_func: Callable[[str, tuple], Any] = read_query):
 
-    tables = {"v1.students": "student", "v1.teachers": "teacher", "v1.admins": "admins"}
+    tables = {"v1.students": "student", "v1.teachers": "teacher", "v1.admins": "admin"}
     #query = "SELECT 1 FROM v1.students WHERE email = $1"
 
     for table, role in tables.items():

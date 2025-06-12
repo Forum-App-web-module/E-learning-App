@@ -10,31 +10,39 @@ from data.models import TeacherResponse, StudentResponse, Course
 load_dotenv(dotenv_path="external_keys.env")
 
 system_email = getenv("SYSTEM_EMAIL")
+admin_email = getenv("ADMIN_EMAIL")
 api_key = getenv("MAILJET_API_KEY")
 api_secret = getenv("MAILJET_SECRET")
+
 
 
 mailjet = Client(auth=(api_key, api_secret), version='v3.1')
 
 
-async def admin_teacher_aproval(teacher_data: TeacherResponse, admin_email: str):
-    URL = "http://127.0.0.1:8000/admins/approve_teacher/" + f"{teacher_data.id}"
+async def admin_teacher_aproval(teacher_data: TeacherResponse):
+    URL = "http://127.0.0.1:8000/admins/teacher/" + f"{teacher_data.id}"
     data = {
     'Messages': [
                     {
                             "From": {
-                                    "Email": "noreply@exaple.com",
+                                    "Email": system_email,
                                     "Name": "System"
                             },
                             "To": [
                                     {
-                                            "Email": f"{admin_email}",
-                                            "Name": "Admin of Example"
+                                            "Email": admin_email,
+                                            "Name": "Admin team"
                                     }
                             ],
                             "Subject": "New Teacher Registration Request",
                             "TextPart": "Hope you have a great day!",
-                            "HTMLPart": f"<h3>Dear Admin, there is new teacher registration waiting your approval. <a href=\"{URL}>Click here to approve the teacher</a>!</h3><br />May the delivery force be with you!"
+                            "HTMLPart": f"""
+                                        <h3>Dear Admin,</h3>
+                                        <p>There is a new teacher registration waiting for your approval.</p>
+                                        <p><a href="{URL}">Click here to approve the teacher</a>!</p>
+                                        <br />
+                                        <p>May the admin force be with you!</p>
+                                        """
                     }
             ]
     }

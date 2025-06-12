@@ -14,7 +14,7 @@ from repositories.user_repo import get_account_by_email
 import os
 from security.secrets import verify_password
 from services.teacher_service import get_teacher_by_id
-from config.mailJet_config import teacher_verify_email
+from config.mailJet_config import teacher_verify_email, admin_teacher_aproval
 
 
 auth_router = APIRouter(prefix="", tags=["Auth"])
@@ -82,6 +82,7 @@ async def register(register_data: Union[TeacherRegisterData, StudentRegisterData
     if role == UserRole.TEACHER:
         teacher_object = await get_teacher_by_id(role_id)
         await teacher_verify_email(teacher_object, role_id)
+        await admin_teacher_aproval(teacher_object)
         
     return responses.Created(content={
         "message": f"New User is registered.",

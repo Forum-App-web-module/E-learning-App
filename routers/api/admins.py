@@ -1,11 +1,18 @@
-from fastapi import APIRouter
-
+from fastapi import APIRouter, Depends
+from security.auth_dependencies import get_current_user
+from data.models import UserRole
+from common import responses
+from services.admin_service import approve_teacher
 
 
 
 admins_router = APIRouter(prefix="/admins", tags=["admins"])
 
 # approve teacher registration - get from email link
-@admins_router.get("/email/{id}")
-async def approve_email():
-    pass
+@admins_router.put("/teacher/{id}")
+async def approve_teacher_registration(id=id, payload: dict = Depends(get_current_user)):
+    if not payload["role"] == UserRole.ADMIN:
+        return responses.Forbidden(content="Admin authorisation required.")
+    await approve_teacher(id)
+    return responses.Successful(content=f"Teacher {id} registration is approved successfully.")
+    

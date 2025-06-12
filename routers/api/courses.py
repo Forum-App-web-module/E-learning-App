@@ -10,9 +10,9 @@ from services.course_service import (
 from services.section_service import create_section_service, update_section_service, get_all_sections_per_course_service
 from data.models import CourseCreate, CourseBase, CourseUpdate, SectionCreate, SectionOut, SectionUpdate, Course
 from fastapi.security import OAuth2PasswordBearer
-from common.responses import Unauthorized, NotFound, Created, Successful
+from common.responses import Unauthorized, NotFound, Created, Successful, Forbidden
 from security.auth_dependencies import get_current_user
-from services.teacher_service import get_teacher_by_email
+from services.teacher_service import get_teacher_by_email, validate_teacher_verified_and_activated
 from router_helper import router_helper
 from typing import Optional
 
@@ -55,7 +55,8 @@ async def create_course(course_data: CourseBase, payload: dict = Security(get_cu
     Owner ID is extracted from the token and linked to the course.\n
     """
     id = await router_helper.get_teacher_id(payload.get("email"))
-
+    if not await validate_teacher_verified_and_activated(id):
+        return Forbidden(content="Account is not verified/acticated still. Please verify your email first.")
     new_course = CourseCreate(**course_data.model_dump(), owner_id=id)
     new_id = await create_course_service(new_course)
 

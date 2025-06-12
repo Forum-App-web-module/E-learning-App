@@ -85,7 +85,7 @@ Accessible only if the user is authenticated. If the user is authenticated as a 
 
 ## For Admins (could)
 
-- ❌ petar Admins could approve registrations for teachers (via email).
+- ✅ Admins could approve registrations for teachers (via email).
 - ❌ Admins could be able to view a list with all public and premium courses, the number of students in them and their rating. Courses list should support pagination. Admins should be able to search through courses filtered by teachers and/or by students. 
 - ❌ Admins could deactivate/reactivate students and teachers.
 - ❌ Admins could delete/hide courses and the enrolled students could receive a notification that the course is no longer active (via email).
@@ -94,7 +94,7 @@ Accessible only if the user is authenticated. If the user is authenticated as a 
 
 ## Optional features (should)
 - ❌ Search endpoints should support pagination and sorting.
-- ❌ petar Email Verification for the teachers could be implemented. For the registration to be completed, the teacher must verify their email by clicking on a link send to their email by the application. Before verifying their email, teachers cannot create courses.
+- ✅ Email Verification for the teachers could be implemented. For the registration to be completed, the teacher must verify their email by clicking on a link send to their email by the application. Before verifying their email, teachers cannot create courses.
 - ❌ petar Email notifications could be supported (i.e.  with the help with a third party service like: https://dev.mailjet.com/email/guides/send-api-v31/.)
 Add Easter eggs whenever you could. Creativity is always welcome and appreciated. Find a way to add something fun and/or interesting, maybe an Easter egg or two to your project to add some variety. 
 
