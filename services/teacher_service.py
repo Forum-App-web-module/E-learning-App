@@ -3,7 +3,8 @@ from repositories.user_repo import get_account_by_email, get_user_by_id_repo
 from repositories.teacher_repo import (
     update_teacher_repo,
     report_enrolled_students,
-    hide_unpopular_courses
+    hide_unpopular_courses,
+    verify_email_repo
 )
 from typing import Union
 from data.models import UserRole, TeacherResponse
@@ -35,3 +36,6 @@ async def get_teacher_by_id(teacher_id: int):
 
 async def confirm_enrollment(enrollment_id):
      return await repo_confirm_enrollment(enrollment_id)
+
+async def verify_email(teacher_id):
+     return await verify_email_repo(teacher_id)

@@ -43,3 +43,7 @@ async def hide_unpopular_courses(teacher_id: int, update_data_func = update_quer
     result = await update_data_func(query, (teacher_id, ))
     return result if result else None
 
+async def verify_email_repo(teacher_id, update_data_func = update_query):
+    query = "UPDATE v1.teachers SET email_verified = $1 WHERE id = $2"
+    result = await update_data_func(query, (True, teacher_id))
+    return result

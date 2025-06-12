@@ -39,18 +39,15 @@ async def admin_teacher_aproval(teacher_data: TeacherResponse, admin_email: str)
             ]
     }
     result = mailjet.send.create(data=data)
-# print (result.status_code)
-# print (result.json())
 
 
-
-async def teacher_verify_email(teacher_data: TeacherResponse):
-    URL = "http://127.0.0.1:8000/admins/approve_teacher/" + f"{teacher_data.id}"
+async def teacher_verify_email(teacher_data: TeacherResponse, teacher_id):
+    URL = "http://127.0.0.1:8000/teachers/email/" + f"{teacher_id}"
     data = {
     'Messages': [
                     {
                             "From": {
-                                    "Email": "noreply@exaple.com",
+                                    "Email": system_email,
                                     "Name": "System"
                             },
                             "To": [
@@ -61,7 +58,13 @@ async def teacher_verify_email(teacher_data: TeacherResponse):
                             ],
                             "Subject": "Email verification needed.",
                             "TextPart": "Hope you have a great day!",
-                            "HTMLPart": "<h3>Hello, your registration in Example needs to be verified. <a href=\"{URL}>Click here to verify your email</a>!</h3><br />Enjoy your teaching!"
+                            "HTMLPart": f"""
+                                        <h3>Hello,</h3>
+                                        <p>Your email needs to be verified.</p>
+                                        <p><a href=\"{URL}\">Click here to verify your email!</a>!</p>
+                                        <br />
+                                        <p>Enjoy your teaching!</p>
+                                        """
                     }
             ]
     }
