@@ -8,7 +8,7 @@ from repositories.teacher_repo import (
 from typing import Union
 from data.models import UserRole, TeacherResponse
 from repositories.user_repo import repo_get_role_by_email
-from repositories.enrollments import repo_confirm_enrollment
+from repositories.enrollments_repo import repo_confirm_enrollment
 
 async def get_teacher_by_email(email):
     return await get_account_by_email(email, role="teacher")

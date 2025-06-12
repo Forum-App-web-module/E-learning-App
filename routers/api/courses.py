@@ -30,7 +30,7 @@ async def get_public_courses(tag: Optional[str] = None):
 @courses_router.get("/student")
 async def get_all_courses_per_student(payload: dict = Depends(get_current_user)):
     """
-    Returns a list with all courses owned by the teacher\n
+    Returns a list with all courses owned by the student\n
     Params: payload
 
     """

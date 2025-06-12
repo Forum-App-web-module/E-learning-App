@@ -46,12 +46,12 @@ async def insert_user(user_data: Union[StudentRegisterData, TeacherRegisterData]
 async def repo_email_exists(email: EmailStr, get_data_func = read_query) -> bool:
 
     query = """
-            SELECT email FROM v1.students
-                WHERE email = $1
-            UNION
-            SELECT email FROM v1.teachers
-                WHERE email = $2
-            """
+        SELECT email FROM v1.students
+            WHERE email = $1
+        UNION
+        SELECT email FROM v1.teachers
+            WHERE email = $2
+    """
     result = await get_data_func(query, (email, email))
     return bool(result)
 

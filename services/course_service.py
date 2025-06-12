@@ -4,7 +4,7 @@ from common.responses import Unauthorized, NotFound
 from data.models import CourseCreate, CourseUpdate
 from asyncpg.exceptions import UniqueViolationError
 from fastapi.exceptions import HTTPException
-from repositories.enrollments import repo_create_enrollment
+from repositories.enrollments_repo import repo_create_enrollment
 from typing import Optional
 
 async def get_all_public_courses_service(tag: Optional[str]):

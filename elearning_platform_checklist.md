@@ -16,7 +16,7 @@ Your task is to design an e-learning platform that would be used by students to 
 - ✅ Users can be teachers, students or admins. Each user must have an email, first name, last name, and a password. They also could have a photo.
 - ✅ The email serves as a username for both students and teachers and cannot be amended.
 - ✅ Teachers should also have a phone number and LinkedIn account.
-- ❌ Students must be able to view available courses and access their content depending on whether the courses are public or premium and/or they have subscribed for them or not.
+- ✅ Students must be able to view available courses and access their content depending on whether the courses are public or premium and/or they have subscribed for them or not.
 - ✅ Teachers must be able to create and update courses, add, edit, and ❌remove sections for them.
 - ❌ Admins could authorize teachers’ registrations (via email), deactivate access for students, hide / delete courses. The admin role comes with predefined log-in details where only the password can be amended (could).
 
@@ -29,7 +29,7 @@ Your task is to design an e-learning platform that would be used by students to 
 - ✅ Each course must have a title (unique), description, objectives, owner (teacher), tags with relevant expertise areas and sections. 
 - ✅ Each course should optionally have a Home Page picture. 
 - ✅ Each course must be either public or premium and can later be augmented with sections. 
-- ❌ Each course should have an option for subscribing or unsubscribing.
+- ✅ Each course should have an option for subscribing or unsubscribing.
 - ✅ Each course could have a rating which represents a proportionate value of the provided scores. As an example, if 2 people rate a course with 7 out of 10 and 6 out of 10, then the calculated rating would be 7 plus 6 divided by 20 (7 + 6 = 13 / 20 = 0.65). The rating would be 6.5 out of 10.
 
 
@@ -67,7 +67,7 @@ Accessible only if the user is authenticated. If the user is authenticated as a 
 - ✅ Students should be able to track their progress for every course based on the sections that they have visited (i.e. if a course has 7 Sections and the Student visited 4 of them the progress would be 57%).
 - ✅ Students must be able to view the courses that they are enrolled in (both public and premium). 
 - ❌ Students must be able to view and search by name and tag through existing public and premium courses.
-- ❌ Students must be able to unsubscribe from premium courses.
+- ✅ Students must be able to unsubscribe from premium courses.
 - ✅ Students should be able to rate a course (only one score for a course) only if they are enrolled in it.
 - ✅ Students should be able to subscribe to a maximum of 5 premium courses at a time and unlimited number of public courses.
 

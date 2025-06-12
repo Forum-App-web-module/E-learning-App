@@ -2,7 +2,9 @@ from fastapi import APIRouter, UploadFile, File, Header, Body, Depends
 from config.mailJet_config import teacher_approve_enrollment
 from config.cloudinary_config import upload_avatar
 from security.auth_dependencies import get_current_user
-from common import responses
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from services.course_service import enroll_course, count_premium_enrollments, get_course_by_id_service
+from services.enrollment_service import unenroll_student_service
 from services.student_service import (
     update_avatar_url,
     get_student_by_email,
@@ -12,10 +14,9 @@ from services.student_service import (
     rate_course_service
 )
 from services.teacher_service import get_teacher_by_id
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from services.subscription_service import subscribe, is_subscribed
-from services.course_service import enroll_course, count_premium_enrollments, get_course_by_id_service
 from data.models import SubscriptionResponse, StudentResponse, CourseStudentResponse, CoursesProgressResponse, TeacherResponse, CourseResponse
+from common import responses
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -126,6 +127,19 @@ async def enroll(course_id: int, payload: dict = Depends(get_current_user)):
         await teacher_approve_enrollment(teacher_data, student_object, course_object, enrollment_id)
 
         return responses.Created(content=f"Enrollment created. Course teacher will be notified about your interest.")
+
+@students_router.put("/unenroll/{course_id}")
+async def unenroll(course_id: int, payload: dict = Depends(get_current_user)):
+    if payload.get("role") != "student":
+        return responses.Forbidden(content="Only a Student user can perform this action")
+
+    student_id = payload.get("id")
+    service_response = await unenroll_student_service(student_id, course_id)
+
+    if service_response:
+        return responses.Successful(content="Unenrollment successful.")
+    else:
+        return responses.Forbidden(content="You can only unenroll courses you are currently enrolled to.")
 
 @students_router.post("/{course_id}/rate")
 async def rate_course(course_id: int, rating: int, payload: dict = Depends(get_current_user)):
