@@ -48,8 +48,8 @@ async def delete_course(course_id: int, payload: dict = Depends(get_current_user
     student_emails, deleted_row_count = await delete_course_service(course_id)
 
     if deleted_row_count:
-        await course_deprecation_email(student_emails, course_response)
-        return responses.Successful(content="Course deleted successfully.")
+        email_status = await course_deprecation_email(student_emails, course_response)
+        return responses.Successful(content=f"Course deleted successfully. \n Email Response: \n {email_status}")
     else:
         return responses.NotFound(content="Course not found.")
 
