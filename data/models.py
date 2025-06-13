@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, EmailStr, field_serializer
 from datetime import datetime, timedelta
 from typing import Annotated, Literal, Optional
 from enum import Enum
+from fastapi import Query
 
 
 # --- Enums and Type Aliases ---
@@ -105,6 +106,16 @@ class CoursesProgressResponse(BaseModel):
     course_id: int
     title: str
     progress_percentage: float
+
+class CourseFilterOptions(BaseModel):
+    title: Optional[str] = Field(default="", description="Filter by course title")
+    tag: Optional[str] = Field(default="", description="Filter by course tag")
+    sort_by: str = Field(default="title", pattern="^(title|rating|created_on)$", description="Sort by 'title', 'rating', or 'created_on'")
+    order: str = Field(default="asc", pattern="^(asc|desc)$", description="Sort order: 'asc' or 'desc'")
+    limit: int = Field(default=10, ge=1, le=100)
+    offset: int = Field(default=0, ge=0)
+
+
 
 
 # --- Section Models ---

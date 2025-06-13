@@ -1,36 +1,29 @@
-from data.models import Course,CourseUpdate, Course_rating, SectionCreate
+from data.models import Course,CourseUpdate, Course_rating, SectionCreate, CourseFilterOptions
 from data.database import insert_query, read_query, update_query, query_count
 from typing import Optional
 
 # get all public courses, display title and description onyl
 
-async def get_all_public_courses_repo(tag: Optional[str], get_data_func = read_query):
+async def get_all_public_courses_repo(filters: CourseFilterOptions, get_data_func = read_query):
 
-    query= """
-    SELECT c.title, c.description, c.tags, ROUND(AVG(cr.rating), 1) AS average_rating
+    sort_fields = {"title":"c.title", "created_on":"c.created_on", "rating":"average_rating"}
+    sort_by_field = sort_fields.get(filters.sort_by, "c.title")
+    order_by = "desc" if filters.order.lower() == "desc" else "asc"
+    query= f"""
+    SELECT c.title, c.description, c.tags, c.picture_url, c.created_on, ROUND(AVG(cr.rating), 1) AS average_rating
     FROM v1.courses c
     LEFT JOIN v1.course_rating cr ON c.id = cr.courses_id
-    WHERE c.is_premium = FALSE
-    AND c.is_hidden = FALSE
-
+    WHERE c.is_hidden = FALSE
+        AND c.is_premium = FALSE
+        AND (c.title ILIKE '%' || $1 || '%' OR $1 = ' ')
+        AND (c.tags ILIKE '%' || $2 || '%' OR $2 = ' ')
+    GROUP BY c.id, c.title, c.description, c.tags, c.picture_url, c.created_on
+    ORDER BY {sort_by_field} {order_by}
+    LIMIT $3 OFFSET $4
     """
-    if not tag:
-        query += " GROUP BY c.id"
-        public_courses = await get_data_func(query)
-    else:    
-        query += "AND tags ILIKE '%' || $1 || '%' GROUP BY c.id"
-        #query = """
-        #SELECT title, description, tags
-        #FROM v1.courses
-        #WHERE is_premium = FALSE
-        #AND is_hidden = FALSE
-        #AND tags ILIKE '%' || $1 || '%';
-    #"""
-    # AND tags ILIKE '%' || $1 || '%' 
-    # AND tags ILIKE '%pyt%';
-        public_courses = await get_data_func(query, (tag, ))
+    params = (filters.title, filters.tag, filters.limit, filters.offset)
 
-    return public_courses
+    return await get_data_func(query, params)
 
 # get course by id
 async def read_course_by_id(id: int, get_data_func = read_query):
@@ -123,3 +116,15 @@ async def repo_count_premium_enrollments(student_id, count_data_func = query_cou
     query = "SELECT count(*) FROM v1.enrollments as en JOIN v1.courses as co on en.course_id=co.id WHERE is_approved = true AND completed_at IS NULL AND drop_out = false AND is_premium = true AND student_id = $1"
     enrollments = await count_data_func(query,(student_id,))
     return enrollments
+
+async def get_course_rating_repo(course_id: int, get_data_func = read_query):
+
+    query = """
+    SELECT cr.rating, cr.students_id, s.email
+    FROM v1.course_rating cr
+    JOIN v1.students s ON cr.students_id = s.id
+    WHERE cr.courses_id = $1
+
+    """
+
+    return await get_data_func(query, (course_id,))

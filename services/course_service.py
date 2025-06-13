@@ -1,14 +1,16 @@
-from repositories.course_repo import read_all_courses_per_teacher, read_course_by_id, insert_course, update_course_data, get_all_public_courses_repo, get_all_student_courses_repo, repo_count_premium_enrollments
+from repositories.course_repo import (
+    read_all_courses_per_teacher, read_course_by_id, insert_course, update_course_data, get_all_public_courses_repo,
+    get_all_student_courses_repo, repo_count_premium_enrollments, get_course_rating_repo)
 from repositories.user_repo import get_account_by_email
 from common.responses import Unauthorized, NotFound
-from data.models import CourseCreate, CourseUpdate
+from data.models import CourseCreate, CourseUpdate, CourseFilterOptions
 from asyncpg.exceptions import UniqueViolationError
 from fastapi.exceptions import HTTPException
 from repositories.enrollments_repo import repo_create_enrollment
 from typing import Optional
 
-async def get_all_public_courses_service(tag: Optional[str]):
-    return await get_all_public_courses_repo(tag)
+async def get_all_public_courses_service(filters: CourseFilterOptions):
+    return await get_all_public_courses_repo(filters)
 
 async def get_course_by_id_service(id: int):
     return await read_course_by_id(id)
@@ -46,3 +48,7 @@ async def enroll_course(course_id: int, student_id: int):
 
 async def count_premium_enrollments(student_id):
     return await repo_count_premium_enrollments(student_id)
+
+async def get_course_rating_service(course_id: int):
+    data = await get_course_rating_repo(course_id) 
+    return [dict(row) for row in data]  # convert asyncpg.Record
