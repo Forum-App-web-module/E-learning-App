@@ -89,7 +89,7 @@ Accessible only if the user is authenticated. If the user is authenticated as a 
 - ❌ Admins could be able to view a list with all public and premium courses, the number of students in them and their rating. Courses list should support pagination. Admins should be able to search through courses filtered by teachers and/or by students. 
 - ❌ Admins could deactivate/reactivate students and teachers.
 - ❌ Admins could delete/hide courses and the enrolled students could receive a notification that the course is no longer active (via email).
-- ❌ Admins could remove students from courses.
+- ✅ Admins could remove students from courses.
 - ✅ Admins could trace back ratings for courses to identify the students who rated the course.
 
 ## Optional features (should)

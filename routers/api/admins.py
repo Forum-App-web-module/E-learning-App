@@ -4,6 +4,7 @@ from data.models import UserRole
 from common import responses
 from services.admin_service import approve_teacher
 from services.course_service import get_course_rating_service
+from services.enrollment_service import unenroll_student_service
 
 
 
@@ -24,3 +25,18 @@ async def get_course_rating(course_id: int, payload: dict = Depends(get_current_
     rating = await get_course_rating_service(course_id)
     return responses.Successful(content=rating)
     
+@admins_router.put("/courses/{course_id}/student/{student_id}")
+async def remove_student_from_course(course_id: int, student_id: int, payload: dict = Depends(get_current_user)):
+    if not payload["role"] == UserRole.ADMIN:
+        return responses.Forbidden(content="Admin authorisation required.")
+
+    service_response = await unenroll_student_service(student_id, course_id)
+
+    if service_response:
+        return responses.Successful(content="Unenrollment successful.")
+    else:
+        return responses.NotFound(content="Student is not enrolled to the course.")
+
+
+
+
