@@ -8,7 +8,7 @@ from services.course_service import (
     update_course_service,
     get_all_public_courses_service)
 from services.section_service import create_section_service, update_section_service, get_all_sections_per_course_service
-from data.models import CourseCreate, CourseBase, CourseUpdate, SectionCreate, SectionOut, SectionUpdate, Course
+from data.models import CourseCreate, CourseBase, CourseUpdate, SectionCreate, SectionOut, SectionUpdate, CourseFilterOptions
 from fastapi.security import OAuth2PasswordBearer
 from common.responses import Unauthorized, NotFound, Created, Successful, Forbidden
 from security.auth_dependencies import get_current_user
@@ -22,10 +22,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 courses_router = APIRouter(prefix="/courses", tags=["courses"])
 
 @courses_router.get("/public")
-async def get_public_courses(tag: Optional[str] = None):
+async def get_public_courses(filters: CourseFilterOptions = Depends()):
     """List all public courses, accessible for non autheticated users"""
 
-    return await get_all_public_courses_service(tag)
+    return await get_all_public_courses_service(filters)
 
 @courses_router.get("/student")
 async def get_all_courses_per_student(payload: dict = Depends(get_current_user)):
