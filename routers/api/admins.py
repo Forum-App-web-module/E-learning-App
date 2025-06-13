@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends
 from security.auth_dependencies import get_current_user
-from data.models import UserRole
+from data.models import UserRole, CourseResponse
 from common import responses
-from services.admin_service import approve_teacher
-from services.course_service import get_course_rating_service
+from config.mailJet_config import course_deprecation_email
+from services.admin_service import approve_teacher, delete_course_service
+from services.course_service import get_course_rating_service, get_course_by_id_service
 from services.enrollment_service import unenroll_student_service
 
 
@@ -18,14 +19,14 @@ async def approve_teacher_registration(id=id, payload: dict = Depends(get_curren
     await approve_teacher(id)
     return responses.Successful(content=f"Teacher {id} registration is approved successfully.")
 
-@admins_router.get("/courses/{course_id}/rating")
+@admins_router.get("/course/{course_id}/rating")
 async def get_course_rating(course_id: int, payload: dict = Depends(get_current_user)):
     if not payload["role"] == UserRole.ADMIN:
         return responses.Forbidden(content="Admin authorisation required.")
     rating = await get_course_rating_service(course_id)
     return responses.Successful(content=rating)
     
-@admins_router.put("/courses/{course_id}/student/{student_id}")
+@admins_router.put("/course/{course_id}/student/{student_id}")
 async def remove_student_from_course(course_id: int, student_id: int, payload: dict = Depends(get_current_user)):
     if not payload["role"] == UserRole.ADMIN:
         return responses.Forbidden(content="Admin authorisation required.")
@@ -37,6 +38,19 @@ async def remove_student_from_course(course_id: int, student_id: int, payload: d
     else:
         return responses.NotFound(content="Student is not enrolled to the course.")
 
+@admins_router.delete("/course/{course_id}")
+async def delete_course(course_id: int, payload: dict = Depends(get_current_user)):
+    if not payload["role"] == UserRole.ADMIN:
+        return responses.Forbidden(content="Admin authorisation required.")
 
+    course_response = CourseResponse(**await get_course_by_id_service(course_id))
+
+    student_emails, deleted_row_count = await delete_course_service(course_id)
+
+    if deleted_row_count:
+        await course_deprecation_email(student_emails, course_response)
+        return responses.Successful(content="Course deleted successfully.")
+    else:
+        return responses.NotFound(content="Course not found.")
 
 

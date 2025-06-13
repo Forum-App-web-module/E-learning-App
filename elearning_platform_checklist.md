@@ -88,7 +88,7 @@ Accessible only if the user is authenticated. If the user is authenticated as a 
 - ✅ Admins could approve registrations for teachers (via email).
 - ❌ Admins could be able to view a list with all public and premium courses, the number of students in them and their rating. Courses list should support pagination. Admins should be able to search through courses filtered by teachers and/or by students. 
 - ❌ Admins could deactivate/reactivate students and teachers.
-- ❌ Admins could delete/hide courses and the enrolled students could receive a notification that the course is no longer active (via email).
+- ✅ Admins could delete/hide courses and the enrolled students could receive a notification that the course is no longer active (via email).
 - ✅ Admins could remove students from courses.
 - ✅ Admins could trace back ratings for courses to identify the students who rated the course.
 
@@ -121,40 +121,40 @@ Besides the REST API (must) you (could) develop a front-end for your application
 
 ### Technical Requirements
 ## General
-•	Follow KISS, SOLID, DRY principles when coding
-•	Follow REST API design best practices when designing the REST API (see Appendix)
-•	Use tiered project structure (separate the application in layers)
-•	The service layer (i.e., "business" functionality) must have at least 60% unit test code coverage
-•	You should implement proper exception handling and propagation
+•	Follow KISS, SOLID, DRY principles when coding <br>
+•	Follow REST API design best practices when designing the REST API (see Appendix) <br>
+•	Use tiered project structure (separate the application in layers) <br>
+•	The service layer (i.e., "business" functionality) must have at least 60% unit test code coverage <br>
+•	You should implement proper exception handling and propagation <br>
 •	Try to think ahead. When developing something, think – “How hard would it be to change/modify this later?”
 ## Database
 The data of the application must be stored in a relational database. You need to identify the core domain objects and model their relationships accordingly. Database structure should avoid data duplication and empty data (normalize your database).
 Your repository must include two scripts – one to create the database and one to fill it with data.
 ## Git
 Commits in the GitHub repository should give a good overview of how the project was developed, which features were created first and the people who contributed. Contributions from all team members must be evident through the git commit history! The repository must contain the complete application source code and any scripts (database scripts, for example).
-Provide a link to a GitHub repository with the following information in the README.md file (must):
-•	Project description
-•	Link to the Swagger documentation
-•	Link to the hosted project (if hosted online)
-•	Instructions how to setup and run the project locally 
-•	Description of the project structure
-•	Technologies that are used, e.g. framework, RDBMS
+Provide a link to a GitHub repository with the following information in the README.md file (must): <br>
+•	Project description <br>
+•	Link to the Swagger documentation <br>
+•	Link to the hosted project (if hosted online) <br>
+•	Instructions how to setup and run the project locally <br>
+•	Description of the project structure <br>
+•	Technologies that are used, e.g. framework, RDBMS <br>
 •	Images of the database relations
 
 ## Optional Requirements
-Besides all requirements marked as should and could, here are some more optional requirements:
-•	Integrate your project with a Continuous Integration server (e.g., GitHub’s own) and configure your unit tests to run on each commit to your master branch
-•	Host your application's backend in a public hosting provider of your choice (e.g., AWS, Azure, Heroku)
+Besides all requirements marked as should and could, here are some more optional requirements: <br>
+•	Integrate your project with a Continuous Integration server (e.g., GitHub’s own) and configure your unit tests to run on each commit to your master branch <br>
+•	Host your application's backend in a public hosting provider of your choice (e.g., AWS, Azure, Heroku) <br>
 •	Use branches while working with Git
 
 ## Teamwork Guidelines
 Please see the Teamwork Guidelines document. 
 ## Appendix
-•	Guidelines for designing good REST API
-•	Guidelines for URL encoding
+•	Guidelines for designing good REST API <br>
+•	Guidelines for URL encoding <br>
 •	Git commits - an effective style guide
 
 ## Legend
-•	Must – Implement these first.
-•	Should – if you have time left, try to implement these.
+•	Must – Implement these first. <br>
+•	Should – if you have time left, try to implement these. <br>
 •	Could – only if you are ready with everything else give these a go.

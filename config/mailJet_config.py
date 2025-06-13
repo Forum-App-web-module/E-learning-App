@@ -1,11 +1,13 @@
-
-
+# Future development - log to a different DB or a monitoring platform
+# import logging
 
 
 from mailjet_rest import Client
 from os import getenv
 from dotenv import load_dotenv
-from data.models import TeacherResponse, StudentResponse, Course
+from pydantic import EmailStr
+
+from data.models import TeacherResponse, StudentResponse, Course, CourseResponse
 
 load_dotenv(dotenv_path="external_keys.env")
 
@@ -47,6 +49,48 @@ async def admin_teacher_aproval(teacher_data: TeacherResponse):
             ]
     }
     result = mailjet.send.create(data=data)
+
+
+async def course_deprecation_email(student_emails: list[str], course_data: CourseResponse):
+    if not student_emails:
+        return {"status": "no_emails"}
+
+    if not course_data.title:
+        return {"status": "no_course_title"}
+
+    data = {
+        'Messages': [
+            {
+                "From": {
+                    "Email": system_email,
+                    "Name": "System"
+                },
+                "To": [{"Email": email} for email in student_emails],
+                "Subject": "Course deprecation",
+                "HTMLPart": f"""
+                    <h3>Dear student,</h3>
+                    <p>Your course <strong>{course_data.title}</strong> has been deprecated.</p>
+                    <p>Feel free to reach out to us if you have any questions.</p>
+                    <p>Best regards,<br>E-learning team</p>
+                """
+            }
+        ]
+    }
+
+    try:
+        response = await mailjet.send.create(data=data)
+        return {
+            "status": "success",
+            "response_status_code": response.status_code,
+            "response_data": response.json() if hasattr(response, "json") else None
+        }
+    except Exception as e:
+        # logging.exception(f"Failed to send batch course deprecation email: {e}")
+        return {
+            "status": "failed",
+            "error": str(e)
+        }
+
 
 
 async def teacher_verify_email(teacher_data: TeacherResponse, teacher_id):
