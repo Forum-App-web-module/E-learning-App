@@ -48,7 +48,7 @@ Your task is to design an e-learning platform that would be used by students to 
 
 The public part must be accessible without authentication i.e., for anonymous users
 - ✅ Anonymous users must be able to view the title and description, tags of available public courses but not be able to open them.
-- ✅ Anonymous users could search courses by tag ❌ and/or rating.
+- ✅ Anonymous users could search courses by tag and/or rating.
 - ✅ Anonymous users must be able to register and login
 
 ---
@@ -66,7 +66,7 @@ Accessible only if the user is authenticated. If the user is authenticated as a 
 - ✅ If logged in as a student, they would access all public courses and only the premium courses in which they are enrolled (info page).
 - ✅ Students should be able to track their progress for every course based on the sections that they have visited (i.e. if a course has 7 Sections and the Student visited 4 of them the progress would be 57%).
 - ✅ Students must be able to view the courses that they are enrolled in (both public and premium). 
-- ❌ Students must be able to view and search by name and tag through existing public and premium courses.
+- ✅ Students must be able to view and search by name and tag through existing public and premium courses.
 - ✅ Students must be able to unsubscribe from premium courses.
 - ✅ Students should be able to rate a course (only one score for a course) only if they are enrolled in it.
 - ✅ Students should be able to subscribe to a maximum of 5 premium courses at a time and unlimited number of public courses.
@@ -90,10 +90,10 @@ Accessible only if the user is authenticated. If the user is authenticated as a 
 - ❌ Admins could deactivate/reactivate students and teachers.
 - ❌ Admins could delete/hide courses and the enrolled students could receive a notification that the course is no longer active (via email).
 - ❌ Admins could remove students from courses.
-- ❌ Admins could trace back ratings for courses to identify the students who rated the course.
+- ✅ Admins could trace back ratings for courses to identify the students who rated the course.
 
 ## Optional features (should)
-- ❌ Search endpoints should support pagination and sorting.
+- ✅ Search endpoints should support pagination and sorting.
 - ✅ Email Verification for the teachers could be implemented. For the registration to be completed, the teacher must verify their email by clicking on a link send to their email by the application. Before verifying their email, teachers cannot create courses.
 - ❌ petar Email notifications could be supported (i.e.  with the help with a third party service like: https://dev.mailjet.com/email/guides/send-api-v31/.)
 Add Easter eggs whenever you could. Creativity is always welcome and appreciated. Find a way to add something fun and/or interesting, maybe an Easter egg or two to your project to add some variety. 
