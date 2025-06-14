@@ -7,7 +7,7 @@ from os import getenv
 from dotenv import load_dotenv
 from pydantic import EmailStr
 
-from data.models import TeacherResponse, StudentResponse, Course, CourseResponse
+from data.models import TeacherResponse, StudentResponse, Course, CourseResponse, Action, Action_UserRole
 
 load_dotenv(dotenv_path="external_keys.env")
 
@@ -160,3 +160,31 @@ async def teacher_approve_enrollment(teacher_data: TeacherResponse, student_data
     }
     result = mailjet.send.create(data=data)
     
+
+async def notify_user_for_account_state(action: Action, role: Action_UserRole, user_email: str):
+        data = {
+        'Messages': [
+                        {
+                                "From": {
+                                        "Email": system_email,
+                                        "Name": "System"
+                                },
+                                "To": [
+                                        {
+                                                "Email": f"{user_email}",
+                                                "Name": "You"
+                                        }
+                                ],
+                                "Subject": f"Your account is {action.value.upper()}D",
+                                "TextPart": "Hope you have a great day!",
+                                "HTMLPart": f"""
+                                                <h3>Hello,</h3>
+                                                <p>Your {role.value} account has been {action.value.upper()}D"</p>
+                                                <br />
+                                                <p>Have a nice day!</p>
+                                                """
+                        }
+                ]
+        }
+        result = mailjet.send.create(data=data)
+
