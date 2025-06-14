@@ -22,8 +22,9 @@ cloudinary.config(
 )
 
 # Upload an image
-def upload_avatar(image_file, email):
-    upload_result = cloudinary.uploader.upload(image_file, 
+async def upload_avatar(image_file, email: str):
+    content = await image_file.read()
+    upload_result = cloudinary.uploader.upload(content, 
                                                folder="avatars/", 
                                                public_id = f"email {email} avatar", 
                                                overwrite = True, 

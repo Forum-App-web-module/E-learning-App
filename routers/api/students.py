@@ -81,14 +81,17 @@ async def get_student_courses_progress(payload: dict = Depends(get_current_user)
 @students_router.post('/avatar')
 async def upload_avatar_photo(file: UploadFile = File(...), payload: dict = Depends(get_current_user) ):
     email = payload.get("email")
-    # Uploading and generating URL
-    url = upload_avatar(file, email)
-
-    # Updating URL in database
-    await update_avatar_url(url, email)
     student_profile = await get_student_by_email(email)
+    if student_profile:
+        # Uploading and generating URL
+        url = await upload_avatar(file, email)
 
-    return responses.Created(content=StudentResponse(**student_profile).model_dump(mode="json"))
+        # Updating URL in database
+        await update_avatar_url(url, email)
+        
+        if student_profile: 
+            return responses.Created(content=StudentResponse(**student_profile).model_dump(mode="json"))
+    return responses.BadRequest(content="Account missmatch. Please login as student and try again.")
 
 @students_router.post("/subscribe")
 async def subscribe_student(payload: dict = Depends(get_current_user)):
