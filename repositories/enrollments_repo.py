@@ -9,11 +9,12 @@ async def repo_create_enrollment(course_id, student_id, insert_data_func = inser
     query = """INSERT INTO v1.enrollments (student_id, course_id) 
                VALUES ($1,$2) 
                RETURNING id"""
-    try: 
-        id = await insert_data_func(query, (student_id, course_id))
-    except UniqueViolationError:
-        raise HTTPException(status_code=400, detail="Already enrolled in this course!")
-    return id
+
+    enrollment_id = await insert_data_func(query, (student_id, course_id))
+
+    return enrollment_id if enrollment_id else None
+    # except UniqueViolationError:
+    #     raise HTTPException(status_code=400, detail="Already enrolled in this course!")
 
 async def repo_confirm_enrollment(enrollment_id, update_data_func = update_query):
     query = """UPDATE v1.enrollments 

@@ -106,7 +106,7 @@ async def enroll(course_id: int, payload: dict = Depends(get_current_user)):
     student_id = payload.get("id")
     if course:
         if course[5] == True:
-        # Check if student is subscibed
+        # Check if student is subscribed
             if await is_subscribed(student_id):
                 # Checking premium courses enrollment count.
                 premium_enrollments_count = await count_premium_enrollments((payload.get("id")))
