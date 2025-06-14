@@ -40,6 +40,15 @@ async def update_section(id: int, updates: SectionUpdate, update_data_func = upd
     updated = await update_data_func(query, data)
     return updated if updated else None
 
+async def hide_section_repo(id: int, update_data_func = update_query):
+    query = """
+    UPDATE v1.course_sections
+    SET is_hidden = TRUE
+    WHERE id = $1
+    RETURNING id
+    """
+    return await update_data_func(query, (id, ))
+
 async def get_all_course_sections_repo(id: int, sort_by: str = "id", order: str = "asc", get_data_func = read_query):
     
     sorting_options = {"id", "title"}
