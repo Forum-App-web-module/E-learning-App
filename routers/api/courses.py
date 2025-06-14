@@ -56,7 +56,7 @@ async def create_course(course_data: CourseBase, payload: dict = Security(get_cu
     """
     id = await router_helper.get_teacher_id(payload.get("email"))
     if not await validate_teacher_verified_and_activated(id):
-        return Forbidden(content="Account is not verified/acticated still. Please verify your email first.")
+        return Forbidden(content="Account is not verified/activated still. Please verify your email first.")
     new_course = CourseCreate(**course_data.model_dump(), owner_id=id)
     new_id = await create_course_service(new_course)
 

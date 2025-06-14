@@ -16,6 +16,13 @@ Password = Annotated[str, Field(min_length=8, max_length=30)]
 Rating = Annotated[int, Field(ge=1, le=10)]
 Name = Annotated[str, Field(min_length=2, max_length=30)]
 
+class Action(str, Enum):
+    activate = "activate"
+    deactivate = "deactivate"
+
+class Action_UserRole(str, Enum):
+    student = "student"
+    teacher = "teacher"
 
 # --- Login and Registration ---
 

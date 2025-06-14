@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from security.auth_dependencies import get_current_user
-from data.models import UserRole, CourseResponse, AdminCourseFilterOptions, AdminCourseListResponse
+from data.models import UserRole, CourseResponse, AdminCourseFilterOptions, AdminCourseListResponse, Action, Action_UserRole
 from common import responses
 from config.mailJet_config import course_deprecation_email
-from services.admin_service import approve_teacher, delete_course_service, get_admin_courses_view_service
+from services.admin_service import delete_course_service, get_admin_courses_view_service, delete_course_service, change_account_state
 from services.course_service import get_course_rating_service, get_course_by_id_service
 from services.enrollment_service import unenroll_student_service
 
@@ -11,13 +11,19 @@ from services.enrollment_service import unenroll_student_service
 
 admins_router = APIRouter(prefix="/admins", tags=["admins"])
 
-# approve teacher registration - get from email link
-@admins_router.put("/teacher/{id}")
-async def approve_teacher_registration(id=id, payload: dict = Depends(get_current_user)):
+# Used also for approve teacher registration - URL received on email after teacher registration.
+@admins_router.put("/{role}/{action}/{id}")
+async def Activate_or_Deactivate_user_account(role: Action_UserRole, action: Action, id: int, payload: dict = Depends(get_current_user)):
+
+    # Admin authorization validation
     if not payload["role"] == UserRole.ADMIN:
         return responses.Forbidden(content="Admin authorisation required.")
-    await approve_teacher(id)
-    return responses.Successful(content=f"Teacher {id} registration is approved successfully.")
+    
+    state_change = await change_account_state(role, action, id)
+    if state_change:
+        return responses.Successful(content=f"{role.value.upper()} with ID:{id} is {action.value.upper()+"D"} successfully.") 
+    return responses.NotFound(content=f"There is no {role.value.upper()} with ID:{id}")
+
 
 @admins_router.get("/course/{course_id}/rating")
 async def get_course_rating(course_id: int, payload: dict = Depends(get_current_user)):
