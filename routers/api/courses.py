@@ -7,7 +7,7 @@ from services.course_service import (
     verify_course_owner,
     update_course_service,
     get_all_public_courses_service)
-from services.section_service import create_section_service, update_section_service, get_all_sections_per_course_service
+from services.section_service import create_section_service, update_section_service, get_all_sections_per_course_service, hide_section_service
 from data.models import CourseCreate, CourseBase, CourseUpdate, SectionCreate, SectionOut, SectionUpdate, CourseFilterOptions
 from fastapi.security import OAuth2PasswordBearer
 from common.responses import Unauthorized, NotFound, Created, Successful, Forbidden
@@ -150,6 +150,19 @@ async def update_section(course_id: int, section_id: int, updates: SectionUpdate
         return NotFound(content="Section not found")
     
     return Successful(content={"message": f"Section with id {section_id} updated"})
+
+@courses_router.put("/{course_id}/{section_id}")
+async def hide_section(course_id: int, section_id: int, payload: dict = Security(get_current_user)):
+
+    teacher_id = await router_helper.get_teacher_id(payload.get("email"))
+    
+    await verify_course_owner(course_id, teacher_id)
+
+    result = await hide_section_service(section_id)
+    if not result:
+        return NotFound
+    
+    return Successful(content=f"Section {section_id} has been hidden")
 
 @courses_router.get("/{course_id}/sections")
 async def get_all_course_sections(

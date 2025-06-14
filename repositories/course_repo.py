@@ -128,3 +128,33 @@ async def get_course_rating_repo(course_id: int, get_data_func = read_query):
     """
 
     return await get_data_func(query, (course_id,))
+
+async def admin_course_view_repo(
+        title_filter: str,
+        teacher_id: Optional[int],
+        student_id: Optional[int],
+        limit: int,
+        offset: int,
+        get_data_func = read_query
+        ):
+    
+    query = f"""
+    SELECT
+        c.id, c.title, c.is_premium, c.description, c.tags, c.picture_url, c.owner_id, c.created_on,
+        COUNT(DISTINCT e.id) AS students_count,
+        ROUND(AVG(cr.rating), 1) AS average_rating
+    FROM v1.courses c
+    LEFT JOIN v1.enrollments e ON c.id = e.course_id
+    LEFT JOIN v1.course_rating cr ON c.id = cr.courses_id
+    WHERE c.is_hidden = FALSE
+        AND (c.title ILIKE '%' || $1 || '%' OR $1 = '' ) 
+        AND ($2::INT IS NULL OR c.owner_id = $2)
+        AND ($3::INT IS NULL OR EXISTS (
+            SELECT 1 FROM v1.enrollments e2 WHERE e2.course_id = c.id AND e2.student_id = $3
+        ))
+    GROUP BY c.id
+    ORDER BY c.created_on DESC
+    LIMIT $4 OFFSET $5
+    """
+
+    return await get_data_func(query, (title_filter, teacher_id, student_id, limit, offset))
