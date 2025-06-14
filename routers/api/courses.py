@@ -54,6 +54,9 @@ async def create_course(course_data: CourseBase, payload: dict = Security(get_cu
         role: teacher \n
     Owner ID is extracted from the token and linked to the course.\n
     """
+    if payload["role"] != UserRole.TEACHER:
+        return Unauthorized(content="Only teachers can create courses")    
+    
     id = await router_helper.get_teacher_id(payload.get("email"))
     if not await validate_teacher_verified_and_activated(id):
         return Forbidden(content="Account is not verified/activated still. Please verify your email first.")
@@ -85,6 +88,8 @@ async def update_course(course_id: int, updates: CourseUpdate, payload: dict = S
         }
         
     """
+    if payload["role"] != UserRole.TEACHER:
+        return Unauthorized(content="Only teachers can update courses")
 
     id = await router_helper.get_teacher_id(payload.get("email"))
     

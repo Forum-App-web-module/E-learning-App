@@ -10,7 +10,7 @@ async def get_all_public_courses_repo(filters: CourseFilterOptions, get_data_fun
     sort_by_field = sort_fields.get(filters.sort_by, "c.title")
     order_by = "desc" if filters.order.lower() == "desc" else "asc"
     query= f"""
-    SELECT c.title, c.description, c.tags, c.picture_url, c.created_on, ROUND(AVG(cr.rating), 1) AS average_rating
+    SELECT c.id, c.title, c.description, c.tags, c.picture_url, c.created_on, ROUND(AVG(cr.rating), 1) AS average_rating
     FROM v1.courses c
     LEFT JOIN v1.course_rating cr ON c.id = cr.courses_id
     WHERE c.is_hidden = FALSE

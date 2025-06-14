@@ -5,10 +5,7 @@ from fastapi.exceptions import HTTPException
 from asyncpg import UniqueViolationError
 
 async def create_section_service(course_id: int, section: SectionCreate):
-    try:
-        return await insert_section(course_id, section)
-    except UniqueViolationError:
-        raise HTTPException(status_code=400, detail="Section with this title already axists")
+    return await insert_section(course_id, section)
     
 async def get_all_sections_per_course_service(course_id, sort_by: str = "id", order: str = "asc"):
     return await get_all_course_sections_repo(course_id, sort_by, order)
