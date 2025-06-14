@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, EmailStr, field_serializer
+from pydantic import BaseModel, Field, EmailStr, field_serializer, field_validator
 from datetime import datetime, timedelta
 from typing import Annotated, Literal, Optional
 from enum import Enum
@@ -36,6 +36,23 @@ class TeacherRegisterData(RegisterData):
 
 
 # --- Response Models ---
+
+class UpdateStudentRequest(BaseModel):
+    first_name: Name | None
+    last_name: Name | None
+    avatar_url: Optional[str] | None
+
+    @field_validator('avatar_url')
+    def validate_avatar_url(cls, value):
+        if value in [None, ""]:
+            return None
+
+        import re
+        pattern = r"^https?:\/\/.*\.(png|jpg|jpeg)$"
+        if not re.match(pattern, value):
+            raise ValueError("avatar_url must be a valid URL ending with .png, .jpg, or .jpeg")
+        return value
+
 
 class StudentResponse(BaseModel):
     email: EmailStr
