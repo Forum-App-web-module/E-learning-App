@@ -1,10 +1,10 @@
-from data.models import Section, SectionCreate, CourseUpdate, SectionUpdate
+from data.models import Section, SectionCreate, CourseUpdate, SectionUpdate, UserRole
 from data.database import insert_query, update_query, read_query
 
 async def insert_section(course_id: int, section: SectionCreate, insert_data_func = insert_query):
     query = """
-        INSERT INTO v1.course_sections (title, course_id, content, description)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO v1.course_sections (title, course_id, content, description, is_hidden)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING id
 """
 
@@ -12,7 +12,8 @@ async def insert_section(course_id: int, section: SectionCreate, insert_data_fun
         section.title,
         course_id,
         section.content,
-        section.description
+        section.description,
+        section.is_hidden
     )
 
     result  = await insert_data_func(query, data)
@@ -49,7 +50,15 @@ async def hide_section_repo(id: int, update_data_func = update_query):
     """
     return await update_data_func(query, (id, ))
 
-async def get_all_course_sections_repo(id: int, sort_by: str = "id", order: str = "asc", get_data_func = read_query):
+async def get_all_course_sections_repo(
+        course_id: int,
+        sort_by: str = "id",
+        order: str = "asc",
+        role: UserRole = UserRole.STUDENT,
+        user_id: int | None = None,
+        owner_id: int | None = None,
+        get_data_func = read_query
+        ):
     
     sorting_options = {"id", "title"}
     order_options = {"asc","desc"}
@@ -60,11 +69,20 @@ async def get_all_course_sections_repo(id: int, sort_by: str = "id", order: str 
     if order not in order_options:
         order = "asc"
 
-    query = f"""
-    SELECT * FROM v1.course_sections
-    WHERE course_id = $1
-    ORDER BY {sort_by} {order}
-"""
+    if role == UserRole.ADMIN or (role == UserRole.TEACHER and user_id == owner_id):
+        query = f"""
+        SELECT * FROM v1.course_sections
+        WHERE course_id = $1
+        ORDER BY {sort_by} {order}
+    """       
+        params = (course_id, )
+    else:
+        query = f"""
+        SELECT * FROM v1.course_sections
+        WHERE course_id = $1 AND is_hidden = FALSE
+        ORDER BY {sort_by} {order}
+    """
+        params = (course_id, )
 
-    all_sections = await get_data_func(query, (id, ))
+    all_sections = await get_data_func(query, params)
     return all_sections if all_sections else None

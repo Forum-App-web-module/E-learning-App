@@ -140,6 +140,7 @@ class Section(BaseModel):
     title: str
     content: str
     description: str
+    is_hidden: bool = False
 
 class SectionCreate(Section):
     pass

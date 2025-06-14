@@ -8,7 +8,7 @@ from services.course_service import (
     update_course_service,
     get_all_public_courses_service)
 from services.section_service import create_section_service, update_section_service, get_all_sections_per_course_service, hide_section_service
-from data.models import CourseCreate, CourseBase, CourseUpdate, SectionCreate, SectionOut, SectionUpdate, CourseFilterOptions
+from data.models import CourseCreate, CourseBase, CourseUpdate, SectionCreate, SectionOut, SectionUpdate, CourseFilterOptions, UserRole
 from fastapi.security import OAuth2PasswordBearer
 from common.responses import Unauthorized, NotFound, Created, Successful, Forbidden
 from security.auth_dependencies import get_current_user
@@ -171,15 +171,23 @@ async def get_all_course_sections(
     order: str = "asc",
     payload: dict = Security(get_current_user)):
 
-    email = payload.get("email")
-    teacher = await get_teacher_by_email(email)
+    user_role = payload.get("role")
 
-    if not teacher:
-        return Unauthorized()
+    if user_role == UserRole.ADMIN:
+        return await get_all_sections_per_course_service(course_id, sort_by, order)
+
+    elif user_role == UserRole.TEACHER:
+        email = payload.get("email")
+        teacher = await get_teacher_by_email(email)
+
+        if not teacher:
+            return Unauthorized(content="Access denied")
     
-    await verify_course_owner(course_id, teacher["id"])
-
-    return  await get_all_sections_per_course_service(course_id, sort_by, order)
+        await verify_course_owner(course_id, teacher["id"])
+        return  await get_all_sections_per_course_service(course_id, sort_by, order)
+    
+    else:
+        return Forbidden(content="Only admins or course owners can access sections.")
 
 
 
