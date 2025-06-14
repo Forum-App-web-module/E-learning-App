@@ -33,7 +33,7 @@ async def repo_get_courses_student_all(student_id, get_data_func = read_query):
                 )
         GROUP BY c.id, c.title, c.description, c.tags, c.picture_url, c.is_premium, c.created_on
     """
-    courses = await get_data_func(query, (student_id,))
+    courses = await get_data_func(query, (student_id, ))
     return courses if courses else None
 
 async def repo_get_courses_progress(student_id:int, get_data_func = read_query):
