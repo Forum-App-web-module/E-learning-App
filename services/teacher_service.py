@@ -3,7 +3,7 @@ from repositories.user_repo import get_account_by_email, get_user_by_id_repo
 from repositories.teacher_repo import (
     update_teacher_repo,
     report_enrolled_students,
-    hide_unpopular_courses,
+    deactivate_course_repo,
     verify_email_repo,
     validate_teacher_verified_and_activated_repo
 )
@@ -28,8 +28,8 @@ async def validate_teacher_role(email: str) -> Union[Unauthorized, Forbidden] | 
 async def get_enrolled_students(teacher_id: int):
     return await report_enrolled_students(teacher_id)
 
-async def hide_unpopular_courses_service(teacher_id: int):
-    return await hide_unpopular_courses(teacher_id)
+async def deactivate_course_service(teacher_id: int, course_id: int):
+    return await deactivate_course_repo(teacher_id, course_id)
 
 async def get_teacher_by_id(teacher_id: int):
     teacher = await get_user_by_id_repo(teacher_id, role = "teacher")
