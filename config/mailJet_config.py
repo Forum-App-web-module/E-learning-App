@@ -78,7 +78,7 @@ async def course_deprecation_email(student_emails: list[str], course_data: Cours
     }
 
     try:
-        response = await mailjet.send.create(data=data)
+        response = mailjet.send.create(data=data)
         return {
             "status": "success",
             "response_status_code": response.status_code,

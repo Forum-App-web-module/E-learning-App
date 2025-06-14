@@ -18,8 +18,8 @@ from router_helper import router_helper
 teachers_router = APIRouter(prefix="/teachers", tags=["teachers"])
 
 # Teachers must be able to view their account information
-@teachers_router.get("/")
-async def get_teachers(payload: dict = Depends(get_current_user)):
+@teachers_router.get("/profile")
+async def get_profile(payload: dict = Depends(get_current_user)):
     teacher = await get_teacher_by_email(payload["email"])
     if teacher:
         return responses.Successful(content=TeacherResponse(**teacher).model_dump(mode="json"))
@@ -42,11 +42,12 @@ async def verify_teacher_email(id=id, payload: dict = Depends(get_current_user))
 async def approve_enrollment(id=id, payload: dict = Depends(get_current_user)):
 
     enrollment_object = await get_enrollment_by_id(id)
-    if await verify_course_owner(enrollment_object.course_id, payload["id"]) == True:
-        await confirm_enrollment(id)
-        return responses.Successful(content="Enrollment is approved successfully.")
-    return responses.Forbidden(content="Only owner can approve enrollment.")
-
+    if enrollment_object:
+        if await verify_course_owner(enrollment_object.course_id, payload["id"]) == True:
+            await confirm_enrollment(id)
+            return responses.Successful(content="Enrollment is approved successfully.")
+        return responses.Forbidden(content="Only owner can approve enrollment.")
+    else: return responses.NotFound(content=f"There is no enrollment with ID: {id}")
 
 # Teachers must be able to edit their account information
 @teachers_router.put("/account")
