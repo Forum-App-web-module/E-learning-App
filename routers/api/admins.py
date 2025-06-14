@@ -2,11 +2,12 @@ from fastapi import APIRouter, Depends
 from security.auth_dependencies import get_current_user
 from data.models import UserRole, CourseResponse, AdminCourseFilterOptions, AdminCourseListResponse, Action, Action_UserRole
 from common import responses
-from config.mailJet_config import course_deprecation_email
+from config.mailJet_config import course_deprecation_email, notify_user_for_account_state
 from services.admin_service import delete_course_service, get_admin_courses_view_service, delete_course_service, change_account_state
 from services.course_service import get_course_rating_service, get_course_by_id_service
 from services.enrollment_service import unenroll_student_service
-
+from services.teacher_service import get_teacher_by_id
+from services.student_service import get_student_by_id
 
 
 admins_router = APIRouter(prefix="/admins", tags=["admins"])
@@ -21,6 +22,10 @@ async def Activate_or_Deactivate_user_account(role: Action_UserRole, action: Act
     
     state_change = await change_account_state(role, action, id)
     if state_change:
+        if role == Action_UserRole.teacher:
+            user_object = await get_teacher_by_id(teacher_id = id)
+        else: user_object= await get_student_by_id(student_id = id)
+        await notify_user_for_account_state(action=action, role=role, user_email=user_object.email)
         return responses.Successful(content=f"{role.value.upper()} with ID:{id} is {action.value.upper()+"D"} successfully.") 
     return responses.NotFound(content=f"There is no {role.value.upper()} with ID:{id}")
 
