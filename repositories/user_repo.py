@@ -13,7 +13,7 @@ ALLOWED_ROLES = {
     },
     "teacher": {
         "table": "v1.teachers",
-        "fields": "id, email, mobile, linked_in_url"
+        "fields": "id, email, mobile, linked_in_url, is_active"
     },
     "admin": {
         "table": "v1.admins",

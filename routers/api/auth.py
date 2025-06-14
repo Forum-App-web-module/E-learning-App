@@ -20,6 +20,8 @@ from config.mailJet_config import teacher_verify_email, admin_teacher_aproval
 auth_router = APIRouter(prefix="", tags=["Auth"])
 
 load_dotenv()
+admin_email=os.getenv("ADMIN_EMAIL")
+
 config = Config(environ=os.environ)
 oauth = OAuth(config)
 oauth.register(
@@ -45,6 +47,11 @@ async def _authenticate_user(email: str, password: str):
 
     
     profile = await get_account_by_email(email, role)
+    if profile.get("is_active") == False:
+        if role == UserRole.STUDENT:
+            return responses.Unauthorized(content=f"This accound is blocked by admin. Please contact ADMIN team at {admin_email}.")
+        elif role == UserRole.TEACHER:
+            return responses.Unauthorized(content=f"Your account is being processed still. Expect notification when accound is acticated. In case of trouble contact us at {admin_email}.")
 
     # token = create_access_token({"sub": email, "role" : role})
 
