@@ -1,4 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Header, Body, Depends
+from typing import Optional
 from config.mailJet_config import teacher_approve_enrollment
 from config.cloudinary_config import upload_avatar
 from security.auth_dependencies import get_current_user
@@ -15,7 +16,14 @@ from services.student_service import (
 )
 from services.teacher_service import get_teacher_by_id
 from services.subscription_service import subscribe, is_subscribed
-from data.models import SubscriptionResponse, StudentResponse, CourseStudentResponse, CoursesProgressResponse, TeacherResponse, CourseResponse
+from data.models import (
+    SubscriptionResponse,
+    UpdateStudentRequest,
+    StudentResponse,
+    CourseStudentResponse,
+    CoursesProgressResponse,
+    TeacherResponse,
+    CourseResponse)
 from common import responses
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
@@ -33,17 +41,15 @@ async def get_students(payload: dict = Depends(get_current_user)):
 @students_router.put("/account")
 async def update_student(
         payload: dict = Depends(get_current_user),
-        first_name = Body(min_length=2, max_length=20),
-        last_name = Body(min_length=2, max_length=20),
-        avatar_url = Body(pattern=r"^https?:\/\/.*\.(png|jpg|jpeg)$")
+        data: UpdateStudentRequest = Body(...)
 ):
     if payload.get("role") != "student":
         return responses.Forbidden(content="Only a Student user can perform this action")
 
     student = await update_student_service(
-        first_name,
-        last_name,
-        avatar_url,
+        data.first_name,
+        data.last_name,
+        data.avatar_url,
         payload.get("email"),
         payload.get("role")
     )
