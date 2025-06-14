@@ -40,4 +40,4 @@ async def rate_course_service(student_id: int, course_id: int, rating: int):
 
 async def get_student_by_id(student_id: int):
     student = await get_user_by_id_repo(student_id, role = "student")
-    return StudentResponse(**student.model_dump(mode="json"))
+    return StudentResponse(**student).model_dump(mode="json")

@@ -25,7 +25,7 @@ async def Activate_or_Deactivate_user_account(role: Action_UserRole, action: Act
         if role == Action_UserRole.teacher:
             user_object = await get_teacher_by_id(teacher_id = id)
         else: user_object= await get_student_by_id(student_id = id)
-        await notify_user_for_account_state(action=action, role=role, user_email=user_object.email)
+        await notify_user_for_account_state(action=action, role=role, user_email=user_object.get("email"))
         return responses.Successful(content=f"{role.value.upper()} with ID:{id} is {action.value.upper()+"D"} successfully.") 
     return responses.NotFound(content=f"There is no {role.value.upper()} with ID:{id}")
 

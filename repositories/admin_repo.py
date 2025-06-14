@@ -18,12 +18,8 @@ async def change_account_state_repo(role: Action_UserRole, action: Action, user_
 
 async def delete_course_repo(course_id, update_date_func = update_query):
     query = """
-        BEGIN;
-
-        DELETE FROM v1.course_sections WHERE course_id = $1;
-        DELETE FROM v1.courses WHERE id = $1;
-        
-        COMMIT;
+        DELETE FROM v1.courses 
+        WHERE id = $1;
     """
     deleted_rows = await update_date_func(query, (course_id, ))
 
