@@ -3,7 +3,7 @@ from security.auth_dependencies import get_current_user
 from data.models import UserRole, CourseResponse, AdminCourseFilterOptions, AdminCourseListResponse, Action, Action_UserRole
 from common import responses
 from config.mailJet_config import course_deprecation_email
-from services.admin_service import approve_teacher, delete_course_service, get_admin_courses_view_service, delete_course_service, change_account_state
+from services.admin_service import delete_course_service, get_admin_courses_view_service, delete_course_service, change_account_state
 from services.course_service import get_course_rating_service, get_course_by_id_service
 from services.enrollment_service import unenroll_student_service
 
