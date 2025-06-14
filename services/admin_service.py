@@ -1,7 +1,7 @@
 
 from repositories.admin_repo import change_account_state_repo, delete_course_repo
 from repositories.teacher_repo import report_enrolled_students
-from repositories.course_repo import read_course_by_id
+from repositories.course_repo import read_course_by_id, admin_course_view_repo
 from data.models import Action_UserRole, Action
 
 async def change_account_state(role: Action_UserRole, action: Action, user_id: int):
@@ -21,6 +21,13 @@ async def delete_course_service(course_id: int):
     else:
         return None, None
 
+async def get_admin_courses_view_service(
+        title: str = "",
+        teacher_id: int = None,
+        student_id: int = None,
+        limit: int = 5,
+        offset: int = 0):
+    return await admin_course_view_repo(title, teacher_id, student_id, limit, offset)
 
 
 

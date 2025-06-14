@@ -17,7 +17,7 @@ Your task is to design an e-learning platform that would be used by students to 
 - ✅ The email serves as a username for both students and teachers and cannot be amended.
 - ✅ Teachers should also have a phone number and LinkedIn account.
 - ✅ Students must be able to view available courses and access their content depending on whether the courses are public or premium and/or they have subscribed for them or not.
-- ✅ Teachers must be able to create and update courses, add, edit, and ❌remove sections for them.
+- ✅ Teachers must be able to create and update courses, add, edit, and remove sections for them.
 - ❌ Admins could authorize teachers’ registrations (via email), deactivate access for students, hide / delete courses. The admin role comes with predefined log-in details where only the password can be amended (could).
 
 
@@ -86,7 +86,7 @@ Accessible only if the user is authenticated. If the user is authenticated as a 
 ## For Admins (could)
 
 - ✅ Admins could approve registrations for teachers (via email).
-- ❌ Admins could be able to view a list with all public and premium courses, the number of students in them and their rating. Courses list should support pagination. Admins should be able to search through courses filtered by teachers and/or by students. 
+- ✅ Admins could be able to view a list with all public and premium courses, the number of students in them and their rating. Courses list should support pagination. Admins should be able to search through courses filtered by teachers and/or by students. 
 - ❌ Admins could deactivate/reactivate students and teachers.
 - ✅ Admins could delete/hide courses and the enrolled students could receive a notification that the course is no longer active (via email).
 - ✅ Admins could remove students from courses.

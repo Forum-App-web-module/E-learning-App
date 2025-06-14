@@ -122,8 +122,24 @@ class CourseFilterOptions(BaseModel):
     limit: int = Field(default=10, ge=1, le=100)
     offset: int = Field(default=0, ge=0)
 
+class AdminCourseFilterOptions(BaseModel):
+    title: Optional[str] = Field(default="", description="Filter by course title")
+    teacher_id: Optional[int] = Field(default=None, description="Filter by teacher ID")
+    student_id: Optional[int] = Field(default=None, description="Filter by student ID")
+    limit: int = Field(default=5, ge=1, le=100, description="Number of items per page")
+    offset: int = Field(default=0, ge=0, description="Pagination offset")
 
-
+class AdminCourseListResponse(BaseModel):
+    id: int
+    title: str
+    description: str
+    tags: str
+    picture_url: str
+    is_premium: bool
+    owner_id: int
+    student_count: int = 0
+    average_rating: Optional[float]
+    created_on: datetime
 
 # --- Section Models ---
 
@@ -131,6 +147,7 @@ class Section(BaseModel):
     title: str
     content: str
     description: str
+    is_hidden: bool = False
 
 class SectionCreate(Section):
     pass
