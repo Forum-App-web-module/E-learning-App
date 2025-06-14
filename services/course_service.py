@@ -25,7 +25,7 @@ async def create_course_service(course_data: CourseCreate):
     try:
         return await insert_course(course_data)
     except UniqueViolationError:
-        raise HTTPException(status_code=400, detail="Course with this title already axists")
+        raise HTTPException(status_code=400, detail="Course with this title already exists")
 
 async def update_course_service(id: int, updates: CourseUpdate):
     return await update_course_data(id, updates)
