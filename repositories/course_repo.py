@@ -1,4 +1,4 @@
-from data.models import Course,CourseUpdate, Course_rating, SectionCreate, CourseFilterOptions
+from data.models import Course, CourseUpdate, Course_rating, SectionCreate, CourseFilterOptions, CourseCreate
 from data.database import insert_query, read_query, update_query, query_count
 from typing import Optional
 
@@ -64,7 +64,7 @@ async def get_all_student_courses_repo(student_id, get_data_func = read_query):
     return courses if courses else None
 
 # create course
-async def insert_course(course_data: Course, insert_data_func = insert_query):
+async def insert_course(course_data: CourseCreate, insert_data_func = insert_query):
 
     query = """
             INSERT INTO v1.courses (title, description, tags, picture_url, is_premium, owner_id, is_hidden, created_on )

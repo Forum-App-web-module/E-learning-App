@@ -61,7 +61,7 @@ async def get_student_courses(payload: dict = Depends(get_current_user)):
     if payload.get("role") != "student":
         return responses.Forbidden(content="Only a Student user can perform this action")
 
-    student_courses = await get_student_courses_service(payload.get("id"))
+    student_courses = await get_student_courses_service(payload.get("id")) or []
     student_courses_response = [CourseStudentResponse(**sc).model_dump(mode="json") for sc in student_courses]
 
     return responses.Successful(content=student_courses_response)
@@ -109,7 +109,7 @@ async def enroll(course_id: int, payload: dict = Depends(get_current_user)):
     student_id = payload.get("id")
     if course:
         if course[5] == True:
-        # Check if student is subscibed
+        # Check if student is subscribed
             if await is_subscribed(student_id):
                 # Checking premium courses enrollment count.
                 premium_enrollments_count = await count_premium_enrollments((payload.get("id")))

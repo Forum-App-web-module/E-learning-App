@@ -12,11 +12,12 @@ async def get_enrollment_by_id(enrollment_id):
 
 async def unenroll_student_service(student_id: int, course_id: int):
     progress_response = await repo_get_courses_progress(student_id)
-    drop_out = progress_response["progress_percentage"] < 100
-    enrollment_id = await get_enrollment_by_student_course_repo(student_id, course_id)
+    filtered_response = list(filter(lambda x: x["course_id"] == course_id, progress_response))
+    drop_out = filtered_response[0]["progress_percentage"] < 100
+    enrollment_response = await get_enrollment_by_student_course_repo(student_id, course_id)
 
-    if enrollment_id:
-        return await unenroll_student_repo(enrollment_id, drop_out)
+    if enrollment_response:
+        return await unenroll_student_repo(enrollment_response["id"], drop_out)
     else:
         return None
 
