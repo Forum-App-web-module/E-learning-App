@@ -16,11 +16,10 @@ async def change_account_state_repo(role: Action_UserRole, action: Action, user_
     return update
 
 
-async def delete_course_repo(course_id, update_date_func = update_query):
+async def soft_delete_course_repo(course_id, update_date_func = update_query):
     query = """
-        DELETE FROM v1.courses 
-        WHERE id = $1;
+        UPDATE v1.courses SET is_hidden = $1 WHERE id = $2
     """
-    deleted_rows = await update_date_func(query, (course_id, ))
+    hidden_rows = await update_date_func(query, (True ,course_id))
 
-    return deleted_rows
+    return hidden_rows

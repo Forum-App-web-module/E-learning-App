@@ -46,3 +46,11 @@ async def unenroll_student_repo(enrollment_id: int, drop_out: bool, update_data_
     row_count = await update_data_func(query, (enrollment_id, drop_out,))
     return row_count
 
+async def unenroll_all_by_course_id_repo(course_id, update_data_func = update_query):
+    query = """UPDATE v1.enrollments
+               SET drop_out = $1, 
+                   completed_at = now() 
+               WHERE course_id = $2"""
+
+    row_count = await update_data_func(query, (True, course_id,))
+    return row_count

@@ -3,7 +3,7 @@ from security.auth_dependencies import get_current_user
 from data.models import UserRole, CourseResponse, AdminCourseFilterOptions, AdminCourseListResponse, Action, Action_UserRole
 from common import responses
 from config.mailJet_config import course_deprecation_email, notify_user_for_account_state
-from services.admin_service import delete_course_service, get_admin_courses_view_service, delete_course_service, change_account_state
+from services.admin_service import get_admin_courses_view_service, soft_delete_course_service, change_account_state
 from services.course_service import get_course_rating_service, get_course_by_id_service
 from services.enrollment_service import unenroll_student_service
 from services.teacher_service import get_teacher_by_id
@@ -49,14 +49,15 @@ async def remove_student_from_course(course_id: int, student_id: int, payload: d
     else:
         return responses.NotFound(content="Student is not enrolled to the course.")
 
-@admins_router.delete("/course/{course_id}")
-async def delete_course(course_id: int, payload: dict = Depends(get_current_user)):
+@admins_router.patch("/course/{course_id}")
+async def soft_delete_course(course_id: int, payload: dict = Depends(get_current_user)):
     if not payload["role"] == UserRole.ADMIN:
         return responses.Forbidden(content="Admin authorisation required.")
 
     course_response = CourseResponse(**await get_course_by_id_service(course_id))
 
-    student_emails, deleted_row_count = await delete_course_service(course_id)
+
+    student_emails, deleted_row_count = await soft_delete_course_service(course_id)
 
     if deleted_row_count:
         email_status = await course_deprecation_email(student_emails, course_response)

@@ -65,7 +65,7 @@ async def course_deprecation_email(student_emails: list[str], course_data: Cours
                     "Email": system_email,
                     "Name": "System"
                 },
-                "To": [{"Email": email} for email in student_emails],
+                "To": [{"Email": email}],
                 "Subject": "Course deprecation",
                 "HTMLPart": f"""
                     <h3>Dear student,</h3>
@@ -74,6 +74,7 @@ async def course_deprecation_email(student_emails: list[str], course_data: Cours
                     <p>Best regards,<br>E-learning team</p>
                 """
             }
+            for email in student_emails
         ]
     }
 
