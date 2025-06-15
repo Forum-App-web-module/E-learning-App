@@ -22,8 +22,8 @@ async def repo_confirm_enrollment(enrollment_id, update_data_func = update_query
                    approved_at = $2 
                WHERE id = $3"""
     timestamp = datetime.now()
-    id = await update_data_func(query, (True, timestamp, int(enrollment_id)))
-    return id
+    row_count = await update_data_func(query, (True, timestamp, int(enrollment_id)))
+    return row_count
 
 async def get_enrollment_by_id_repo(enrollment_id, read_data_func = read_query ):
     query = """SELECT *
@@ -46,6 +46,6 @@ async def unenroll_student_repo(enrollment_id: int, drop_out: bool, update_data_
                    completed_at = now() 
                WHERE id = $1"""
 
-    id = await update_data_func(query, (enrollment_id, drop_out,))
-    return id
+    row_count = await update_data_func(query, (enrollment_id, drop_out,))
+    return row_count
 
