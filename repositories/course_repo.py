@@ -4,16 +4,20 @@ from typing import Optional
 
 # get all public courses, display title and description onyl
 
-async def get_all_public_courses_repo(filters: CourseFilterOptions, get_data_func = read_query):
+async def get_all_courses_repo(filters: CourseFilterOptions, premium: bool, get_data_func = read_query):
 
     sort_fields = {"title":"c.title", "created_on":"c.created_on", "rating":"average_rating"}
     sort_by_field = sort_fields.get(filters.sort_by, "c.title")
     order_by = "desc" if filters.order.lower() == "desc" else "asc"
+
+    premium_clause = "" if premium else "AND c.is_premium = FALSE"
+
     query= f"""
     SELECT c.id, c.title, c.description, c.tags, c.picture_url, c.created_on, ROUND(AVG(cr.rating), 1) AS average_rating
     FROM v1.courses c
     LEFT JOIN v1.course_rating cr ON c.id = cr.courses_id
     WHERE c.is_hidden = FALSE
+        {premium_clause}
         AND c.is_premium = FALSE
         AND (c.title ILIKE '%' || $1 || '%' OR $1 = ' ')
         AND (c.tags ILIKE '%' || $2 || '%' OR $2 = ' ')

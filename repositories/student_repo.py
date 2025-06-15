@@ -113,3 +113,13 @@ async def repo_allow_rating(student_id, course_id, get_data_func = read_query):
     result = await get_data_func(query, (student_id, course_id))
     #print(result) # allow_rating result: [<Record ?column?=1>]
     return len(result) > 0
+
+
+async def repo_validate_subscription(student_id, get_data_func = read_query):
+    query = """
+        SELECT 1
+        FROM v1.subscriptions 
+        WHERE student_id = $1 AND is_active = TRUE AND expire_date > CURRENT_DATE
+    """
+    subscription = await get_data_func(query, (student_id,))
+    return bool(subscription)

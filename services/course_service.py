@@ -1,7 +1,7 @@
 from repositories.course_repo import (
-    read_all_courses_per_teacher, read_course_by_id, insert_course, update_course_data, get_all_public_courses_repo,
+    read_all_courses_per_teacher, read_course_by_id, insert_course, update_course_data, get_all_courses_repo,
     get_all_student_courses_repo, repo_count_premium_enrollments, get_course_rating_repo)
-from repositories.user_repo import get_account_by_email
+from repositories.student_repo import repo_validate_subscription
 from common.responses import Unauthorized, NotFound
 from data.models import CourseCreate, CourseUpdate, CourseFilterOptions
 from asyncpg.exceptions import UniqueViolationError
@@ -9,8 +9,11 @@ from fastapi.exceptions import HTTPException
 from repositories.enrollments_repo import repo_create_enrollment
 from typing import Optional
 
-async def get_all_public_courses_service(filters: CourseFilterOptions):
-    return await get_all_public_courses_repo(filters)
+async def get_all_courses_service(filters: CourseFilterOptions, student_id: Optional[int] = None):
+    premium = False
+    if student_id:
+        premium = await repo_validate_subscription(student_id)
+    return await get_all_courses_repo(filters, premium)
 
 async def get_course_by_id_service(id: int):
     return await read_course_by_id(id)
