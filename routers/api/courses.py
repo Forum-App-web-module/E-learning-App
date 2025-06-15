@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, Security
+from fastapi import APIRouter, Depends, Security, Request
+from fastapi.security.utils import get_authorization_scheme_param
 from services.course_service import (
     get_all_courses_per_teacher_service,
     get_all_courses_per_student_service,
@@ -6,7 +7,7 @@ from services.course_service import (
     update_course_service,
     get_all_courses_service)
 from services.section_service import create_section_service, update_section_service, get_all_sections_per_course_service, hide_section_service
-from data.models import CourseCreate, CourseBase, CourseUpdate, SectionCreate, SectionOut, SectionUpdate, CourseFilterOptions, UserRole
+from data.models import CourseCreate, CourseBase, CourseUpdate, SectionCreate, SectionOut, SectionUpdate, CourseFilterOptions, UserRole, TeacherCourseFilter, StudentCourseFilter
 from fastapi.security import OAuth2PasswordBearer
 from common.responses import Unauthorized, NotFound, Created, Successful, Forbidden
 from security.auth_dependencies import get_current_user
@@ -20,20 +21,28 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 courses_router = APIRouter(prefix="/courses", tags=["courses"])
 
 @courses_router.get("/public")
-async def get_all_courses(filters: CourseFilterOptions = Depends(), payload: Optional[dict] = Depends(get_current_user)):
+async def get_all_courses(request: Request, filters: CourseFilterOptions = Depends()):
     """List all public courses for non autheticated users \n
         If the user is authenticated as a student with premium subscription, all premium courses are included as well.
     """
+    auth: Optional[str] = request.headers.get("Authorization") #get auth header
     student_id = None
-    role = payload.get("role")
-    if payload and role == UserRole.STUDENT:
-        student_id = payload.get("id")
+
+    if auth:
+        scheme, token = get_authorization_scheme_param(auth) #get the scheme and token from header
+        if scheme.lower() == "bearer" and token:
+            try:
+                payload = await get_current_user(token)
+                if payload.get("role") == UserRole.STUDENT:
+                    student_id = payload.get("id")
+            except Exception:
+                pass  # for anonymous users
 
     return await get_all_courses_service(filters, student_id)
 
 
 @courses_router.get("/student")
-async def get_all_courses_per_student(payload: dict = Depends(get_current_user)):
+async def get_all_courses_per_student(filters: StudentCourseFilter = Depends(), payload: dict = Depends(get_current_user)):
     """
     Returns a list with all courses a student has enrolled to.\n
     Params: payload
@@ -42,10 +51,10 @@ async def get_all_courses_per_student(payload: dict = Depends(get_current_user))
     if payload.get("role") != UserRole.STUDENT:
         return Unauthorized(content="Only students can view the courses they are enrolled to.")
     
-    return await get_all_courses_per_student_service(payload.get("id"))
+    return await get_all_courses_per_student_service(payload.get("id"), filters)
 
 @courses_router.get("/teacher")
-async def get_all_courses_per_teacher(payload: dict = Depends(get_current_user)):
+async def get_all_courses_per_teacher(filters: TeacherCourseFilter = Depends(), payload: dict = Depends(get_current_user)):
     """
     Returns a list with all courses owned by the teacher\n
     Params: payload
@@ -54,7 +63,7 @@ async def get_all_courses_per_teacher(payload: dict = Depends(get_current_user))
     if payload.get("role") != UserRole.TEACHER:
         return Unauthorized(content="Only teachers can view the courses they own.")    
     
-    return await get_all_courses_per_teacher_service(payload.get("id"))
+    return await get_all_courses_per_teacher_service(payload.get("id"), filters)
 
 @courses_router.post("/")
 async def create_course(course_data: CourseBase, payload: dict = Security(get_current_user)): 

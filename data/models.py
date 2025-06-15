@@ -131,13 +131,20 @@ class CoursesProgressResponse(BaseModel):
     title: str
     progress_percentage: float
 
-class CourseFilterOptions(BaseModel):
+class CourseFilterBase(BaseModel):
     title: Optional[str] = Field(default="", description="Filter by course title")
     tag: Optional[str] = Field(default="", description="Filter by course tag")
-    sort_by: str = Field(default="title", pattern="^(title|rating|created_on)$", description="Sort by 'title', 'rating', or 'created_on'")
-    order: str = Field(default="asc", pattern="^(asc|desc)$", description="Sort order: 'asc' or 'desc'")
+    order: str = Field(default="asc", pattern="^(asc|desc)$", description="Sort order")
     limit: int = Field(default=10, ge=1, le=100)
-    offset: int = Field(default=0, ge=0)
+    offset: int = Field(default=0, ge=0)    
+class CourseFilterOptions(CourseFilterBase):
+    sort_by: Optional[str] = Field(default="title", pattern="^(title|rating|created_on)$", description="Sort by 'title', 'rating', or 'created_on'")
+
+class TeacherCourseFilter(CourseFilterBase):
+    sort_by: Optional[str] = Field(default="created_on", pattern="^(created_on|title)$")
+
+class StudentCourseFilter(CourseFilterBase):
+    sort_by: Optional[str] = Field(default="approved_at", pattern="^(approved_at|title)$")
 
 class AdminCourseFilterOptions(BaseModel):
     title: Optional[str] = Field(default="", description="Filter by course title")

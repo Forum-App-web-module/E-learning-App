@@ -3,7 +3,7 @@ from repositories.course_repo import (
     get_all_student_courses_repo, repo_count_premium_enrollments, get_course_rating_repo)
 from repositories.student_repo import repo_validate_subscription
 from common.responses import Unauthorized, NotFound
-from data.models import CourseCreate, CourseUpdate, CourseFilterOptions
+from data.models import CourseCreate, CourseUpdate, CourseFilterOptions, StudentCourseFilter, TeacherCourseFilter
 from asyncpg.exceptions import UniqueViolationError
 from fastapi.exceptions import HTTPException
 from repositories.enrollments_repo import repo_create_enrollment
@@ -18,11 +18,11 @@ async def get_all_courses_service(filters: CourseFilterOptions, student_id: Opti
 async def get_course_by_id_service(id: int):
     return await read_course_by_id(id)
 
-async def get_all_courses_per_teacher_service(teacher_id):
-    return await read_all_courses_per_teacher(teacher_id)
+async def get_all_courses_per_teacher_service(teacher_id, filters: TeacherCourseFilter):
+    return await read_all_courses_per_teacher(teacher_id, filters)
 
-async def get_all_courses_per_student_service(student_id):
-    return await get_all_student_courses_repo(student_id)
+async def get_all_courses_per_student_service(student_id, filters: StudentCourseFilter):
+    return await get_all_student_courses_repo(student_id, filters)
 
 async def create_course_service(course_data: CourseCreate):
     try:

@@ -1,4 +1,4 @@
-from data.models import Course, CourseUpdate, Course_rating, SectionCreate, CourseFilterOptions, CourseCreate
+from data.models import Course, CourseUpdate, Course_rating, SectionCreate, CourseFilterOptions, CourseCreate, TeacherCourseFilter, StudentCourseFilter
 from data.database import insert_query, read_query, update_query, query_count
 from typing import Optional
 
@@ -42,29 +42,41 @@ async def read_course_by_id(id: int, get_data_func = read_query):
     return result[0] if result else None
 
 # get all courses per teacher
-async def read_all_courses_per_teacher(teacher_id, get_data_func = read_query):
+async def read_all_courses_per_teacher(teacher_id: int, filters: TeacherCourseFilter, get_data_func = read_query):
 
-    query = """
+    order_by = "c.created_on" if filters.sort_by == "created_on" else "c.title"
+
+    query =f"""
     SELECT c.*,
-    AVG(cr.rating) as average_rating
+    ROUND(AVG(cr.rating), 1) as average_rating
     FROM v1.courses c
     LEFT JOIN v1.course_rating cr ON c.id = cr.courses_id
-    WHERE owner_id = $1
-    GROUP BY c.id, c.title, c.description, c.tags, c.picture_url, c.is_premium, c.is_hidden
+    WHERE owner_id = $1 AND c.title ILIKE '%' || $2 || '%'
+    GROUP BY c.id
+    ORDER by {order_by}
+    LIMIT $4 OFFSET $5
 """
 
-    courses = await get_data_func(query, (teacher_id, ))
+    courses = await get_data_func(query, (teacher_id, filters.title))
     return courses if courses else None
 
 # get all courses a student is enrolled to 
-async def get_all_student_courses_repo(student_id, get_data_func = read_query):
-    query = """
-    SELECT c.id AS course_id, c.title
+async def get_all_student_courses_repo(student_id, filters: StudentCourseFilter, get_data_func = read_query):
+    order_by = "e.approved_at" if filters.sort_by == "approved_at" else "c.title"
+    query = f"""
+    SELECT c.id, c.title,c.description, e.approved_at,
+    ROUND(AVG(cr.rating), 1) AS average_rating 
     FROM v1.enrollments e
     INNER JOIN v1.courses c ON e.course_id = c.id
+    LEFT JOIN v1.course_rating cr ON c.id = cr.courses_id
     WHERE e.student_id = $1
+        AND c.title ILIKE '%' || $2 || '%'
+        AND c.tag ILIKE '%' || $3 || '%'
+    GROUP BY c.id, c.title, c.description, e.approved_at
+    ORDER BY {order_by}
+    LIMIT $4 OFFSET $5
 """
-    courses = await get_data_func(query, (student_id, ))
+    courses = await get_data_func(query, (student_id, filters.title, filters.tag, filters.limit, filters.offset ))
     return courses if courses else None
 
 # create course
