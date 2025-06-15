@@ -2,9 +2,7 @@ from fastapi import APIRouter, Depends, Security
 from services.course_service import (
     get_all_courses_per_teacher_service,
     get_all_courses_per_student_service,
-    get_course_by_id_service,
     create_course_service,
-    verify_course_owner,
     update_course_service,
     get_all_public_courses_service)
 from services.section_service import create_section_service, update_section_service, get_all_sections_per_course_service, hide_section_service
@@ -93,7 +91,10 @@ async def update_course(course_id: int, updates: CourseUpdate, payload: dict = S
 
     id = await router_helper.get_teacher_id(payload.get("email"))
     
-    await verify_course_owner(course_id, id)
+    validated = await router_helper.verify_course_owner(course_id, id)
+
+    if not validated:
+        return Unauthorized(content="Only course owners can perform this action")
 
     updated = await update_course_service(course_id, updates)
 
@@ -116,7 +117,7 @@ async def create_section(course_id: int, section: SectionCreate, payload: dict =
     """
     id = await router_helper.get_teacher_id(payload.get("email"))
     
-    await verify_course_owner(course_id, id)
+    await router_helper.verify_course_owner(course_id, id)
 
     new_section = await create_section_service(course_id, section)
 
@@ -147,7 +148,7 @@ async def update_section(course_id: int, section_id: int, updates: SectionUpdate
     """
     id = await router_helper.get_teacher_id(payload.get("email"))
     
-    await verify_course_owner(course_id, id)
+    await router_helper.verify_course_owner(course_id, id)
 
     updated = await update_section_service(section_id, updates)
 
@@ -161,7 +162,7 @@ async def hide_section(course_id: int, section_id: int, payload: dict = Security
 
     teacher_id = await router_helper.get_teacher_id(payload.get("email"))
     
-    await verify_course_owner(course_id, teacher_id)
+    await router_helper.verify_course_owner(course_id, teacher_id)
 
     result = await hide_section_service(section_id)
     if not result:
@@ -188,7 +189,7 @@ async def get_all_course_sections(
         if not teacher:
             return Unauthorized(content="Access denied")
     
-        await verify_course_owner(course_id, teacher["id"])
+        await router_helper.verify_course_owner(course_id, teacher["id"])
         return  await get_all_sections_per_course_service(course_id, sort_by, order)
     
     else:

@@ -30,16 +30,6 @@ async def create_course_service(course_data: CourseCreate):
 async def update_course_service(id: int, updates: CourseUpdate):
     return await update_course_data(id, updates)
 
-async def verify_course_owner(course_id: int, teacher_id: int):
-    course = await read_course_by_id(course_id)
-
-    if not course:
-        return NotFound(content="Course not found")
-    
-    if course["owner_id"] != teacher_id:
-        return Unauthorized(content="You are not the owner of the course")
-    
-    return True
 
 async def enroll_course(course_id: int, student_id: int):
     enrollment_id = await repo_create_enrollment(course_id, student_id)

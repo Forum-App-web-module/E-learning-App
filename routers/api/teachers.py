@@ -11,7 +11,6 @@ from services.teacher_service import (
     verify_email,
 )
 from services.enrollment_service import get_enrollment_by_id
-from services.course_service import verify_course_owner
 from common import responses
 from router_helper import router_helper
 
@@ -42,7 +41,7 @@ async def verify_teacher_email(id=id, payload: dict = Depends(get_current_user))
 async def approve_enrollment(id=id, payload: dict = Depends(get_current_user)):
 
     enrollment_object = await get_enrollment_by_id(id)
-    if await verify_course_owner(enrollment_object.course_id, payload["id"]) == True:
+    if await router_helper.verify_course_owner(enrollment_object.course_id, payload["id"]) == True:
         await confirm_enrollment(id)
         return responses.Successful(content="Enrollment is approved successfully.")
     return responses.Forbidden(content="Only owner can approve enrollment.")
