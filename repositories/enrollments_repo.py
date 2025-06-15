@@ -1,11 +1,8 @@
 from data.database import insert_query, read_query, update_query
-from asyncpg import UniqueViolationError
-from fastapi import HTTPException
 from datetime import datetime
 
 
-
-async def repo_create_enrollment(course_id, student_id, insert_data_func = insert_query):
+async def create_enrollment_repo(course_id, student_id, insert_data_func = insert_query):
     query = """INSERT INTO v1.enrollments (student_id, course_id) 
                VALUES ($1,$2) 
                RETURNING id"""
@@ -16,7 +13,7 @@ async def repo_create_enrollment(course_id, student_id, insert_data_func = inser
     # except UniqueViolationError:
     #     raise HTTPException(status_code=400, detail="Already enrolled in this course!")
 
-async def repo_confirm_enrollment(enrollment_id, update_data_func = update_query):
+async def confirm_enrollment_repo(enrollment_id, update_data_func = update_query):
     query = """UPDATE v1.enrollments 
                SET is_approved = $1, 
                    approved_at = $2 

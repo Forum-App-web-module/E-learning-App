@@ -1,6 +1,4 @@
-from data.database import read_query, insert_query, update_query
-
-
+from data.database import read_query, update_query
 
 async def update_teacher_repo(mobile, linked_in_url, email, update_data_func = update_query):
     query = """
@@ -13,7 +11,7 @@ async def update_teacher_repo(mobile, linked_in_url, email, update_data_func = u
     result = await update_data_func(query, (mobile, linked_in_url, email))
     return result if result else None
 
-async def report_enrolled_students(owner_id: int,  get_data_func = read_query):
+async def report_enrolled_students_repo(owner_id: int,  get_data_func = read_query):
     query = """
         SELECT e.student_id, s.email, s.first_name, s.last_name,
            e.course_id, c.title, e.requested_at, e.approved_at, e.completed_at, e.drop_out, c.created_on

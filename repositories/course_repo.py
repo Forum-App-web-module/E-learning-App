@@ -1,4 +1,4 @@
-from data.models import Course, CourseUpdate, Course_rating, SectionCreate, CourseFilterOptions, CourseCreate, TeacherCourseFilter, StudentCourseFilter
+from data.models import CourseUpdate, CourseFilterOptions, CourseCreate, TeacherCourseFilter, StudentCourseFilter
 from data.database import insert_query, read_query, update_query, query_count
 from typing import Optional
 
@@ -30,19 +30,19 @@ async def get_all_courses_repo(filters: CourseFilterOptions, premium: bool, get_
     return await get_data_func(query, params)
 
 # get course by id
-async def read_course_by_id(id: int, get_data_func = read_query):
+async def get_course_by_id_repo(id: int, get_data_func = read_query):
 
     query = """
     SELECT *
     FROM v1.courses
     WHERE id = $1
-"""
+    """
 
     result = await get_data_func(query, (id, ))
     return result[0] if result else None
 
 # get all courses per teacher
-async def read_all_courses_per_teacher(teacher_id: int, filters: TeacherCourseFilter, get_data_func = read_query):
+async def get_all_courses_per_teacher_repo(teacher_id: int, filters: TeacherCourseFilter, get_data_func = read_query):
 
     order_by = "c.created_on" if filters.sort_by == "created_on" else "c.title"
 
@@ -55,7 +55,7 @@ async def read_all_courses_per_teacher(teacher_id: int, filters: TeacherCourseFi
     GROUP BY c.id
     ORDER by {order_by}
     LIMIT $3 OFFSET $4
-"""
+    """
 
     courses = await get_data_func(query, (teacher_id, filters.title, filters.limit, filters.offset))
     return courses if courses else None
@@ -75,18 +75,18 @@ async def get_all_student_courses_repo(student_id, filters: StudentCourseFilter,
     GROUP BY c.id, c.title, c.description, e.approved_at
     ORDER BY {order_by}
     LIMIT $4 OFFSET $5
-"""
+    """
     courses = await get_data_func(query, (student_id, filters.title, filters.tag, filters.limit, filters.offset ))
     return courses if courses else None
 
 # create course
-async def insert_course(course_data: CourseCreate, insert_data_func = insert_query):
+async def insert_course_repo(course_data: CourseCreate, insert_data_func = insert_query):
 
     query = """
             INSERT INTO v1.courses (title, description, tags, picture_url, is_premium, owner_id, is_hidden, created_on )
             VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
             RETURNING id
-"""
+    """
 
     values = (
         course_data.title,
@@ -101,7 +101,7 @@ async def insert_course(course_data: CourseCreate, insert_data_func = insert_que
     return course
     
 # update course by title
-async def update_course_data(id: int, updates: CourseUpdate, update_data_func = update_query): #update_query -> int
+async def update_course_data_repo(id: int, updates: CourseUpdate, update_data_func = update_query): #update_query -> int
 
     query = """
     UPDATE v1.courses
@@ -114,7 +114,7 @@ async def update_course_data(id: int, updates: CourseUpdate, update_data_func = 
         is_hidden = COALESCE($7, is_hidden)
     WHERE id = $1
     RETURNING id
-"""
+    """
     data = (
         id,
         updates.title,
@@ -128,8 +128,17 @@ async def update_course_data(id: int, updates: CourseUpdate, update_data_func = 
     updated = await update_data_func(query, data)
     return updated if updated else None
 
-async def repo_count_premium_enrollments(student_id, count_data_func = query_count):
-    query = "SELECT count(*) FROM v1.enrollments as en JOIN v1.courses as co on en.course_id=co.id WHERE is_approved = true AND completed_at IS NULL AND drop_out = false AND is_premium = true AND student_id = $1"
+async def count_premium_enrollments_repo(student_id, count_data_func = query_count):
+    query = """
+    SELECT count(*) 
+    FROM v1.enrollments as en 
+    JOIN v1.courses as co on en.course_id=co.id 
+    WHERE is_approved = true 
+        AND completed_at IS NULL 
+        AND drop_out = false 
+        AND is_premium = true 
+        AND student_id = $1
+        """
     enrollments = await count_data_func(query,(student_id,))
     return enrollments
 

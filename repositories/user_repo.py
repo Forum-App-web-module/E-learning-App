@@ -1,7 +1,5 @@
 from typing import Callable, Any, Union
 from pydantic import EmailStr
-from starlette.responses import JSONResponse
-
 from common.responses import BadRequest
 from data.database import read_query, insert_query
 from data.models import StudentRegisterData, TeacherRegisterData, UserRole
@@ -21,7 +19,7 @@ ALLOWED_ROLES = {
     },
 }
 
-async def insert_user(user_data: Union[StudentRegisterData, TeacherRegisterData], hashed_password: str):
+async def insert_user_repo(user_data: Union[StudentRegisterData, TeacherRegisterData], hashed_password: str):
 
     if isinstance(user_data, StudentRegisterData):
         query = """
@@ -47,7 +45,7 @@ async def insert_user(user_data: Union[StudentRegisterData, TeacherRegisterData]
     user_id = await insert_query(query, values)
     return role, user_id
 
-async def repo_email_exists(email: EmailStr, get_data_func = read_query) -> bool:
+async def email_exists_repo(email: EmailStr, get_data_func = read_query) -> bool:
 
     query = """
         SELECT email FROM v1.students
@@ -63,7 +61,7 @@ async def repo_email_exists(email: EmailStr, get_data_func = read_query) -> bool
     return bool(result)
 
 
-async def get_account_by_email(
+async def get_account_by_email_repo(
     email: str,
     role: str,
     get_data_func: Callable[[str, tuple], Any] = read_query
@@ -82,11 +80,10 @@ async def get_account_by_email(
     result = await get_data_func(query, (email,))
     return result[0] if result else None
 
-async def repo_get_role_by_email(email, get_data_func: Callable[[str, tuple], Any] = read_query):
+async def get_role_by_email_repo(email, get_data_func: Callable[[str, tuple], Any] = read_query):
 
     tables = {"v1.students": "student", "v1.teachers": "teacher", "v1.admins": "admin"}
-    #query = "SELECT 1 FROM v1.students WHERE email = $1"
-
+    
     for table, role in tables.items():
         query = f"SELECT 1 FROM {table} WHERE email = $1"
         role_found = await get_data_func(query,(email,))

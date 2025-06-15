@@ -9,7 +9,7 @@ from services.course_service import (
 from services.section_service import (
     create_section_service,update_section_service, get_all_sections_per_course_service,
     hide_section_service,is_student_allowed_to_view_sections)
-from data.models import CourseCreate, CourseBase, CourseUpdate, SectionCreate, SectionOut, SectionUpdate, CourseFilterOptions, UserRole, TeacherCourseFilter, StudentCourseFilter
+from data.models import CourseCreate, CourseBase, CourseUpdate, SectionCreate, SectionUpdate, CourseFilterOptions, UserRole, TeacherCourseFilter, StudentCourseFilter
 from fastapi.security import OAuth2PasswordBearer
 from common.responses import Unauthorized, NotFound, Created, Successful, Forbidden
 from security.auth_dependencies import get_current_user

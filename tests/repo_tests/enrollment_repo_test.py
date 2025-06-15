@@ -2,8 +2,8 @@ import pytest
 from unittest.mock import AsyncMock, patch
 from datetime import datetime
 from repositories.enrollments_repo import (
-    repo_create_enrollment,
-    repo_confirm_enrollment,
+    create_enrollment_repo,
+    confirm_enrollment_repo,
     get_enrollment_by_id_repo,
     get_enrollment_by_student_course_repo,
     unenroll_student_repo
@@ -20,7 +20,7 @@ class TestRepoCreateEnrollment:
         mock_insert_query = AsyncMock(return_value=fake_result)
 
         # Act
-        result = await repo_create_enrollment(course_id, student_id, insert_data_func=mock_insert_query)
+        result = await create_enrollment_repo(course_id, student_id, insert_data_func=mock_insert_query)
 
         # Assert
         assert result == fake_result
@@ -38,7 +38,7 @@ class TestRepoCreateEnrollment:
         mock_insert_query = AsyncMock(return_value=None)
 
         # Act
-        result = await repo_create_enrollment(course_id, student_id, insert_data_func=mock_insert_query)
+        result = await create_enrollment_repo(course_id, student_id, insert_data_func=mock_insert_query)
 
         # Assert
         assert result is None
@@ -56,7 +56,7 @@ class TestRepoConfirmEnrollment:
         with patch("repositories.enrollments_repo.datetime") as mock_datetime:
             mock_datetime.now.return_value = fake_timestamp
 
-            result = await repo_confirm_enrollment(enrollment_id, update_data_func=mock_update_query)
+            result = await confirm_enrollment_repo(enrollment_id, update_data_func=mock_update_query)
 
             # Should return row count from update query
             assert result == fake_row_count

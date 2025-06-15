@@ -2,7 +2,7 @@ from data.database import update_query, insert_query, read_query
 from data.models import Subscription
 
 
-async def update_student_data(
+async def update_student_data_repo(
         first_name: str,
         last_name: str,
         avatar_url: str,
@@ -19,7 +19,7 @@ async def update_student_data(
     student = await update_data_func(query, (first_name, last_name, avatar_url, user_email))
     return student
 
-async def repo_get_courses_student_all(student_id, get_data_func = read_query):
+async def get_courses_student_all_repo(student_id, get_data_func = read_query):
     query = """
         SELECT c.*, avg(cr.rating) AS average_rating FROM v1.courses c
         LEFT JOIN v1.course_rating cr ON c.id = cr.courses_id
@@ -36,7 +36,7 @@ async def repo_get_courses_student_all(student_id, get_data_func = read_query):
     courses = await get_data_func(query, (student_id, ))
     return courses if courses else None
 
-async def repo_get_courses_progress(student_id:int, get_data_func = read_query):
+async def get_courses_progress_repo(student_id:int, get_data_func = read_query):
     query = """
         SELECT
         c.id AS course_id,
@@ -60,7 +60,7 @@ async def repo_get_courses_progress(student_id:int, get_data_func = read_query):
     courses = await get_data_func(query, (student_id,))
     return courses if courses else None
 
-async def repo_update_avatar_url(url: str, user_email, update_data_func = update_query): 
+async def update_avatar_url_repo(url: str, user_email, update_data_func = update_query): 
     query = """
         UPDATE v1.students 
         SET avatar_url = $1 
@@ -70,7 +70,7 @@ async def repo_update_avatar_url(url: str, user_email, update_data_func = update
     return student_id
 
 
-async def repo_subscribe(student_id, subscription: Subscription, insert_data_func = insert_query):
+async def subscribe_repo(student_id, subscription: Subscription, insert_data_func = insert_query):
     query = """
         INSERT INTO v1.subscriptions (student_id, expire_date) 
         VALUES ($1, $2) 
@@ -80,7 +80,7 @@ async def repo_subscribe(student_id, subscription: Subscription, insert_data_fun
     return new_id
 
 
-async def repo_is_subscribed(student_id, get_data_func = read_query):
+async def is_subscribed_repo(student_id, get_data_func = read_query):
     query = """
         SELECT id, student_id, subscribed_at, expire_date 
         FROM v1.subscriptions 
@@ -89,7 +89,7 @@ async def repo_is_subscribed(student_id, get_data_func = read_query):
     subscription = await get_data_func(query, (student_id,))
     return subscription[0] if subscription else None
 
-async def repo_rate_course(student_id, course_id, rating: int, insert_data_func = insert_query):
+async def rate_course_repo(student_id, course_id, rating: int, insert_data_func = insert_query):
     query = """
         INSERT INTO v1.course_rating(students_id, courses_id, rating)
         VALUES ($1, $2, $3)
@@ -97,12 +97,11 @@ async def repo_rate_course(student_id, course_id, rating: int, insert_data_func 
         DO UPDATE SET rating = EXCLUDED.rating
         RETURNING students_id, courses_id, rating
     """
-    # ON CONFLICT (student_id, course_id) DO UPDATE SET rating = EXCLUDED.rating - a student can change their rating, EXCLUDED.rating is the new raiting inserted
     rating = await insert_data_func(query, (student_id, course_id, rating))
     return rating
 
 #get all courses a student is enrolled to or has completed
-async def repo_allow_rating(student_id, course_id, get_data_func = read_query):
+async def allow_rating_repo(student_id, course_id, get_data_func = read_query):
     query = """
         SELECT 1
         FROM v1.enrollments
@@ -111,11 +110,10 @@ async def repo_allow_rating(student_id, course_id, get_data_func = read_query):
         AND (completed_at IS NOT NULL OR (completed_at is NULL and drop_out = FALSE))
     """
     result = await get_data_func(query, (student_id, course_id))
-    #print(result) # allow_rating result: [<Record ?column?=1>]
     return len(result) > 0
 
 
-async def repo_validate_subscription(student_id, get_data_func = read_query):
+async def validate_subscription_repo(student_id, get_data_func = read_query):
     query = """
         SELECT 1
         FROM v1.subscriptions 
@@ -124,7 +122,7 @@ async def repo_validate_subscription(student_id, get_data_func = read_query):
     subscription = await get_data_func(query, (student_id,))
     return bool(subscription)
 
-async def repo_check_enrollment(course_id: int, student_id: int, get_data_func=read_query):
+async def check_enrollment_repo(course_id: int, student_id: int, get_data_func=read_query):
     query = """
         SELECT 1
         FROM v1.enrollments

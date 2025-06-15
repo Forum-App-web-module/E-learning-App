@@ -1,9 +1,9 @@
-from fastapi import APIRouter, UploadFile, File, Header, Body, Depends
+from fastapi import APIRouter, UploadFile, File, Body, Depends
 from typing import Optional
 from config.mailJet_config import teacher_approve_enrollment
 from config.cloudinary_config import upload_avatar
 from security.auth_dependencies import get_current_user
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from services.course_service import enroll_course, count_premium_enrollments, get_course_by_id_service
 from services.enrollment_service import unenroll_student_service
 from services.student_service import (

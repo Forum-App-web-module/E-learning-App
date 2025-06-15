@@ -1,12 +1,12 @@
-from data.models import Section, SectionCreate, CourseUpdate, SectionUpdate, UserRole
+from data.models import SectionCreate, SectionUpdate, UserRole
 from data.database import insert_query, update_query, read_query
 
-async def insert_section(course_id: int, section: SectionCreate, insert_data_func = insert_query):
+async def insert_section_repo(course_id: int, section: SectionCreate, insert_data_func = insert_query):
     query = """
         INSERT INTO v1.course_sections (title, course_id, content, description, is_hidden)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING id
-"""
+    """
 
     data = (
         section.title,
@@ -19,7 +19,7 @@ async def insert_section(course_id: int, section: SectionCreate, insert_data_fun
     result  = await insert_data_func(query, data)
     return result if result else None
 
-async def update_section(id: int, updates: SectionUpdate, update_data_func = update_query):
+async def update_section_repo(id: int, updates: SectionUpdate, update_data_func = update_query):
     query = """
     UPDATE v1.course_sections
     SET
@@ -29,7 +29,7 @@ async def update_section(id: int, updates: SectionUpdate, update_data_func = upd
     WHERE id = $1
     RETURNING id
 
-"""
+    """
 
     data = (
         id,
@@ -70,6 +70,7 @@ async def get_all_course_sections_repo(
         order = "asc"
 
     if role == UserRole.ADMIN or (role == UserRole.TEACHER and user_id == owner_id):
+        
         query = f"""
         SELECT * FROM v1.course_sections
         WHERE course_id = $1

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from fastapi.params import Depends, Header, Body
-from data.models import TeacherRegisterData, UserRole, TeacherResponse, EnrollmentReport
+from fastapi.params import Depends, Body
+from data.models import TeacherResponse, EnrollmentReport
 from security.auth_dependencies import get_current_user
 from services.teacher_service import (
     get_teacher_by_email,

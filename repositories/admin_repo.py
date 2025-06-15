@@ -5,7 +5,7 @@ from data.models import Action_UserRole, Action
 
 async def change_account_state_repo(role: Action_UserRole, action: Action, user_id: id, update_date_func = update_query):
     
-    query = f"UPDATE v1.{role.value}s SET is_active = $1 WHERE id = $2"
+    query = f"""UPDATE v1.{role.value}s SET is_active = $1 WHERE id = $2"""
 
     if action == Action.deactivate:
         action_bool = False

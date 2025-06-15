@@ -1,12 +1,10 @@
-
-from data import database
-from repositories.student_repo import repo_is_subscribed, repo_subscribe
+from repositories.student_repo import is_subscribed_repo, subscribe_repo
 from asyncpg import UniqueViolationError
 from fastapi import HTTPException
 from data.models import Subscription, SubscriptionResponse
 
 async def is_subscribed(student_id):
-    record = await repo_is_subscribed(student_id)
+    record = await is_subscribed_repo(student_id)
     if record:
         return SubscriptionResponse(
             id=record['id'],
@@ -21,7 +19,7 @@ async def is_subscribed(student_id):
 async def subscribe(student_id):
     try: 
         subscription = Subscription(student_id=student_id)
-        await repo_subscribe(student_id, subscription)
+        await subscribe_repo(student_id, subscription)
     except UniqueViolationError:
         raise HTTPException(status_code=400, detail="Student is already subscribed for premium account!")
     return await is_subscribed(student_id)

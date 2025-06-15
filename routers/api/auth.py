@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, Depends
-from fastapi.responses import RedirectResponse, HTMLResponse
+from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from data.models import LoginData, StudentRegisterData, TeacherRegisterData, UserRole
 from services.user_service import email_exists, create_account, get_hash_by_email, get_role_by_email
@@ -10,7 +10,7 @@ from security.jwt_auth import create_access_token
 from authlib.integrations.starlette_client import OAuth
 from starlette.config import Config
 from dotenv import load_dotenv
-from repositories.user_repo import get_account_by_email
+from repositories.user_repo import get_account_by_email_repo
 import os
 from security.secrets import verify_password
 from services.teacher_service import get_teacher_by_id
@@ -46,7 +46,7 @@ async def _authenticate_user(email: str, password: str):
     role = await get_role_by_email(email)
 
     
-    profile = await get_account_by_email(email, role)
+    profile = await get_account_by_email_repo(email, role)
     if profile.get("is_active") == False:
         if role == UserRole.STUDENT:
             return responses.Unauthorized(content=f"This accound is blocked by admin. Please contact ADMIN team at {admin_email}.")
