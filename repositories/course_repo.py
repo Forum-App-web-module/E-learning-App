@@ -54,10 +54,10 @@ async def read_all_courses_per_teacher(teacher_id: int, filters: TeacherCourseFi
     WHERE owner_id = $1 AND c.title ILIKE '%' || $2 || '%'
     GROUP BY c.id
     ORDER by {order_by}
-    LIMIT $4 OFFSET $5
+    LIMIT $3 OFFSET $4
 """
 
-    courses = await get_data_func(query, (teacher_id, filters.title))
+    courses = await get_data_func(query, (teacher_id, filters.title, filters.limit, filters.offset))
     return courses if courses else None
 
 # get all courses a student is enrolled to 
