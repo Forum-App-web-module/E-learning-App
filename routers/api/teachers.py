@@ -6,7 +6,7 @@ from services.teacher_service import (
     get_teacher_by_email,
     update_teacher_service,
     get_enrolled_students,
-    hide_unpopular_courses_service, 
+    deactivate_course_service, 
     confirm_enrollment,
     verify_email,
 )
@@ -17,8 +17,8 @@ from router_helper import router_helper
 teachers_router = APIRouter(prefix="/teachers", tags=["teachers"])
 
 # Teachers must be able to view their account information
-@teachers_router.get("/")
-async def get_teachers(payload: dict = Depends(get_current_user)):
+@teachers_router.get("/profile")
+async def get_profile(payload: dict = Depends(get_current_user)):
     teacher = await get_teacher_by_email(payload["email"])
     if teacher:
         return responses.Successful(content=TeacherResponse(**teacher).model_dump(mode="json"))
@@ -41,17 +41,18 @@ async def verify_teacher_email(id=id, payload: dict = Depends(get_current_user))
 async def approve_enrollment(id=id, payload: dict = Depends(get_current_user)):
 
     enrollment_object = await get_enrollment_by_id(id)
-    if await router_helper.verify_course_owner(enrollment_object.course_id, payload["id"]) == True:
-        await confirm_enrollment(id)
-        return responses.Successful(content="Enrollment is approved successfully.")
-    return responses.Forbidden(content="Only owner can approve enrollment.")
-
+    if enrollment_object:
+        if await verify_course_owner(enrollment_object.course_id, payload["id"]) == True:
+            await confirm_enrollment(id)
+            return responses.Successful(content="Enrollment is approved successfully.")
+        return responses.Forbidden(content="Only owner can approve enrollment.")
+    else: return responses.NotFound(content=f"There is no enrollment with ID: {id}")
 
 # Teachers must be able to edit their account information
 @teachers_router.put("/account")
 async def update_teacher(
         payload: dict = Depends(get_current_user),
-        mobile: str = Body(min_length=6, max_length=17),
+        mobile: str = Body(min_length=9, max_length=10),
         linked_in_url: str = Body(pattern=r"^https?:\/\/www\.linkedin\.com\/.+"),
 ):
     email = payload["email"]
@@ -76,15 +77,15 @@ async def generate_report(payload: dict = Depends(get_current_user)):
 
 # Teachers to deactivate only courses to which they are owners when there are no student enrollments
 # The SQL query checks for enrollments and updates at the same time.
-@teachers_router.patch("/deactivate/courses")
-async def deactivate_courses(payload: dict = Depends(get_current_user)):
+@teachers_router.put("/deactivate/course/{id}")
+async def deactivate_course(id: int, payload: dict = Depends(get_current_user)):
     if not await get_teacher_by_email(payload["email"]):
             return responses.NotFound(content="You need to be Teacher for this action.")
 
-    repo_response = await hide_unpopular_courses_service(payload["id"])
+    repo_response = await deactivate_course_service(payload["id"], int(id))
 
     if repo_response:
         return responses.Successful(content="Courses deactivated successfully.")
     else:
-        return responses.NoContent()
+        return responses.BadRequest(content="You can deactivate only own courses where there are no students subscribed")
 

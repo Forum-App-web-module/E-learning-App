@@ -16,7 +16,7 @@ async def delete_course_service(course_id: int):
         enrolled_students_data = await report_enrolled_students(owner_id)
         deleted_row_count = await delete_course_repo(course_id)
         student_emails = [row["email"] for row in enrolled_students_data]
-
+        
         return student_emails, deleted_row_count
     else:
         return None, None

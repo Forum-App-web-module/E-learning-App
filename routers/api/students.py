@@ -31,8 +31,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 students_router = APIRouter(prefix="/students", tags=["students"])
 
 
-@students_router.get("/")
-async def get_students(payload: dict = Depends(get_current_user)):
+@students_router.get("/profile")
+async def get_profile(payload: dict = Depends(get_current_user)):
     if payload.get("role") != "student":
         return responses.Forbidden(content="Only a Student user can perform this action")
     student = await get_student_by_email(payload.get("email"))

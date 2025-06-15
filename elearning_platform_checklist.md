@@ -75,12 +75,12 @@ Accessible only if the user is authenticated. If the user is authenticated as a 
 ## For Teachers
 
 - ✅ Teachers must be able to view and edit their account information (except the username).
-- ✅ If the user is authenticated as a teacher, they would be able to access all courses and sections they own.
-- ✅ Teachers must be able to create courses, view and update their own courses.
+- ❌ If the user is authenticated as a teacher, they would be able to access all courses and sections they own.
+- ✅ Teachers must be able to create courses, ❌ view and update their own courses.
 - ✅ Teachers could be notified via email whenever an enrollment request is sent by a student for a specific course that they own.
-- ✅ Teachers petar should be able to approve enrollment requests sent by students.
+- ✅ Teachers should be able to approve enrollment requests sent by students.
 - ✅ Teachers could be able to deactivate / hide only courses to which they are owners when there are no students subscribed for that course.
-- ✅ Teachers should be able to generate reports for the past and current students that have subscribed for their courses.
+- ❌ Teachers should be able to generate reports for the past and current students that have subscribed for their courses.
 
 
 ## For Admins (could)

@@ -7,8 +7,11 @@ from data.models import EnrollmentResponse
 
 
 async def get_enrollment_by_id(enrollment_id):
-    enrollment = EnrollmentResponse(**await get_enrollment_by_id_repo(int(enrollment_id)))
-    return enrollment
+    enrollment = await get_enrollment_by_id_repo(int(enrollment_id))
+    if enrollment:
+        enrollment_response = EnrollmentResponse(**enrollment)
+        return enrollment_response
+    return None
 
 async def unenroll_student_service(student_id: int, course_id: int):
     progress_response = await repo_get_courses_progress(student_id)
