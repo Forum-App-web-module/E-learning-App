@@ -123,3 +123,12 @@ async def repo_validate_subscription(student_id, get_data_func = read_query):
     """
     subscription = await get_data_func(query, (student_id,))
     return bool(subscription)
+
+async def repo_check_enrollment(course_id: int, student_id: int, get_data_func=read_query):
+    query = """
+        SELECT 1
+        FROM v1.enrollments
+        WHERE course_id = $1 AND student_id = $2
+    """
+    result = await get_data_func(query, (course_id, student_id))
+    return bool(result)
