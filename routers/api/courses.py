@@ -6,7 +6,9 @@ from services.course_service import (
     create_course_service,
     update_course_service,
     get_all_courses_service)
-from services.section_service import create_section_service, update_section_service, get_all_sections_per_course_service, hide_section_service
+from services.section_service import (
+    create_section_service,update_section_service, get_all_sections_per_course_service,
+    hide_section_service,is_student_allowed_to_view_sections)
 from data.models import CourseCreate, CourseBase, CourseUpdate, SectionCreate, SectionOut, SectionUpdate, CourseFilterOptions, UserRole, TeacherCourseFilter, StudentCourseFilter
 from fastapi.security import OAuth2PasswordBearer
 from common.responses import Unauthorized, NotFound, Created, Successful, Forbidden
@@ -204,18 +206,29 @@ async def get_all_course_sections(
     if user_role == UserRole.ADMIN:
         return await get_all_sections_per_course_service(course_id, sort_by, order)
 
-    elif user_role == UserRole.TEACHER:
+    if user_role == UserRole.TEACHER:
         email = payload.get("email")
         teacher = await get_teacher_by_email(email)
 
         if not teacher:
             return Unauthorized(content="Access denied")
     
-        await router_helper.verify_course_owner(course_id, teacher["id"])
-        return  await get_all_sections_per_course_service(course_id, sort_by, order)
+        is_owner = await router_helper.verify_course_owner(course_id, teacher["id"])
+        if not is_owner:
+            return  await get_all_sections_per_course_service(course_id, sort_by, order)
+        
+        return await get_all_sections_per_course_service(course_id, sort_by, order)
     
-    else:
-        return Forbidden(content="Only admins or course owners can access sections.")
+    if user_role == UserRole.STUDENT:
+        student_id = payload.get("id")
+        allowed = await is_student_allowed_to_view_sections(course_id, student_id)
+
+        if not allowed:
+            return Forbidden(content="Access to course sections is accessible for enrolled users only")
+        
+        return await get_all_sections_per_course_service(course_id, sort_by, order)
+    
+    return Forbidden("Only enrolled students, owners, or admins can access course sections.")
 
 
 
