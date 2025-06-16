@@ -212,7 +212,7 @@ Returns:
         return responses.Forbidden(content="You can only unenroll courses you are currently enrolled to.")
 
 @students_router.post("/{course_id}/rate")
-async def rate_course(course_id: int, rating: int, payload: dict = Depends(get_current_user)):
+async def rate_course(course_id: int, rating: int = Body(...), payload: dict = Depends(get_current_user)):
     """
 Rate a course the student is enrolled in.
 

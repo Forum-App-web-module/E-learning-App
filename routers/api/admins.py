@@ -30,7 +30,7 @@ based on the `role` parameter. A notification email is sent after the update.
         if role == Action_UserRole.teacher:
             user_object = await get_teacher_by_id(teacher_id = id)
         else: user_object= await get_student_by_id(student_id = id)
-        await notify_user_for_account_state(action=action, role=role, user_email=user_object.get("email"))
+        await notify_user_for_account_state(action=action, role=role, user_email=user_object.email)
         return responses.Successful(content=f"{role.value.upper()} with ID:{id} is {action.value.upper()+"D"} successfully.") 
     return responses.NotFound(content=f"There is no {role.value.upper()} with ID:{id}")
 
@@ -88,7 +88,7 @@ Admin access required.
         return responses.NotFound(content="Course not found.")
     
 @admins_router.get("/courses")
-async def get_admin_view_courses(filters:AdminCourseFilterOptions = Depends(), payload: dict = Depends(get_current_user)):
+async def view_courses(filters:AdminCourseFilterOptions = Depends(), payload: dict = Depends(get_current_user)):
     """
 List all courses with advanced filters.
 
