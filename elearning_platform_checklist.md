@@ -15,7 +15,7 @@
 ❌ Скрипт за Схемата и отделен с test дата. (поне един админ, които при първи логин трябва да си смени паролата).
 ❌ Картинка на архитектурата - https://github.com/mygitbob/feb24_project_job-market
 ❌ Инструкции как да се вдигне приложението
-❌ Petyr Postman collection
+✅ Postman collection
 ❌ Clean .env в репото + инструкции
 ❌ Integrate your project with a Continuous Integration server
 ❌ Да пушнем към main
