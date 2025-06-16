@@ -139,6 +139,7 @@ Create a new section for a course.
 
 Only the course owner can create sections.
 Requires title, description, and content in the request body.
+
 """
     id = await router_helper.get_teacher_id(payload.get("email"))
     
