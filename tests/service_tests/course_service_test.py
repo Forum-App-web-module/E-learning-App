@@ -10,9 +10,11 @@ from data.models import CourseFilterOptions
 @pytest.mark.asyncio
 class TestGetAllCoursesServiceShould:
     async def test_with_student_id_calls_subscription_check(self):
+        # Arrange
         filters = CourseFilterOptions()
         student_id = 42
 
+        # Act & Assert
         with patch("services.course_service.validate_subscription_repo", new_callable=AsyncMock) as mock_validate, \
              patch("services.course_service.get_all_courses_repo", new_callable=AsyncMock) as mock_repo:
             mock_validate.return_value = True
@@ -25,8 +27,10 @@ class TestGetAllCoursesServiceShould:
             assert result == []
 
     async def test_without_student_id_skips_subscription_check(self):
+        # Arrange
         filters = CourseFilterOptions()
 
+        # Act & Assert
         with patch("services.course_service.get_all_courses_repo", new_callable=AsyncMock) as mock_repo:
             mock_repo.return_value = ["course1", "course2"]
 
@@ -39,6 +43,7 @@ class TestGetAllCoursesServiceShould:
 @pytest.mark.asyncio
 class TestGetCourseByIdServiceShould:
     async def test_returns_course(self):
+        # Arrange & Act & Assert
         with patch("services.course_service.get_course_by_id_repo", new_callable=AsyncMock) as mock_repo:
             mock_repo.return_value = {"id": 1, "name": "Test Course"}
 
