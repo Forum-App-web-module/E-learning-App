@@ -45,20 +45,12 @@ async def _authenticate_user(email: str, password: str):
 
     role = await get_role_by_email(email)
 
-    
     profile = await get_account_by_email_repo(email, role)
     if profile.get("is_active") == False:
         if role == UserRole.STUDENT:
             return responses.Unauthorized(content=f"This accound is blocked by admin. Please contact ADMIN team at {admin_email}.")
         elif role == UserRole.TEACHER:
             return responses.Unauthorized(content=f"Your account is being processed still. Expect notification when accound is acticated. In case of trouble contact us at {admin_email}.")
-
-    # token = create_access_token({"sub": email, "role" : role})
-
-    # check if google login and add "sub" and source
-    # if password == "GOOGLE_AUTH":
-    #     profile["sub"] = profile.get("email")
-    #     profile["auth_source"] = "google"
 
     profile = dict(profile)
     profile["role"] = role
