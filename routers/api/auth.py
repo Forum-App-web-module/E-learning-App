@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, Depends
-from fastapi.responses import HTMLResponse
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from data.models import LoginData, StudentRegisterData, TeacherRegisterData, UserRole
 from services.user_service import email_exists, create_account, get_hash_by_email, get_role_by_email
@@ -159,7 +159,7 @@ Parameters:
     request (Request): The request object from Google's redirect.
     
 Returns:
-    HTML response welcoming the user.
+    JSON response with a JWT token.
 """
     token = await oauth.google.authorize_access_token(request)
     google_responce = await oauth.google.get("https://openidconnect.googleapis.com/v1/userinfo", token=token)
@@ -178,10 +178,9 @@ Returns:
 
     _authenticate_user(email=email, password="GOOGLE_AUTH")
 
-#returning html for testing purposes
-    # jwt_token = create_access_token({"sub": email, "auth_source": "google"})
-    return HTMLResponse(f"""
-        <h2>Добре дошъл, {name}!</h2>
-    """)
+    jwt_token = create_access_token({"sub": email, "auth_source":"google"})
+    return JSONResponse({"access_token": jwt_token, "token_type": "bearer"})
+
+
 
 
