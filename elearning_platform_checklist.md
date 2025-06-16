@@ -1,6 +1,6 @@
-
+❌ тестове
 ❌ Картинка на схематa
-❌ Документрация към всеки ендпоинт + то -до
+❌ Документрация към всеки ендпоинт
 ❌ Assestment_form
 ❌ Подробно readme +
         · Project description
@@ -12,11 +12,11 @@
         · Technologies that are used, e.g. framework, RDBMS
         · Images of the database relationsКак се стартира приложението
 
-❌ Скрипт за Схемата и отделен с test дата. (поне един админ, които при първи логин трябва да си смени паролата).
+❌ Скрипт за Схемата✅ и отделен с test дата. (поне един админ, които при първи логин трябва да си смени паролата).
 ❌ Картинка на архитектурата - https://github.com/mygitbob/feb24_project_job-market
-❌ Инструкции как да се вдигне приложението
+✅ Инструкции как да се вдигне приложението
 ✅ Postman collection
-❌ Clean .env в репото + инструкции
+✅ Clean .env в репото + инструкции
 ❌ Integrate your project with a Continuous Integration server
 ❌ Да пушнем към main
 
