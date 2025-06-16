@@ -45,6 +45,3 @@ async def query_count(sql: str, sql_params: Union[Sequence[Any], dict] = ()) -> 
     finally:
         await conn.close()
 
-
-
-

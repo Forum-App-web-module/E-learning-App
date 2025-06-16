@@ -13,9 +13,10 @@ Authlib==1.6.0
 fastapi==0.115.12
 asyncpg==0.30.0
 python_jose==3.4.0
-starlette==0.47.0
+starlette
 supabase==2.15.2
 uvicorn==0.34.2
 python-multipart==0.0.20
 pytest==8.3.5
 pytest-asyncio==1.0.0
+pydantic[email]

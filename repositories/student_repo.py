@@ -130,3 +130,5 @@ async def check_enrollment_repo(course_id: int, student_id: int, get_data_func=r
     """
     result = await get_data_func(query, (course_id, student_id))
     return bool(result)
+
+

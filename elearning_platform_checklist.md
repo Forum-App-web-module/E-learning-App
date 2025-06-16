@@ -1,4 +1,29 @@
 
+❌ Картинка на схематa
+❌ Документрация към всеки ендпоинт + то -до
+❌ Assestment_form
+❌ Подробно readme +
+        · Project description
+        · Как се стартира приложението
+        · Link to the Swagger documentation
+        · Link to the hosted project (if hosted online)
+        · Instructions how to setup and run the project locally
+        · Description of the project structure
+        · Technologies that are used, e.g. framework, RDBMS
+        · Images of the database relationsКак се стартира приложението
+
+❌ Скрипт за Схемата и отделен с test дата. (поне един админ, които при първи логин трябва да си смени паролата).
+❌ Картинка на архитектурата - https://github.com/mygitbob/feb24_project_job-market
+❌ Инструкции как да се вдигне приложението
+❌ Petyr Postman collection
+❌ Clean .env в репото + инструкции
+❌ Integrate your project with a Continuous Integration server
+❌ Да пушнем към main
+
+
+
+
+
 # Poodle e-Learning Platform
 
 ## 🔒 Project Requirements

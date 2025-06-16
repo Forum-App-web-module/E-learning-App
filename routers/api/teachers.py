@@ -19,6 +19,11 @@ teachers_router = APIRouter(prefix="/teachers", tags=["teachers"])
 # Teachers must be able to view their account information
 @teachers_router.get("/profile")
 async def get_profile(payload: dict = Depends(get_current_user)):
+    """
+Get the profile of the authenticated teacher.
+
+Returns the full teacher profile data based on their token.
+"""
     teacher = await get_teacher_by_email(payload["email"])
     if teacher:
         return responses.Successful(content=TeacherResponse(**teacher).model_dump(mode="json"))
@@ -30,6 +35,12 @@ async def get_profile(payload: dict = Depends(get_current_user)):
 # Verify email by email. Teacher get email from system to verify his email by clicking on the Url.
 @teachers_router.put("/email/{id}")
 async def verify_teacher_email(id=id, payload: dict = Depends(get_current_user)):
+    """
+Verify teacher's email address via URL.
+
+The verification link is sent by the system after registration.
+Only the owner of the account can verify.
+"""
     if id == str(payload["id"]):
         await verify_email(payload["id"])
         return responses.Successful(content="Email is now verified!")
@@ -39,6 +50,12 @@ async def verify_teacher_email(id=id, payload: dict = Depends(get_current_user))
 # By clicking to the Url teacher gets this endpoint and approves.
 @teachers_router.put("/enrollments/{id}")
 async def approve_enrollment(id=id, payload: dict = Depends(get_current_user)):
+    """
+Approve a student enrollment request.
+
+Triggered via a link sent to the course owner.
+Only course owners can approve enrollments.
+"""
 
     enrollment_object = await get_enrollment_by_id(id)
     if enrollment_object:
@@ -55,6 +72,11 @@ async def update_teacher(
         mobile: str = Body(min_length=9, max_length=10),
         linked_in_url: str = Body(pattern=r"^https?:\/\/www\.linkedin\.com\/.+"),
 ):
+    """
+Update teacher profile details.
+
+Allows teachers to update their mobile number and LinkedIn profile link.
+"""
     email = payload["email"]
     if not await get_teacher_by_email(email):
             return responses.NotFound(content="You need to be Teacher for this action.")
@@ -67,6 +89,11 @@ async def update_teacher(
 # Teachers should be able to generate reports for the past and current students that have subscribed for their courses.
 @teachers_router.get("/enrollment/report")
 async def generate_report(payload: dict = Depends(get_current_user)):
+    """
+Generate a report of students enrolled in the teacher’s courses.
+
+Returns historical and current enrollments.
+"""
     if not await get_teacher_by_email(payload["email"]):
             return responses.NotFound(content="You need to be Teacher for this action.")
 
@@ -79,6 +106,11 @@ async def generate_report(payload: dict = Depends(get_current_user)):
 # The SQL query checks for enrollments and updates at the same time.
 @teachers_router.put("/deactivate/course/{id}")
 async def deactivate_course(id: int, payload: dict = Depends(get_current_user)):
+    """
+Deactivate a course owned by the teacher.
+
+Only allowed if the course has no enrolled students.
+"""
     if not await get_teacher_by_email(payload["email"]):
             return responses.NotFound(content="You need to be Teacher for this action.")
 
