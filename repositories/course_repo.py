@@ -64,7 +64,7 @@ async def get_all_courses_per_teacher_repo(teacher_id: int, filters: TeacherCour
 async def get_all_student_courses_repo(student_id, filters: StudentCourseFilter, get_data_func = read_query):
     order_by = "e.approved_at" if filters.sort_by == "approved_at" else "c.title"
     query = f"""
-    SELECT c.id, c.title,c.description, e.approved_at, e.completed_at
+    SELECT c.id, c.title,c.description, e.approved_at, e.completed_at,
     ROUND(AVG(cr.rating), 1) AS average_rating 
     FROM v1.enrollments e
     INNER JOIN v1.courses c ON e.course_id = c.id
@@ -72,6 +72,7 @@ async def get_all_student_courses_repo(student_id, filters: StudentCourseFilter,
     WHERE e.student_id = $1
         AND c.title ILIKE '%' || $2 || '%'
         AND c.tags ILIKE '%' || $3 || '%'
+        AND e.approved_at IS NOT NULL
     GROUP BY c.id, c.title, c.description, e.approved_at, e.completed_at
     ORDER BY {order_by}
     LIMIT $4 OFFSET $5
