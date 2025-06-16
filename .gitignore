@@ -163,3 +163,7 @@ __pycache__/
 .env
 # Ignore database connection file
 database.py
+data/database.py
+key_gen.py
+# External keys and secrets
+external_keys.env

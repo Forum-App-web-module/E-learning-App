@@ -1,42 +1,47 @@
-import psycopg2
-from psycopg2.extensions import connection as Connection
+import asyncpg
+from typing import Any, Sequence, Union
+from config.database_deploy_config import connection_supabase
+from os import getenv
+from dotenv import load_dotenv
 
-def _get_connection() -> Connection:
-    return psycopg2.connect(
-        user='postgres',
-        password='1997',
-        host='localhost',
-        port=5432,
-        dbname='E-learning'
-    )
 
-def read_query(sql: str, sql_params=()):
-    with _get_connection() as conn:
-        with conn.cursor() as cursor:
-            cursor.execute(sql, sql_params)
-            return cursor.fetchall()
-        
-def insert_query(sql: str, sql_params=()):
-    with _get_connection() as conn:
-        with conn.cursor() as cursor:
-            cursor.execute(sql, sql_params)
-            conn.commit()
-            try:
-                return cursor.fetchone()[0]
-            except (TypeError, IndexError):
-                return cursor.rowcount
-                
-def update_query(sql: str, sql_params=()) -> int:
-    with _get_connection() as conn:
-        with conn.cursor() as cursor:
-            cursor.execute(sql, sql_params)
-            conn.commit()
-            return cursor.rowcount
-        
+# load_dotenv(dotenv_path="external_keys.env")
+# USE_DEPLOYED_DB = getenv("USE_DEPLOYED_DB", "true").lower() == "true"
 
-def query_count(sql: str, sql_params=()) -> int:
-    with _get_connection as conn:
-        with conn.cursor as cursor:
-            cursor.execute(sql, sql_params)
-            return cursor.rowcount
+
+async def _get_connection()-> asyncpg.Connection:
+    return await asyncpg.connect(**connection_supabase())
+
+async def read_query(sql: str, sql_params: Union[Sequence[Any], dict] = ()):
+    conn = await _get_connection()
+    try:
+        # When parameters are not list, tuple, pass a dictionary
+        return await conn.fetch(sql, *sql_params) if isinstance(sql_params, (list, tuple)) else await conn.fetch(sql, **sql_params)
+    finally:
+        await conn.close()
+
+async def insert_query(sql: str, sql_params: Union[Sequence[Any], dict] = ()):
+    conn = await _get_connection()
+    try:
+        result = await conn.fetchrow(sql, *sql_params) if isinstance(sql_params, (list, tuple)) else await conn.fetchrow(sql, **sql_params)
+        return result[0] if result else None
+    finally:
+        await conn.close()
+
+async def update_query(sql: str, sql_params: Union[Sequence[Any], dict] = ()) -> int:
+    conn = await _get_connection()
+    try:
+        result = await conn.execute(sql, *sql_params) if isinstance(sql_params, (list, tuple)) else await conn.execute(sql, **sql_params)
+        # The result is a string like "UPDATE 1" — extract the row count
+        return int(result.split()[-1])
+    finally:
+        await conn.close()
+
+async def query_count(sql: str, sql_params: Union[Sequence[Any], dict] = ()) -> int:
+    conn = await _get_connection()
+    try:
+        result = await conn.fetchrow(sql, *sql_params) if isinstance(sql_params, (list, tuple)) else await conn.fetchrow(sql, **sql_params)
+        return result[0] if result else 0
+    finally:
+        await conn.close()
 

@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS v1.teachers
+    ALTER COLUMN is_active SET DEFAULT false;
