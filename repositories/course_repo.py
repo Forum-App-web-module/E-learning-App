@@ -183,3 +183,14 @@ async def admin_course_view_repo(
     """
 
     return await get_data_func(query, (title_filter, teacher_id, student_id, limit, offset))
+
+async def complete_course_repo(student_id: int, course_id: int, update_data_func = update_query):
+    query = """
+    UPDATE v1.enrollments
+    SET completed_at = NOW
+    WHERE student_id = $1
+        AND course_id = $2
+        AND completed_at IS NULL
+    RETURNING id
+    """
+    return await update_data_func(query, (student_id, course_id))

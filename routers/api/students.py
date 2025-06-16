@@ -12,7 +12,8 @@ from services.student_service import (
     update_student_service,
     get_student_courses_service,
     get_student_courses_progress_service,
-    rate_course_service
+    rate_course_service, complete_section_service,
+    complete_course_service, check_enrollment_service
 )
 from services.teacher_service import get_teacher_by_id
 from services.subscription_service import subscribe, is_subscribed
@@ -23,7 +24,7 @@ from data.models import (
     CourseStudentResponse,
     CoursesProgressResponse,
     TeacherResponse,
-    CourseResponse)
+    CourseResponse, UserRole)
 from common import responses
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
@@ -164,3 +165,48 @@ async def rate_course(course_id: int, rating: int, payload: dict = Depends(get_c
     
     return responses.Successful(content="Course rating submitted.")
     
+
+
+@students_router.post("/{course_id}/sections/{section_id}/complete")
+async def complete_section(course_id: int, section_id: int, payload: dict = Depends(get_current_user)):
+    """
+    Mark a course section as completed by an enrolled student
+    """
+    if payload.get("role") != UserRole.STUDENT:
+        return responses.Unauthorized(content="Only students can complete sections.")
+
+    student_id = payload.get("id")
+    enrolled = await check_enrollment_service(course_id, student_id)
+
+    if not enrolled:
+        return responses.Forbidden(content="You must be enrolled to complete a section.")
+
+    await complete_section_service(student_id, section_id)
+    return responses.Successful(content={"message": f"Section {section_id} marked as completed."})
+
+
+@students_router.post("/{course_id}/complete")
+async def complete_course(course_id: int, payload: dict = Depends(get_current_user)):
+    """
+    Mark the course as completed — only if all sections are completed
+    """
+    if payload.get("role") != UserRole.STUDENT:
+        return responses.Unauthorized(content="Only students can complete courses.")
+
+    student_id = payload.get("id")
+    enrolled = await check_enrollment_service(course_id, student_id)
+
+    if not enrolled:
+        return responses.Forbidden(content="You must be enrolled to complete this course.")
+
+    progress_data = await get_student_courses_progress_service(student_id)
+    course_progress = next((course for course in progress_data if course["course_id"] == course_id), None)
+
+    if not course_progress:
+        return responses.NotFound(content="Course progress data not found.")
+
+    if course_progress["progress_percentage"] < 100:
+        return responses.Forbidden(content="You must complete all sections before completing the course.")
+
+    await complete_course_service(student_id, course_id)
+    return responses.Successful(content={"message": f"Course {course_id} marked as completed."})
