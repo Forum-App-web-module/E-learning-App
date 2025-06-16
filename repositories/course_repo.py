@@ -72,6 +72,7 @@ async def get_all_student_courses_repo(student_id, filters: StudentCourseFilter,
     WHERE e.student_id = $1
         AND c.title ILIKE '%' || $2 || '%'
         AND c.tags ILIKE '%' || $3 || '%'
+        AND e.approved_at IS NOT NULL
     GROUP BY c.id, c.title, c.description, e.approved_at, e.completed_at
     ORDER BY {order_by}
     LIMIT $4 OFFSET $5
