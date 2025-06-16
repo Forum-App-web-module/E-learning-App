@@ -15,7 +15,12 @@ admins_router = APIRouter(prefix="/admins", tags=["admins"])
 # Used also for approve teacher registration - URL received on email after teacher registration.
 @admins_router.put("/{role}/{action}/{id}")
 async def Activate_or_Deactivate_user_account(role: Action_UserRole, action: Action, id: int, payload: dict = Depends(get_current_user)):
+    """
+Activate or deactivate a user account.
 
+Only admins can perform this action. Affects either a teacher or student
+based on the `role` parameter. A notification email is sent after the update.
+"""
     # Admin authorization validation
     if not payload["role"] == UserRole.ADMIN:
         return responses.Forbidden(content="Admin authorisation required.")
@@ -32,6 +37,12 @@ async def Activate_or_Deactivate_user_account(role: Action_UserRole, action: Act
 
 @admins_router.get("/course/{course_id}/rating")
 async def get_course_rating(course_id: int, payload: dict = Depends(get_current_user)):
+    """
+Retrieve all ratings for a specific course.
+
+Returns a list of ratings and their average.
+Admin access required.
+"""
     if not payload["role"] == UserRole.ADMIN:
         return responses.Forbidden(content="Admin authorisation required.")
     rating = await get_course_rating_service(course_id)
@@ -39,6 +50,11 @@ async def get_course_rating(course_id: int, payload: dict = Depends(get_current_
     
 @admins_router.put("/course/{course_id}/student/{student_id}")
 async def remove_student_from_course(course_id: int, student_id: int, payload: dict = Depends(get_current_user)):
+    """
+Unenroll a student from a specific course.
+
+Admin-only endpoint. Useful in case of moderation or disputes.
+"""
     if not payload["role"] == UserRole.ADMIN:
         return responses.Forbidden(content="Admin authorisation required.")
 
@@ -51,6 +67,12 @@ async def remove_student_from_course(course_id: int, student_id: int, payload: d
 
 @admins_router.patch("/course/{course_id}")
 async def soft_delete_course(course_id: int, payload: dict = Depends(get_current_user)):
+    """
+Soft delete a course and notify enrolled students.
+
+Marks the course as inactive and sends email notifications.
+Admin access required.
+"""
     if not payload["role"] == UserRole.ADMIN:
         return responses.Forbidden(content="Admin authorisation required.")
 
@@ -67,6 +89,12 @@ async def soft_delete_course(course_id: int, payload: dict = Depends(get_current
     
 @admins_router.get("/courses")
 async def get_admin_view_courses(filters:AdminCourseFilterOptions = Depends(), payload: dict = Depends(get_current_user)):
+    """
+List all courses with advanced filters.
+
+Admins can filter by course title, teacher ID or student ID
+and apply pagination with limit/offset.
+"""
     if not payload["role"] == UserRole.ADMIN:
         return responses.Forbidden(content="Admin authorisation required.")
     

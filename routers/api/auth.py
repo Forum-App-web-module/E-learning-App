@@ -61,6 +61,18 @@ async def _authenticate_user(email: str, password: str):
 
 @auth_router.post("/token")
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    """
+    Authenticate user and return an access token.
+
+This endpoint uses OAuth2PasswordRequestForm for login with email and password.
+The access token returned can be used to authorize protected endpoints.
+
+Parameters:
+    form_data (OAuth2PasswordRequestForm): Form containing `username` (email) and `password`.
+
+Returns:
+    JSON with access token and token type, or an error message if credentials are invalid.
+"""
     email = form_data.username
     password = form_data.password
 
@@ -68,11 +80,36 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 @auth_router.post('/login')
 async def login(login: LoginData):
+    """
+    Log in a user using email and password (JSON payload).
+
+This is a standard login endpoint accepting credentials in the request body.
+Returns a JWT access token if credentials are valid.
+
+Parameters:
+    login (LoginData): User login credentials.
+
+Returns:
+    JWT access token and token type, or an error message if authentication fails
+"""
     return await _authenticate_user(login.email, login.password)
 
 
 @auth_router.post('/register')
 async def register(register_data: Union[TeacherRegisterData, StudentRegisterData]):
+    """
+    Register a new student or teacher account.
+
+Based on the data provided, the user is registered as either a student or teacher.
+- Teachers receive a verification email and await admin approval.
+- Students are immediately active unless blocked.
+
+Parameters:
+    register_data (TeacherRegisterData | StudentRegisterData): Registration information.
+
+Returns:
+    A message confirming registration, the user role, and new user ID.
+"""
     if await email_exists(register_data.email):
         return responses.BadRequest(content="Email already registered.")
     
@@ -90,25 +127,40 @@ async def register(register_data: Union[TeacherRegisterData, StudentRegisterData
     })
 
 # login redirect to google
-"""
-Redirect to google for Oauth2
-Redirect uri is generated: auth_google_callback, should be the same as in Google cloud console
-
-"""
 @auth_router.get("/login/google")
 async def google_login(request: Request):
+    """
+    Initiate Google OAuth2 login flow.
+Redirects the user to Google's authentication page. After successful login,
+Google redirects back to your app via the configured callback.
+
+Parameters:
+    request (Request): Incoming HTTP request.
+
+Returns:
+    Redirect response to Google's OAuth2 login page.
+"""
     redirect_uri = request.url_for("auth_google_callback")
     print("Redirect uri:", redirect_uri)
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
-"""
-Callback to Google after successful login
-Get token and user data from google
-Create an account if it does not exist
-Return JWT token 
-"""
+
 @auth_router.get("/auth/google/callback")
 async def auth_google_callback(request: Request):
+    """
+    Handle Google OAuth2 callback and log in the user.
+
+After a successful Google login, this endpoint:
+- Retrieves user info from Google.
+- Creates a student account if not already registered.
+- Issues a JWT token to authenticate further requests.
+
+Parameters:
+    request (Request): The request object from Google's redirect.
+    
+Returns:
+    HTML response welcoming the user.
+"""
     token = await oauth.google.authorize_access_token(request)
     google_responce = await oauth.google.get("https://openidconnect.googleapis.com/v1/userinfo", token=token)
     user_data = google_responce.json()
