@@ -31,7 +31,8 @@ based on the `role` parameter. A notification email is sent after the update.
             user_object = await get_teacher_by_id(teacher_id = id)
         else: user_object= await get_student_by_id(student_id = id)
         await notify_user_for_account_state(action=action, role=role, user_email=user_object.get("email"))
-        return responses.Successful(content=f"{role.value.upper()} with ID:{id} is {action.value.upper()+"D"} successfully.") 
+        status = action.value.upper()+"D"
+        return responses.Successful(content=f"{role.value.upper()} with ID:{id} is {status} successfully.") 
     return responses.NotFound(content=f"There is no {role.value.upper()} with ID:{id}")
 
 
