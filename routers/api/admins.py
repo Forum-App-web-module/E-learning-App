@@ -15,7 +15,11 @@ admins_router = APIRouter(prefix="/admins", tags=["admins"])
 # Used also for approve teacher registration - URL received on email after teacher registration.
 @admins_router.put("/{role}/{action}/{id}")
 async def Activate_or_Deactivate_user_account(role: Action_UserRole, action: Action, id: int, payload: dict = Depends(get_current_user)):
+    """
+    Activate or deactivate a user account - teacher or student.\n
+    Available for admins only.
 
+    """
     # Admin authorization validation
     if not payload["role"] == UserRole.ADMIN:
         return responses.Forbidden(content="Admin authorisation required.")
@@ -32,6 +36,10 @@ async def Activate_or_Deactivate_user_account(role: Action_UserRole, action: Act
 
 @admins_router.get("/course/{course_id}/rating")
 async def get_course_rating(course_id: int, payload: dict = Depends(get_current_user)):
+    """
+    Returns all ratings for a specific course. \n
+    Admin access required.
+    """
     if not payload["role"] == UserRole.ADMIN:
         return responses.Forbidden(content="Admin authorisation required.")
     rating = await get_course_rating_service(course_id)
@@ -39,6 +47,10 @@ async def get_course_rating(course_id: int, payload: dict = Depends(get_current_
     
 @admins_router.put("/course/{course_id}/student/{student_id}")
 async def remove_student_from_course(course_id: int, student_id: int, payload: dict = Depends(get_current_user)):
+    """
+    Unenroll a student from a course.\n
+    Admin access required.
+    """
     if not payload["role"] == UserRole.ADMIN:
         return responses.Forbidden(content="Admin authorisation required.")
 
@@ -51,6 +63,10 @@ async def remove_student_from_course(course_id: int, student_id: int, payload: d
 
 @admins_router.patch("/course/{course_id}")
 async def soft_delete_course(course_id: int, payload: dict = Depends(get_current_user)):
+    """
+    Hides the course and notifies students.\n
+    Admin access required.
+    """
     if not payload["role"] == UserRole.ADMIN:
         return responses.Forbidden(content="Admin authorisation required.")
 
@@ -67,6 +83,10 @@ async def soft_delete_course(course_id: int, payload: dict = Depends(get_current
     
 @admins_router.get("/courses")
 async def get_admin_view_courses(filters:AdminCourseFilterOptions = Depends(), payload: dict = Depends(get_current_user)):
+    """
+    View all courses with filters (title, teacher, student).\n
+    Admin access required.
+    """
     if not payload["role"] == UserRole.ADMIN:
         return responses.Forbidden(content="Admin authorisation required.")
     

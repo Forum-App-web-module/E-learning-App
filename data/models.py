@@ -131,28 +131,6 @@ class CoursesProgressResponse(BaseModel):
     title: str
     progress_percentage: float
 
-class CourseFilterBase(BaseModel):
-    title: Optional[str] = Field(default="", description="Filter by course title")
-    tag: Optional[str] = Field(default="", description="Filter by course tag")
-    order: str = Field(default="asc", pattern="^(asc|desc)$", description="Sort order")
-    limit: int = Field(default=10, ge=1, le=100)
-    offset: int = Field(default=0, ge=0)    
-class CourseFilterOptions(CourseFilterBase):
-    sort_by: Optional[str] = Field(default="title", pattern="^(title|rating|created_on)$", description="Sort by 'title', 'rating', or 'created_on'")
-
-class TeacherCourseFilter(CourseFilterBase):
-    sort_by: Optional[str] = Field(default="created_on", pattern="^(created_on|title)$")
-
-class StudentCourseFilter(CourseFilterBase):
-    sort_by: Optional[str] = Field(default="approved_at", pattern="^(approved_at|title)$")
-
-class AdminCourseFilterOptions(BaseModel):
-    title: Optional[str] = Field(default="", description="Filter by course title")
-    teacher_id: Optional[int] = Field(default=None, description="Filter by teacher ID")
-    student_id: Optional[int] = Field(default=None, description="Filter by student ID")
-    limit: int = Field(default=5, ge=1, le=100, description="Number of items per page")
-    offset: int = Field(default=0, ge=0, description="Pagination offset")
-
 class AdminCourseListResponse(BaseModel):
     id: int
     title: str
@@ -279,5 +257,48 @@ class EnrollmentReport(BaseModel):
     completed_at: datetime | None
     drop_out: bool
     created_on: datetime
+
+# --- Search and Filter Models ---
+
+class SortOrder(str, Enum):
+    asc = "asc"
+    desc = "desc"
+
+class CourseSortField(str, Enum):
+    title = "title"
+    rating = "rating"
+    created_on = "created_on"
+
+class TeacherSortField(str, Enum):
+    created_on = "created_on"
+    title = "title"
+
+class StudentSortField(str, Enum):
+    approved_at = "approved_at"
+    title = "title"
+
+class CourseFilterBase(BaseModel):
+    title: Optional[str] = Field(default="", description="Filter by course title")
+    tag: Optional[str] = Field(default="", description="Filter by course tag")
+    order: SortOrder = Field(default=SortOrder.asc, description="Sort order: asc or desc")
+    limit: int = Field(default=10, ge=1, le=100)
+    offset: int = Field(default=0, ge=0)    
+class CourseFilterOptions(CourseFilterBase):
+    sort_by: CourseSortField = Field(default=CourseSortField.title, description="Sort by title, rating, or created_on")
+
+class TeacherCourseFilter(CourseFilterBase):
+    sort_by: TeacherSortField = Field(default=TeacherSortField.created_on, description="Sort by created_on or title")
+
+class StudentCourseFilter(CourseFilterBase):
+    sort_by: StudentSortField = Field(default=StudentSortField.approved_at, description="Sort by approved_at or title")
+
+class AdminCourseFilterOptions(BaseModel):
+    title: Optional[str] = Field(default="", description="Filter by course title")
+    teacher_id: Optional[int] = Field(default=None, description="Filter by teacher ID")
+    student_id: Optional[int] = Field(default=None, description="Filter by student ID")
+    limit: int = Field(default=5, ge=1, le=100, description="Number of items per page")
+    offset: int = Field(default=0, ge=0, description="Pagination offset")
+
+
 
 
