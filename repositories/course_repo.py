@@ -57,8 +57,7 @@ async def get_all_courses_per_teacher_repo(teacher_id: int, filters: TeacherCour
     LIMIT $3 OFFSET $4
     """
 
-    courses = await get_data_func(query, (teacher_id, filters.title, filters.limit, filters.offset))
-    return courses if courses else None
+    return await get_data_func(query, (teacher_id, filters.title, filters.limit, filters.offset))
 
 # get all courses a student is enrolled to 
 async def get_all_student_courses_repo(student_id, filters: StudentCourseFilter, get_data_func = read_query):
