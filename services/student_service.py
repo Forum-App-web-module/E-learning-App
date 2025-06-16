@@ -32,7 +32,6 @@ async def get_student_by_email(email):
 
 async def rate_course_service(student_id: int, course_id: int, rating: int):
     is_allowed = await allow_rating_repo(student_id, course_id)
-    print("is_allowed:", is_allowed)
     if not is_allowed:
         return None
     
