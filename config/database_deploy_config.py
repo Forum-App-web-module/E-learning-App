@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from supabase import create_client, Client
 
 
-load_dotenv(dotenv_path="external_keys.env")
+load_dotenv(dotenv_path=".env")
 
 DATABASE_URL = getenv("DATABASE_URL")
 KEY = getenv("KEY")

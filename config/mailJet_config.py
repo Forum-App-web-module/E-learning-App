@@ -9,7 +9,7 @@ from pydantic import EmailStr
 
 from data.models import TeacherResponse, StudentResponse, Course, CourseResponse, Action, Action_UserRole
 
-load_dotenv(dotenv_path="external_keys.env")
+load_dotenv(dotenv_path=".env")
 
 system_email = getenv("SYSTEM_EMAIL")
 admin_email = getenv("ADMIN_EMAIL")

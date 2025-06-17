@@ -6,7 +6,7 @@ from os import getenv
 
 data = load_dotenv()
 
-load_dotenv(dotenv_path="external_keys.env")
+load_dotenv(dotenv_path=".env")
 
 CLOUD_NAME = getenv("CLOUD_NAME")
 API_KEY = getenv("API_KEY")

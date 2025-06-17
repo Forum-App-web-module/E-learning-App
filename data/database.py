@@ -5,10 +5,6 @@ from os import getenv
 from dotenv import load_dotenv
 
 
-# load_dotenv(dotenv_path="external_keys.env")
-# USE_DEPLOYED_DB = getenv("USE_DEPLOYED_DB", "true").lower() == "true"
-
-
 async def _get_connection()-> asyncpg.Connection:
     return await asyncpg.connect(**connection_supabase())
 
