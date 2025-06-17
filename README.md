@@ -1,6 +1,10 @@
 # E-learning-App
 
-Learning Management System (LMS)
+## Project Title: Poodle – E-Learning Platform Backend API
+
+-  Description:
+Poodle is a Learning Management System (LMS) delivered as RESTful backend API designed for a modern e-learning platform, built with FastAPI. It supports user authentication and role-based access control for students, teachers, and administrators, allowing seamless interaction with educational content. The API enables course creation, section and lesson management, user enrollment, and rating/review systems. It also includes automated documentation (Swagger/OpenAPI), secure token-based authentication, and a scalable PostgreSQL database setup, delivered through an external API integration with Supabase.
+
 
 -------------------------------------------------------------------------
 
@@ -30,16 +34,16 @@ Learning Management System (LMS)
 
 ## Tech Stack
 
-- **Frontend:** HTML, CSS
 - **Backend:** FastAPI (Python)
 - **Database:** Postgresql
 - **Tools & Libraries:** 
-   - FastAPI
    - OAuth2  
    - JWT  
-   - mailjet   
-   - python-dotenv  
-   - PostgreSQL  
+   - Mailjet
+   - Supabase
+   - Cloudinary
+   - Pytest
+   - Python-dotenv  
    - Pydantic  
    - Uvicorn   
 

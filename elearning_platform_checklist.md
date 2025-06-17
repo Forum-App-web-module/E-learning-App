@@ -3,13 +3,12 @@
 ❌ Документрация към всеки ендпоинт
 ❌ Assestment_form
 ❌ Подробно readme +
-        · Project description
-        · Как се стартира приложението
-        · Link to the Swagger documentation
-        · Link to the hosted project (if hosted online)
-        · Instructions how to setup and run the project locally
+        ✅ Project description
+        ✅ Как се стартира приложението
+        ✅ Link to the Swagger documentation
+        ✅ Instructions how to setup and run the project locally
         · Description of the project structure
-        · Technologies that are used, e.g. framework, RDBMS
+        ✅ Technologies that are used, e.g. framework, RDBMS
         · Images of the database relationsКак се стартира приложението
 
 ❌ Скрипт за Схемата✅ и отделен с test дата. (поне един админ, които при първи логин трябва да си смени паролата).
