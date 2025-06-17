@@ -50,7 +50,7 @@ class TestUnenrollStudentShould:
         fake_unenroll_result = {"status": "success"}
 
         with patch(
-            "services.enrollment_service.repo_get_courses_progress",
+            "services.enrollment_service.get_courses_progress_repo",
             new_callable=AsyncMock
         ) as mock_get_progress, \
              patch(
@@ -80,7 +80,7 @@ class TestUnenrollStudentShould:
         fake_progress = [{"course_id": course_id, "progress_percentage": 100}]
 
         with patch(
-            "services.enrollment_service.repo_get_courses_progress",
+            "services.enrollment_service.get_courses_progress_repo",
             new_callable=AsyncMock
         ) as mock_get_progress, \
              patch(
