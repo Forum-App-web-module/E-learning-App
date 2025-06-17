@@ -17,7 +17,7 @@
 ✅ Postman collection
 ✅ Clean .env в репото + инструкции
 ❌ Integrate your project with a Continuous Integration server
-❌ Да пушнем към main
+✅ Да пушнем към main
 
 
 
