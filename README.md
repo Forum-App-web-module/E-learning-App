@@ -135,6 +135,15 @@ Poodle is a Learning Management System (LMS) delivered as RESTful backend API de
 
 ## Database Design
 
+![Database Schema](docs/database%20Postgre/E-Learning%20DB%20diagram%20snapshot.png)
+
+**Colors Legend**:
+- User entities - admins, teachers, students - in Bright Green
+- Course entities - courses, course_sections - in Pink
+- Composite tables - course_rating, student_course_sections - in Peach
+- Subscribtion-related - enrollments, subscriptions - in lighter green
+- Other - external_resources, event_log - in default white 
+
 ### The schema covers the following key entities
 
 
