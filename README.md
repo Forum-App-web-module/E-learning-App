@@ -39,13 +39,15 @@ Poodle is a Learning Management System (LMS) delivered as RESTful backend API de
 - **Tools & Libraries:** 
    - OAuth2  
    - JWT  
-   - Mailjet
-   - Supabase
-   - Cloudinary
-   - Pytest
-   - Python-dotenv  
+   - mailjet External API
+   - Supabase External API
+   - Google Auth External API
+   - Cloudinary External API
+   - python-dotenv  
+   - PostgreSQL  
    - Pydantic  
-   - Uvicorn   
+   - Uvicorn
+   - Pytest   
 
 
 ---
@@ -55,7 +57,7 @@ Poodle is a Learning Management System (LMS) delivered as RESTful backend API de
 ###  Authentication
 
 - **User Registration**
-  - Students and teachers can register using their email and password. Teachers receive verification links and await admin approval.
+  - Students and teachers can register using their email and password. Teachers receive email verification links as well as await admin approval.
 - **User Login**
   - Email and password-based login returns a JWT token. Supports OAuth2 login via Google.
 - **Google Authentication**
@@ -122,12 +124,10 @@ Poodle is a Learning Management System (LMS) delivered as RESTful backend API de
    *If additional dependecy is installed use the bellow command to update the file*  
    *pip freeze > requirements.txt*
 
-4. **Set up your environment variables:**  
-    Copy the environment file:  
-   `cp key_example.env .env`  
-    Fill in the required values (e.g., database credentials, secret keys)
+4. **Set up your environment variables:**
+    Repository includes template .env file. Copy `.env.example` to `.env` and fill in your own credentials:
 
-5. **Run the application**:  
+6. **Run the application**:  
    `uvicorn main:app --reload`  
    *Use `--port {port_number}` if you want to run the app on a different port (default is `8000`)*
 
