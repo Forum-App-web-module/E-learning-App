@@ -1,6 +1,6 @@
 # E-learning-App
 
-## Project Title: Poodle – E-Learning Platform Backend API
+## Project Title: MOOC E-Learning Platform Backend API
 
 -  Description:
 Poodle is a Learning Management System (LMS) delivered as RESTful backend API designed for a modern e-learning platform, built with FastAPI. It supports user authentication and role-based access control for students, teachers, and administrators, allowing seamless interaction with educational content. The API enables course creation, section and lesson management, user enrollment, and rating/review systems. It also includes automated documentation (Swagger/OpenAPI), secure token-based authentication, and a scalable PostgreSQL database setup, delivered through an external API integration with Supabase.
@@ -176,7 +176,13 @@ Service and Repo Layers for:
     - GitHub Action - https://github.com/Forum-App-web-module/E-learning-App/actions/workflows/test.yml
 
 ## Future Improvements / Roadmap
-
+- Develop a log event feature for user timelines, admin actions, and system event captions.
+- Develop a personal messaging feature with encrypted messages.
+- Implement a personal notes feature.
+- Add endpoints for user event history.
+- Continue developing email notifications:
+- New course advertisements
+- Action reminder emails
 
 
 ---
