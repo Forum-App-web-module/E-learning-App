@@ -112,8 +112,7 @@ Poodle is a Learning Management System (LMS) delivered as RESTful backend API de
 ## Installation
 
 1. **Clone the repository:**  
-   `git clone https://github.com/Forum-App-web-module/E-learning-App.git`  
-   `cd forum-app`
+   `git clone https://github.com/Forum-App-web-module/E-learning-App.git`
 
 2. **(Optional, Recommended) Create and activate a virtual environment:**  
    `python -m venv venv`  
@@ -121,7 +120,7 @@ Poodle is a Learning Management System (LMS) delivered as RESTful backend API de
 
 3. **Install the required dependencies:**   
    `pip install -r requirements.txt`  
-   *If additional dependecy is installed use the bellow command to update the file*  
+   *If additional dependency is installed use the bellow command to update the file*  
    *pip freeze > requirements.txt*
 
 4. **Set up your environment variables:**
@@ -135,24 +134,24 @@ Poodle is a Learning Management System (LMS) delivered as RESTful backend API de
 
 ## Database Design
 
-![Database Schema](docs/database%20Postgre/E-Learning%20DB%20diagram%20snapshot.png)
+![Database Schema](docs/misc/E-Learning%20DB%20diagram%20snapshot.png)
 
-**Colors Legend**:
+### The schema covers the following key entities
+**Color Legend**:
 - User entities - admins, teachers, students - in Bright Green
 - Course entities - courses, course_sections - in Pink
 - Composite tables - course_rating, student_course_sections - in Peach
 - Subscribtion-related - enrollments, subscriptions - in lighter green
 - Other - external_resources, event_log - in default white 
 
-### The schema covers the following key entities
-
-
 
 ## N-Tier Architecture  
-From an MVC perspective:
+
 - **View** - Client/UI
 - **Controller** - Web Server and Application/Business Logic
 - **Model** - Data and Database Layers
+
+![System Architecture](docs/misc/system_architecture%20_diagram.png)
 
 Through the FastAPI server, the client calls the routers which interact with Security and Service Layers.  
 The two services on their side, use the Pydantic models and interact with the Database via Database Connector.
@@ -165,13 +164,16 @@ Refer to the FastAPI swagger for the backend API docs. - http://127.0.0.1:8000/d
    The tests are written using the `pytest` framework.
    All tests are located in E-LEARNING-APP/tests/  
 ### Coverage:  
-   - 
-   -   
-   -   
-   -  
+Service and Repo Layers for:
+   - admin
+   - course
+   - enrollment
+   - student
+   - teacher
+   - user
 
 ### Tests execution:  
-    - 
+    - GitHub Action - https://github.com/Forum-App-web-module/E-learning-App/actions/workflows/test.yml
 
 ## Future Improvements / Roadmap
 
