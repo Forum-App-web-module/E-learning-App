@@ -1,4 +1,4 @@
-❌ тестове
+✅ тестове
 ❌ Картинка на схематa
 ❌ Документрация към всеки ендпоинт
 ❌ Assestment_form
@@ -7,7 +7,7 @@
         ✅ Как се стартира приложението
         ✅ Link to the Swagger documentation
         ✅ Instructions how to setup and run the project locally
-        · Description of the project structure
+        ✅ Description of the project structure
         ✅ Technologies that are used, e.g. framework, RDBMS
         · Images of the database relations
 
@@ -16,8 +16,8 @@
 ✅ Инструкции как да се вдигне приложението
 ✅ Postman collection
 ✅ Clean .env в репото + инструкции
-❌ Integrate your project with a Continuous Integration server
-❌ Да пушнем към main
+✅ Integrate your project with a Continuous Integration server
+✅ Да пушнем към main
 
 
 
