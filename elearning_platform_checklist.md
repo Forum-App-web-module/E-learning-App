@@ -9,7 +9,7 @@
         ✅ Instructions how to setup and run the project locally
         · Description of the project structure
         ✅ Technologies that are used, e.g. framework, RDBMS
-        · Images of the database relationsКак се стартира приложението
+        · Images of the database relations
 
 ❌ Скрипт за Схемата✅ и отделен с test дата. (поне един админ, които при първи логин трябва да си смени паролата).
 ❌ Картинка на архитектурата - https://github.com/mygitbob/feb24_project_job-market
