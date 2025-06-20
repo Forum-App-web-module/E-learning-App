@@ -3,7 +3,7 @@
 ## Project Title: MOOC E-Learning Platform Backend API
 
 -  Description:
-Poodle is a Learning Management System (LMS) delivered as RESTful backend API designed for a modern e-learning platform, built with FastAPI. It supports user authentication and role-based access control for students, teachers, and administrators, allowing seamless interaction with educational content. The API enables course creation, section and lesson management, user enrollment, and rating/review systems. It also includes automated documentation (Swagger/OpenAPI), secure token-based authentication, and a scalable PostgreSQL database setup, delivered through an external API integration with Supabase.
+This repo offers a Learning Management System (LMS) delivered as RESTful backend API designed for a modern e-learning platform, built with FastAPI. It supports user authentication and role-based access control for students, teachers, and administrators, allowing seamless interaction with educational content. The API enables course creation, section and lesson management, user enrollment, and rating/review systems. It also includes automated documentation (Swagger/OpenAPI), secure token-based authentication, and a scalable PostgreSQL database setup, delivered through an external API integration with Supabase.
 
 
 -------------------------------------------------------------------------
