@@ -4,12 +4,22 @@ from repositories.course_repo import get_course_by_id_repo, admin_course_view_re
 from repositories.enrollments_repo import unenroll_all_by_course_id_repo
 from data.models import Action_UserRole, Action
 
-async def change_account_state(role: Action_UserRole, action: Action, user_id: int):
+async def change_account_state(role: Action_UserRole, action: Action, user_id: int) -> int | None:
+    """
+    :param role: Action_UserRole.student | Action_UserRole.teacher | Action_UserRole.admin
+    :param action: Action.deactivate | Action.activate
+    :param user_id: int
+    :return updated row count: int | None
+    """
     change = await change_account_state_repo(role, action, user_id)
     return change if change else None
 
 
-async def soft_delete_course_service(course_id: int):
+async def soft_delete_course_service(course_id: int) -> tuple[list[str], int] | tuple[None, None]:
+    """
+    :param course_id:
+    :return tuple[list[str], int] | tuple[None, None]:
+    """
     course_data = await get_course_by_id_repo(course_id)
     if course_data:
         owner_id = course_data["owner_id"]
@@ -31,6 +41,25 @@ async def get_admin_courses_view_service(
         student_id: int = None,
         limit: int = 5,
         offset: int = 0):
+    """
+
+    :param title: "" | course title to filter by.
+    :param teacher_id: None | teacher_id to filter by.
+    :param student_id: None | student_id to filter by.
+    :param limit: 5 | limit of rows to return.
+    :param offset: 0 | offset of rows to return.
+    :return: Record(
+        id,
+        title,
+        is_premium,
+        description,
+        tags,
+        picture_url,
+        owner_id,
+        created_on,
+        students_count,
+        average_rating)
+    """
     return await admin_course_view_repo(title, teacher_id, student_id, limit, offset)
 
 
