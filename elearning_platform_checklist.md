@@ -1,13 +1,13 @@
-❌ тестове
-❌ Картинка на схематa
-❌ Документрация към всеки ендпоинт
-❌ Assestment_form
-❌ Подробно readme +
+✅ тестове
+✅ Картинка на схематa
+✅ Документрация към всеки ендпоинт
+✅ Assestment_form
+✅ Подробно readme +
         · Description of the project structure
         · Images of the database relations
 
 ❌ и отделен с test дата. (поне един админ, които при първи логин трябва да си смени паролата).
-❌ Картинка на архитектурата
+✅ Картинка на архитектурата
 ❌ Integrate your project with a Continuous Integration server
 
 
