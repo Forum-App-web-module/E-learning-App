@@ -20,10 +20,10 @@ teachers_router = APIRouter(prefix="/teachers", tags=["teachers"])
 @teachers_router.get("/profile")
 async def get_profile(payload: dict = Depends(get_current_user)):
     """
-Get the profile of the authenticated teacher.
+    Get the profile of the authenticated teacher.
 
-Returns the full teacher profile data based on their token.
-"""
+    Returns the full teacher profile data based on their token.
+    """
     teacher = await get_teacher_by_email(payload["email"])
     if teacher:
         return responses.Successful(content=TeacherResponse(**teacher).model_dump(mode="json"))
@@ -36,11 +36,11 @@ Returns the full teacher profile data based on their token.
 @teachers_router.put("/email/{id}")
 async def verify_teacher_email(id=id, payload: dict = Depends(get_current_user)):
     """
-Verify teacher's email address via URL.
+    Verify teacher's email address via URL.
 
-The verification link is sent by the system after registration.
-Only the owner of the account can verify.
-"""
+    The verification link is sent by the system after registration.
+    Only the owner of the account can verify.
+    """
     if id == str(payload["id"]):
         await verify_email(payload["id"])
         return responses.Successful(content="Email is now verified!")
@@ -51,11 +51,11 @@ Only the owner of the account can verify.
 @teachers_router.put("/enrollments/{id}")
 async def approve_enrollment(id=id, payload: dict = Depends(get_current_user)):
     """
-Approve a student enrollment request.
+    Approve a student enrollment request.
 
-Triggered via a link sent to the course owner.
-Only course owners can approve enrollments.
-"""
+    Triggered via a link sent to the course owner.
+    Only course owners can approve enrollments.
+    """
 
     enrollment_object = await get_enrollment_by_id(id)
     if enrollment_object:
@@ -73,10 +73,10 @@ async def update_teacher(
         linked_in_url: str = Body(pattern=r"^https?:\/\/www\.linkedin\.com\/.+"),
 ):
     """
-Update teacher profile details.
+    Update teacher profile details.
 
-Allows teachers to update their mobile number and LinkedIn profile link.
-"""
+    Allows teachers to update their mobile number and LinkedIn profile link.
+    """
     email = payload["email"]
     if not await get_teacher_by_email(email):
             return responses.NotFound(content="You need to be Teacher for this action.")
@@ -90,10 +90,10 @@ Allows teachers to update their mobile number and LinkedIn profile link.
 @teachers_router.get("/enrollment/report")
 async def generate_report(payload: dict = Depends(get_current_user)):
     """
-Generate a report of students enrolled in the teacher’s courses.
+    Generate a report of students enrolled in the teacher’s courses.
 
-Returns historical and current enrollments.
-"""
+    Returns historical and current enrollments.
+    """
     if not await get_teacher_by_email(payload["email"]):
             return responses.NotFound(content="You need to be Teacher for this action.")
 
@@ -107,10 +107,10 @@ Returns historical and current enrollments.
 @teachers_router.put("/deactivate/course/{id}")
 async def deactivate_course(id: int, payload: dict = Depends(get_current_user)):
     """
-Deactivate a course owned by the teacher.
+    Deactivate a course owned by the teacher.
 
-Only allowed if the course has no enrolled students.
-"""
+    Only allowed if the course has no enrolled students.
+    """
     if not await get_teacher_by_email(payload["email"]):
             return responses.NotFound(content="You need to be Teacher for this action.")
 

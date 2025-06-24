@@ -35,11 +35,11 @@ students_router = APIRouter(prefix="/students", tags=["students"])
 @students_router.get("/profile")
 async def get_profile(payload: dict = Depends(get_current_user)):
     """
-Get the authenticated student's profile information.
+    Get the authenticated student's profile information.
 
-Returns:
-    Basic details about the logged-in student (first name, last name, avatar, etc.).
-"""
+    Returns:
+        Basic details about the logged-in student (first name, last name, avatar, etc.).
+    """
     if payload.get("role") != "student":
         return responses.Forbidden(content="Only a Student user can perform this action")
     student = await get_student_by_email(payload.get("email"))
@@ -51,14 +51,14 @@ async def update_student(
         data: UpdateStudentRequest = Body(...)
 ):
     """
-Update the logged-in student's personal data.
+    Update the logged-in student's personal data.
 
-Request Body:
-    UpdateStudentRequest: First name, last name, and/or avatar URL.
+    Request Body:
+        UpdateStudentRequest: First name, last name, and/or avatar URL.
 
-Returns:
-    The updated student profile.
-"""
+    Returns:
+        The updated student profile.
+    """
     if payload.get("role") != "student":
         return responses.Forbidden(content="Only a Student user can perform this action")
 
@@ -74,6 +74,20 @@ Returns:
 
 @students_router.get("/courses")
 async def get_student_courses(payload: dict = Depends(get_current_user)):
+    """
+    Fetches the list of courses associated with a student user.
+
+    The operation is accessible only to users with the "student" role. If the
+    user has the required role, the courses are fetched using the service layer and
+    formatted according to the response model.
+
+    :param payload: The request payload containing user information, typically
+        resolved using the dependency injection.
+    :type payload: dict
+    :return: A successful response containing the list of student courses if the
+        user is a student, or a forbidden response if the user lacks the required role.
+    :rtype: JSONResponse
+    """
     if payload.get("role") != "student":
         return responses.Forbidden(content="Only a Student user can perform this action")
 
@@ -85,11 +99,11 @@ async def get_student_courses(payload: dict = Depends(get_current_user)):
 @students_router.get("/courses/progress")
 async def get_student_courses_progress(payload: dict = Depends(get_current_user)):
     """
-Retrieve the completion progress of each enrolled course.
+    Retrieve the completion progress of each enrolled course.
 
-Returns:
-    Course IDs, titles, and percentage progress for each course.
-"""
+    Returns:
+        Course IDs, titles, and percentage progress for each course.
+    """
     if payload.get("role") != "student":
         return responses.Forbidden(content="Only a Student user can perform this action")
 
@@ -103,13 +117,13 @@ Returns:
 @students_router.post('/avatar')
 async def upload_avatar_photo(file: UploadFile = File(...), payload: dict = Depends(get_current_user) ):
     """
-Upload and update the student's profile avatar.
+    Upload and update the student's profile avatar.
 
-Uploads an image to cloud storage and updates the avatar URL in the profile.
+    Uploads an image to cloud storage and updates the avatar URL in the profile.
 
-Returns:
-    The updated student profile with the new avatar URL.
-"""
+    Returns:
+        The updated student profile with the new avatar URL.
+    """
     email = payload.get("email")
     student_profile = await get_student_by_email(email)
     if student_profile:
@@ -126,13 +140,13 @@ Returns:
 @students_router.post("/subscribe")
 async def subscribe_student(payload: dict = Depends(get_current_user)):
     """
-Subscribe the student to a premium plan.
+    Subscribe the student to a premium plan.
 
-Triggers a mock or real payment process and updates subscription status.
+    Triggers a mock or real payment process and updates subscription status.
 
-Returns:
-    Subscription details (e.g., activation status, expiration).
-"""
+    Returns:
+        Subscription details (e.g., activation status, expiration).
+    """
     student = await get_student_by_email(payload.get("email"))
     subscription = await subscribe(student[0])
     return responses.Created(content=SubscriptionResponse(**subscription).model_dump(mode="json"))
@@ -140,17 +154,17 @@ Returns:
 @students_router.post("/enroll/{course_id}")
 async def enroll(course_id: int, payload: dict = Depends(get_current_user)):
     """
-Enroll the student in a specific course.
+    Enroll the student in a specific course.
 
-Validates subscription status for premium courses, checks enrollment limits,
-and sends a notification to the course's teacher for approval.
+    Validates subscription status for premium courses, checks enrollment limits,
+    and sends a notification to the course's teacher for approval.
 
-Path Parameters:
-    course_id: ID of the course to enroll in.
+    Path Parameters:
+        course_id: ID of the course to enroll in.
 
-Returns:
-    Enrollment status message.
-"""
+    Returns:
+        Enrollment status message.
+    """
     # allowed by default
     allowed = True
 
@@ -190,16 +204,16 @@ Returns:
 @students_router.put("/unenroll/{course_id}")
 async def unenroll(course_id: int, payload: dict = Depends(get_current_user)):
     """
-Unenroll the student from a course.
+    Unenroll the student from a course.
 
-Only allowed for students currently enrolled in the given course.
+    Only allowed for students currently enrolled in the given course.
 
-Path Parameters:
-    course_id: ID of the course to leave.
+    Path Parameters:
+        course_id: ID of the course to leave.
 
-Returns:
-    Confirmation message or error if unenrollment is not permitted.
-"""
+    Returns:
+        Confirmation message or error if unenrollment is not permitted.
+    """
     if payload.get("role") != "student":
         return responses.Forbidden(content="Only a Student user can perform this action")
 
@@ -214,16 +228,16 @@ Returns:
 @students_router.post("/{course_id}/rate")
 async def rate_course(course_id: int, rating: int = Body(...), payload: dict = Depends(get_current_user)):
     """
-Rate a course the student is enrolled in.
+    Rate a course the student is enrolled in.
 
-Students may submit one rating per course, only if enrolled or completed.
+    Students may submit one rating per course, only if enrolled or completed.
 
-Query Parameters:
-    rating: Integer rating score (e.g., 1–10).
+    Query Parameters:
+        rating: Integer rating score (e.g., 1–10).
 
-Returns:
-    A success message if the rating is recorded.
-"""
+    Returns:
+        A success message if the rating is recorded.
+    """
     role = payload.get("role")
     if role != "student":
         return responses.Forbidden(content="Only a Student user can rate a course")
@@ -241,17 +255,17 @@ Returns:
 @students_router.post("/{course_id}/sections/{section_id}/complete")
 async def complete_section(course_id: int, section_id: int, payload: dict = Depends(get_current_user)):
     """
-Mark a course section as completed.
+    Mark a course section as completed.
 
-Accessible only to students who are enrolled in the parent course.
+    Accessible only to students who are enrolled in the parent course.
 
-Path Parameters:
-    course_id: ID of the course.
-    section_id: ID of the section to mark as complete.
+    Path Parameters:
+        course_id: ID of the course.
+        section_id: ID of the section to mark as complete.
 
-Returns:
-    A success message indicating the section was completed.
-"""
+    Returns:
+        A success message indicating the section was completed.
+    """
     if payload.get("role") != UserRole.STUDENT:
         return responses.Unauthorized(content="Only students can complete sections.")
 
@@ -268,16 +282,16 @@ Returns:
 @students_router.post("/{course_id}/complete")
 async def complete_course(course_id: int, payload: dict = Depends(get_current_user)):
     """
-Mark the course as completed by the student.
+    Mark the course as completed by the student.
 
-Allowed only if all sections in the course are completed.
+    Allowed only if all sections in the course are completed.
 
-Path Parameters:
-    course_id: ID of the course to mark as completed.
+    Path Parameters:
+        course_id: ID of the course to mark as completed.
 
-Returns:
-    Success message or error if the course is incomplete.
-"""
+    Returns:
+        Success message or error if the course is incomplete.
+    """
     if payload.get("role") != UserRole.STUDENT:
         return responses.Unauthorized(content="Only students can complete courses.")
 

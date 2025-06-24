@@ -25,11 +25,11 @@ courses_router = APIRouter(prefix="/courses", tags=["courses"])
 @courses_router.get("/public")
 async def get_all_courses(request: Request, filters: CourseFilterOptions = Depends()):
     """
-List all public courses.
+    List all public courses.
 
-Returns public courses for anonymous users.
-If a student is authenticated and subscribed, premium courses are included.
-"""
+    Returns public courses for anonymous users.
+    If a student is authenticated and subscribed, premium courses are included.
+    """
     auth: Optional[str] = request.headers.get("Authorization") #get auth header
     student_id = None
 
@@ -49,11 +49,11 @@ If a student is authenticated and subscribed, premium courses are included.
 @courses_router.get("/student")
 async def get_all_courses_per_student(filters: StudentCourseFilter = Depends(), payload: dict = Depends(get_current_user)):
     """
-List all courses the authenticated student is enrolled in.
+    List all courses the authenticated student is enrolled in.
 
-Returns:
-    A list of student-specific enrolled courses.
-"""
+    Returns:
+        A list of student-specific enrolled courses.
+    """
     if payload.get("role") != UserRole.STUDENT:
         return Unauthorized(content="Only students can view the courses they are enrolled to.")
     
@@ -62,11 +62,11 @@ Returns:
 @courses_router.get("/teacher")
 async def get_all_courses_per_teacher(filters: TeacherCourseFilter = Depends(), payload: dict = Depends(get_current_user)):
     """
-List all courses created by the authenticated teacher.
+    List all courses created by the authenticated teacher.
 
-Returns:
-    A list of teacher-owned courses.
-"""
+    Returns:
+        A list of teacher-owned courses.
+    """
     if payload.get("role") != UserRole.TEACHER:
         return Unauthorized(content="Only teachers can view the courses they own.")    
     
@@ -75,11 +75,11 @@ Returns:
 @courses_router.post("/")
 async def create_course(course_data: CourseBase, payload: dict = Security(get_current_user)):
     """
-Create a new course (Teacher only).
+    Create a new course (Teacher only).
 
-Only verified and active teachers can create courses.
-Owner ID is inferred from the authenticated token.
-"""
+    Only verified and active teachers can create courses.
+    Owner ID is inferred from the authenticated token.
+    """
     if payload["role"] != UserRole.TEACHER:
         return Unauthorized(content="Only teachers can create courses")    
     
@@ -135,12 +135,12 @@ async def update_course(course_id: int, updates: CourseUpdate, payload: dict = S
 @courses_router.post("/{course_id}/sections")
 async def create_section(course_id: int, section: SectionCreate, payload: dict = Security(get_current_user)):
     """
-Create a new section for a course.
+    Create a new section for a course.
 
-Only the course owner can create sections.
-Requires title, description, and content in the request body.
+    Only the course owner can create sections.
+    Requires title, description, and content in the request body.
 
-"""
+    """
     id = await router_helper.get_teacher_id(payload.get("email"))
     
     await router_helper.verify_course_owner(course_id, id)
@@ -186,11 +186,11 @@ async def update_section(course_id: int, section_id: int, updates: SectionUpdate
 @courses_router.put("/{course_id}/{section_id}")
 async def hide_section(course_id: int, section_id: int, payload: dict = Security(get_current_user)):
     """
-Hide a section from student view.
+    Hide a section from student view.
 
-Only the course owner (teacher) can hide a section.
-Useful for temporarily removing a section from visibility.
-"""
+    Only the course owner (teacher) can hide a section.
+    Useful for temporarily removing a section from visibility.
+    """
 
     teacher_id = await router_helper.get_teacher_id(payload.get("email"))
     
@@ -209,17 +209,17 @@ async def get_all_course_sections(
     order: str = "asc",
     payload: dict = Security(get_current_user)):
     """
-Get all sections for a specific course.
+    Get all sections for a specific course.
 
-Access is role-based:
-- Admins: All sections
-- Teachers: All if they own the course
-- Students: Only if enrolled, and section is visible
+    Access is role-based:
+    - Admins: All sections
+    - Teachers: All if they own the course
+    - Students: Only if enrolled, and section is visible
 
-Query params:
-    sort_by: Field to sort by (default: 'id')
-    order: Sort order (asc/desc)
-"""
+    Query params:
+        sort_by: Field to sort by (default: 'id')
+        order: Sort order (asc/desc)
+    """
 
     user_role = payload.get("role")
 

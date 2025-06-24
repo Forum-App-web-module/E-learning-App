@@ -35,6 +35,21 @@ oauth.register(
 )
 
 async def _authenticate_user(email: str, password: str):
+    """
+    Authenticates a user by verifying their email and password credentials. This
+    function checks if the email exists in the database, validates the password,
+    and ensures the user account is active. If the credentials are valid, it generates
+    an access token and returns it along with the token type. If the account is blocked
+    or still in the process of activation, appropriate messages are returned.
+
+    :param email: The email address for the user attempting to authenticate.
+    :type email: str
+    :param password: The password for the user attempting to authenticate.
+    :type password: str
+    :return: A successful response containing an access token if authentication succeeds,
+        or an unauthorized response with an error message if authentication fails.
+    :rtype: responses.Successful or responses.Unauthorized
+    """
 
     if not await email_exists(email):
         return responses.Unauthorized("Wrong Credentials!")
@@ -62,17 +77,17 @@ async def _authenticate_user(email: str, password: str):
 @auth_router.post("/token")
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     """
-    Authenticate user and return an access token.
+    Authenticate a user and return an access token.
 
-This endpoint uses OAuth2PasswordRequestForm for login with email and password.
-The access token returned can be used to authorize protected endpoints.
+    This endpoint uses OAuth2PasswordRequestForm for login with email and password.
+    The access token returned can be used to authorize protected endpoints.
 
-Parameters:
-    form_data (OAuth2PasswordRequestForm): Form containing `username` (email) and `password`.
+    Parameters:
+        form_data (OAuth2PasswordRequestForm): Form containing `username` (email) and `password`.
 
-Returns:
-    JSON with access token and token type, or an error message if credentials are invalid.
-"""
+    Returns:
+        JSON with access token and token type, or an error message if credentials are invalid.
+    """
     email = form_data.username
     password = form_data.password
 
@@ -83,15 +98,15 @@ async def login(login: LoginData):
     """
     Log in a user using email and password (JSON payload).
 
-This is a standard login endpoint accepting credentials in the request body.
-Returns a JWT access token if credentials are valid.
+    This is a standard login endpoint accepting credentials in the request body.
+    Returns a JWT access token if credentials are valid.
 
-Parameters:
-    login (LoginData): User login credentials.
+    Parameters:
+        login (LoginData): User login credentials.
 
-Returns:
-    JWT access token and token type, or an error message if authentication fails
-"""
+    Returns:
+        JWT access token and token type, or an error message if authentication fails
+    """
     return await _authenticate_user(login.email, login.password)
 
 
@@ -100,16 +115,16 @@ async def register(register_data: Union[TeacherRegisterData, StudentRegisterData
     """
     Register a new student or teacher account.
 
-Based on the data provided, the user is registered as either a student or teacher.
-- Teachers receive a verification email and await admin approval.
-- Students are immediately active unless blocked.
+    Based on the data provided, the user is registered as either a student or teacher.
+    - Teachers receive a verification email and await admin approval.
+    - Students are immediately active unless blocked.
 
-Parameters:
-    register_data (TeacherRegisterData | StudentRegisterData): Registration information.
+    Parameters:
+        register_data (TeacherRegisterData | StudentRegisterData): Registration information.
 
-Returns:
-    A message confirming registration, the user role, and new user ID.
-"""
+    Returns:
+        A message confirming registration, the user role, and new user ID.
+    """
     if await email_exists(register_data.email):
         return responses.BadRequest(content="Email already registered.")
     
@@ -131,15 +146,15 @@ Returns:
 async def google_login(request: Request):
     """
     Initiate Google OAuth2 login flow.
-Redirects the user to Google's authentication page. After successful login,
-Google redirects back to your app via the configured callback.
+    Redirects the user to Google's authentication page. After successful login,
+    Google redirects back to your app via the configured callback.
 
-Parameters:
-    request (Request): Incoming HTTP request.
+    Parameters:
+        request (Request): Incoming HTTP request.
 
-Returns:
-    Redirect response to Google's OAuth2 login page.
-"""
+    Returns:
+        Redirect response to Google's OAuth2 login page.
+    """
     redirect_uri = request.url_for("auth_google_callback")
     print("Redirect uri:", redirect_uri)
     return await oauth.google.authorize_redirect(request, redirect_uri)
@@ -150,17 +165,17 @@ async def auth_google_callback(request: Request):
     """
     Handle Google OAuth2 callback and log in the user.
 
-After a successful Google login, this endpoint:
-- Retrieves user info from Google.
-- Creates a student account if not already registered.
-- Issues a JWT token to authenticate further requests.
+    After a successful Google login, this endpoint:
+    - Retrieves user info from Google.
+    - Creates a student account if not already registered.
+    - Issues a JWT token to authenticate further requests.
 
-Parameters:
-    request (Request): The request object from Google's redirect.
-    
-Returns:
-    JSON response with a JWT token.
-"""
+    Parameters:
+        request (Request): The request object from Google's redirect.
+
+    Returns:
+        JSON response with a JWT token.
+    """
     token = await oauth.google.authorize_access_token(request)
     google_responce = await oauth.google.get("https://openidconnect.googleapis.com/v1/userinfo", token=token)
     user_data = google_responce.json()
