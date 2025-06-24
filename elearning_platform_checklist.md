@@ -1,8 +1,8 @@
 ✅ тестове
-❌ Картинка на схематa
-❌ Документрация към всеки ендпоинт
-❌ Assestment_form
-❌ Подробно readme +
+✅ Картинка на схематa
+✅ Документрация към всеки ендпоинт
+✅ Assestment_form
+✅ Подробно readme +
         ✅ Project description
         ✅ Как се стартира приложението
         ✅ Link to the Swagger documentation
@@ -18,7 +18,7 @@
         · Images of the database relations
 
 ❌ Скрипт за Схемата✅ и отделен с test дата. (поне един админ, които при първи логин трябва да си смени паролата).
-❌ Картинка на архитектурата - https://github.com/mygitbob/feb24_project_job-market
+✅ Картинка на архитектурата - https://github.com/mygitbob/feb24_project_job-market
 ✅ Инструкции как да се вдигне приложението
 ✅ Postman collection
 ✅ Clean .env в репото + инструкции
